@@ -1,0 +1,58 @@
+// API Endpoints
+export const API_ENDPOINTS = {
+  AUTH: '/auth',
+  MARKETPLACE: '/marketplace',
+  ORDERS: '/orders',
+  ADMIN: '/admin',
+};
+
+// User Roles
+export const USER_ROLES = {
+  BUYER: 'BUYER',
+  SELLER: 'SELLER',
+  ADMIN: 'ADMIN',
+};
+
+// QCU Member Types
+export const MEMBER_TYPES = {
+  STUDENT: 'STUDENT',
+  FACULTY: 'FACULTY',
+  STAFF: 'STAFF',
+};
+
+// Verification Status
+export const VERIFICATION_STATUS = {
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED',
+};
+
+// Seller Types
+export const SELLER_TYPES = {
+  STUDENT_ENTERPRISE: 'STUDENT_ENTERPRISE',
+  RECOGNIZED_ORGANIZATION: 'RECOGNIZED_ORGANIZATION',
+  INDEPENDENT_SELLER: 'INDEPENDENT_SELLER',
+};
+
+// Order Status
+export const ORDER_STATUS = {
+  PENDING_PAYMENT: 'PENDING_PAYMENT',
+  PENDING_CONFIRMATION: 'PENDING_CONFIRMATION',
+  PREPARING: 'PREPARING',
+  READY_FOR_PICKUP: 'READY_FOR_PICKUP',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+};
+
+// Payment Methods
+export const PAYMENT_METHODS = {
+  CASH: 'CASH',
+  GCASH_PAYMONGO: 'GCASH_PAYMONGO',
+};
+
+// Delivery Methods
+export const DELIVERY_METHODS = {
+  ROOM_TO_ROOM: 'ROOM_TO_ROOM',
+  PICKUP: 'PICKUP',
+};
