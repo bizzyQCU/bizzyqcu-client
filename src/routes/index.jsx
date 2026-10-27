@@ -4,6 +4,7 @@ import AuthLayout from '../layouts/AuthLayout.jsx';
 import {
   LandingPage,
   Login,
+  Signup,
   SellerAuth,
   SellerRegister,
 } from '../subsystems/auth';
@@ -22,10 +23,7 @@ export default function AppRoutes() {
           path="/seller-signup"
           element={<Placeholder title="Seller Sign Up" text="The seller registration form will live here." />}
         />
-        <Route
-          path="/signup"
-          element={<Placeholder title="Create an Account" text="The student sign-up form will live here." />}
-        />
+        <Route path="/signup" element={<Signup />} />
       </Route>
 
       {/* Main App Routes - With Navbar */}

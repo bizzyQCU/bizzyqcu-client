@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import { getCurrentUser, logout as logoutApi } from '../subsystems/auth/api';
+import { getCurrentUser } from '../subsystems/auth/api';
+import { AUTH_TOKEN_KEY } from '../lib/api-client';
 
 const AuthContext = createContext(null);
 
@@ -11,41 +12,39 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
+  // Loads the profile (GET /auth/profile) for the stored token.
   const checkAuth = async () => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
       if (token) {
         const userData = await getCurrentUser();
         setUser(userData);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      localStorage.removeItem('authToken');
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      setUser(null);
     } finally {
       setLoading(false);
     }
   };
 
   const login = (userData, token) => {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem(AUTH_TOKEN_KEY, token);
     setUser(userData);
   };
 
+  // The server has no logout endpoint; sessions are cleared client-side.
   const logout = async () => {
-    try {
-      await logoutApi();
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      localStorage.removeItem('authToken');
-      setUser(null);
-    }
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    setUser(null);
   };
 
   const value = {
     user,
     loading,
     isAuthenticated: !!user,
+    isVerified: user?.verificationStatus === 'VERIFIED',
     isSeller: user?.role === 'SELLER',
     isAdmin: user?.role === 'ADMIN',
     login,

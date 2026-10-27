@@ -10,15 +10,19 @@ const badges = [
     label: 'Every Shop Is a QCUian’s',
     path: 'M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z',
   },
-  {
-    label: 'Your Money Stays in QCU',
-    path: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
-  },
 ]
 
-function Arrow({ className }) {
+function Arrow({ className = 'w-4 h-4' }) {
   return (
-    <svg className={`${className} transition-transform group-hover:translate-x-1 stroke-current`} fill="none" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+    <svg
+      className={`${className} transition-transform duration-300 group-hover:translate-x-1 stroke-current`}
+      fill="none"
+      strokeWidth="2.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
       <line x1="5" x2="19" y1="12" y2="12" />
       <polyline points="12 5 19 12 12 19" />
     </svg>
@@ -28,52 +32,80 @@ function Arrow({ className }) {
 export default function LandingPage() {
   return (
     <>
-      <main className="flex-grow flex items-center justify-center px-4 py-8 md:py-14">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="mb-4 text-sm sm:text-base font-bold text-amber-400">
-            BizzyQCU · Quezon City University
-          </p>
+      <main className="relative flex-grow flex items-center justify-center px-4 sm:px-6 py-12 md:py-20">
+        {/* Subtle centered ambient spotlight behind hero text */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[540px] h-[260px] sm:h-[340px] rounded-full bg-amber-500/[0.07] blur-[100px]"
+        />
 
-          <div className="relative flex items-center justify-center px-4 sm:px-8 py-2">
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight uppercase leading-tight shine-text">
-              BUY FROM A QCUIAN.<br />SELL AS A QCUIAN.
+        <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
+          {/* Eyebrow Pill */}
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/25 backdrop-blur-md shadow-sm mb-6 sm:mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+            </span>
+            <p className="text-xs sm:text-sm font-bold tracking-wider uppercase text-amber-300">
+              BizzyQCU <span className="text-amber-400/50 mx-1">·</span> Quezon City University
+            </p>
+          </div>
+
+          {/* Hero Headline */}
+          <div className="relative flex items-center justify-center px-2 sm:px-6">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight uppercase leading-[1.08] shine-text select-none">
+              BUY FROM A QCUIAN.
+              <span className="block mt-1 sm:mt-2">SELL AS A QCUIAN.</span>
             </h1>
           </div>
 
+          {/* Value Proposition */}
           <FadeUpLines
             text="BizzyQCU is the online marketplace where QCU student entrepreneurs list what they make and sell, and where classmates, friends, and the whole campus can find it in one place."
-            className="mt-4 sm:mt-5 text-base sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto px-4"
+            className="mt-6 sm:mt-7 text-base sm:text-lg md:text-xl text-slate-200/90 leading-relaxed max-w-2xl mx-auto px-2 sm:px-4"
           />
 
-          <div className="mt-7 sm:mt-8 flex flex-col items-center gap-4">
+          {/* Primary & Secondary CTAs */}
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto px-4 sm:px-0">
             <Link
               to="/login"
-              className="inline-flex items-center bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:scale-95 text-slate-900 font-black text-base sm:text-lg px-8 sm:px-10 py-3.5 sm:py-4 rounded-full shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all group"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:via-amber-400 hover:to-amber-500 active:scale-[0.98] text-slate-950 font-black text-base sm:text-lg px-8 sm:px-9 py-3.5 sm:py-4 rounded-full shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/40 ring-1 ring-inset ring-amber-200/50 transition-all duration-200 group"
             >
               <span>Log in to Shop</span>
-              <Arrow className="w-5 h-5 ml-2.5" />
+              <Arrow className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
 
             <Link
               to="/seller-register"
-              className="inline-flex items-center text-white/90 hover:text-amber-400 font-bold text-sm sm:text-base border-b-2 border-white/40 hover:border-amber-400 pb-0.5 transition-all group"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white/[0.06] hover:bg-white/[0.12] active:scale-[0.98] text-white hover:text-amber-300 font-bold text-base sm:text-lg px-7 sm:px-8 py-3.5 sm:py-4 rounded-full border border-white/15 hover:border-amber-400/50 backdrop-blur-md shadow-sm transition-all duration-200 group"
             >
               <span>Open Your BizzyQCU Shop</span>
-              <Arrow className="w-4 h-4 ml-1.5" />
+              <Arrow className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
             </Link>
           </div>
 
-          <section className="w-full pt-12 md:pt-16 px-4">
-            <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5">
+          {/* Subtle Divider */}
+          <div
+            aria-hidden="true"
+            className="mt-12 md:mt-14 mb-6 md:mb-8 h-px w-48 sm:w-64 bg-gradient-to-r from-transparent via-white/15 to-transparent"
+          />
+
+          {/* Trust Badges */}
+          <section aria-label="Campus marketplace highlights" className="w-full px-2">
+            <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               {badges.map((b) => (
                 <div
                   key={b.label}
-                  className="flex items-center gap-2.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-sm border border-white/20 shadow-sm transition-all group"
+                  className="flex items-center gap-3 pl-2.5 pr-4 py-2 sm:pl-3 sm:pr-5 sm:py-2.5 rounded-full bg-slate-900/60 hover:bg-slate-900/85 backdrop-blur-md border border-white/15 hover:border-amber-400/40 shadow-md shadow-black/20 transition-all duration-200 group"
                 >
-                  <svg className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                    <path d={b.path} />
-                  </svg>
-                  <span className="text-xs sm:text-sm font-bold text-white whitespace-nowrap">{b.label}</span>
+                  <span className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-400 group-hover:scale-110 group-hover:bg-amber-400/25 transition-all duration-200">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d={b.path} />
+                    </svg>
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold tracking-wide text-white/95 whitespace-nowrap">
+                    {b.label}
+                  </span>
                 </div>
               ))}
             </div>

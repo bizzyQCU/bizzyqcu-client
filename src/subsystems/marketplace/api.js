@@ -2,108 +2,75 @@ import apiClient from '../../lib/api-client';
 
 // ============================================================================
 // SUBSYSTEM 2: MARKETPLACE & ENTERPRISE MANAGEMENT
+// Mirrors bizzyqcu-server: src/modules/marketplace
+//
+// Not available on the server yet (do not call): stores, categories,
+// single-product lookup, product update/delete, seller inventory list.
 // ============================================================================
 
 /**
- * Get all stores (with optional filters)
- */
-export const getStores = async (filters = {}) => {
-  const response = await apiClient.get('/marketplace/stores', { params: filters });
-  return response.data;
-};
-
-/**
- * Get store by ID or slug
- */
-export const getStore = async (identifier) => {
-  const response = await apiClient.get(`/marketplace/stores/${identifier}`);
-  return response.data;
-};
-
-/**
- * Create a new store (seller only)
- */
-export const createStore = async (storeData) => {
-  const response = await apiClient.post('/marketplace/stores', storeData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return response.data;
-};
-
-/**
- * Update store information
- */
-export const updateStore = async (storeId, storeData) => {
-  const response = await apiClient.put(`/marketplace/stores/${storeId}`, storeData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return response.data;
-};
-
-/**
- * Get all categories
- */
-export const getCategories = async () => {
-  const response = await apiClient.get('/marketplace/categories');
-  return response.data;
-};
-
-/**
- * Get products with filters
+ * GET /marketplace/products (public)
+ * Only VERIFIED, available, in-stock products from approved stores are returned.
+ *
+ * @param {object} [filters]
+ * @param {string} [filters.search]
+ * @param {string} [filters.categoryId]  uuid
+ * @param {'STUDENT_ENTERPRISE'|'RECOGNIZED_ORGANIZATION'|'INDEPENDENT_SELLER'} [filters.sellerType]
+ * @param {number} [filters.minPrice]
+ * @param {number} [filters.maxPrice]
+ * @param {'newest'|'price_asc'|'price_desc'} [filters.sort]  default "newest"
+ * @param {number} [filters.page]   default 1
+ * @param {number} [filters.limit]  default 12, max 50
+ * @returns {Promise<{success: boolean, items: object[], pagination: {page, limit, total, totalPages}}>}
  */
 export const getProducts = async (filters = {}) => {
-  const response = await apiClient.get('/marketplace/products', { params: filters });
+  // Drop empty values so the server's zod validation doesn't reject e.g. `search=`
+  const params = Object.fromEntries(
+    Object.entries(filters).filter(([, v]) => v !== '' && v !== null && v !== undefined)
+  );
+  const response = await apiClient.get('/marketplace/products', { params });
   return response.data;
 };
 
 /**
- * Get product by ID
- */
-export const getProduct = async (productId) => {
-  const response = await apiClient.get(`/marketplace/products/${productId}`);
-  return response.data;
-};
-
-/**
- * Create a new product (seller only)
+ * POST /marketplace/products
+ * Product is created as PENDING and awaits admin approval.
+ *
+ * @param {object} productData
+ * @param {string} productData.storeId        uuid
+ * @param {string} productData.categoryId     uuid
+ * @param {string} productData.name           min 3 chars
+ * @param {string} productData.description    min 10 chars
+ * @param {number} productData.price          > 0 (send a number, not a string)
+ * @param {number} productData.stockQuantity  integer >= 0
+ * @param {string[]} productData.imageUrls    at least 1 valid URL
  */
 export const createProduct = async (productData) => {
-  const response = await apiClient.post('/marketplace/products', productData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  const response = await apiClient.post('/marketplace/products', productData);
   return response.data;
 };
 
 /**
- * Update product
+ * PATCH /marketplace/products/:id/stock (seller only)
  */
-export const updateProduct = async (productId, productData) => {
-  const response = await apiClient.put(`/marketplace/products/${productId}`, productData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+export const setProductStock = async (productId, stockQuantity) => {
+  const response = await apiClient.patch(`/marketplace/products/${productId}/stock`, { stockQuantity });
   return response.data;
 };
 
 /**
- * Delete product
+ * PATCH /marketplace/products/:id/availability (seller only)
  */
-export const deleteProduct = async (productId) => {
-  const response = await apiClient.delete(`/marketplace/products/${productId}`);
+export const setProductAvailability = async (productId, isAvailable) => {
+  const response = await apiClient.patch(`/marketplace/products/${productId}/availability`, { isAvailable });
   return response.data;
 };
 
 /**
- * Get seller dashboard data
+ * GET /marketplace/seller/dashboard (seller only)
+ * @returns data: { store, sales, ordersByStatus, productsByApproval, lowStock, topSelling }
  */
 export const getSellerDashboard = async () => {
   const response = await apiClient.get('/marketplace/seller/dashboard');
-  return response.data;
-};
-
-/**
- * Get seller inventory
- */
-export const getSellerInventory = async () => {
-  const response = await apiClient.get('/marketplace/seller/inventory');
   return response.data;
 };

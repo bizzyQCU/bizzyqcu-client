@@ -2,10 +2,25 @@ import apiClient from '../../lib/api-client';
 
 // ============================================================================
 // SUBSYSTEM 1: AUTHENTICATION & VERIFICATION
+// Mirrors bizzyqcu-server: src/modules/auth
+//
+// Not available on the server yet (do not call): login, WebAuthn passkeys,
+// OTP, and photo upload. Add them here once the endpoints exist.
 // ============================================================================
 
 /**
- * Register a new user with QCU ID verification
+ * POST /auth/register
+ * Registration is submitted as PENDING until an admin verifies the user.
+ *
+ * @param {object} userData
+ * @param {string} userData.qcuIdNumber    YY-NNNN (e.g. "24-0001")
+ * @param {string} userData.email
+ * @param {string} userData.fullName       min 2 chars
+ * @param {'STUDENT'|'FACULTY'|'STAFF'} userData.memberType
+ * @param {string} userData.qcuIdPhotoUrl  valid URL
+ * @param {string} userData.liveSelfieUrl  valid URL
+ * @param {string} [userData.password]     min 8 chars
+ * @returns {Promise<{success: boolean, message: string, data: object}>}
  */
 export const registerUser = async (userData) => {
   const response = await apiClient.post('/auth/register', userData);
@@ -13,111 +28,18 @@ export const registerUser = async (userData) => {
 };
 
 /**
- * Login with QCU ID and password
+ * GET /auth/profile (requires Bearer token)
+ * @returns {Promise<{success: boolean, data: object}>} data includes
+ *   id, qcuIdNumber, email, fullName, memberType, role, verificationStatus,
+ *   sellerProfile, passkeys[]
  */
-export const loginWithPassword = async (credentials) => {
-  const response = await apiClient.post('/auth/login', credentials);
+export const getProfile = async () => {
+  const response = await apiClient.get('/auth/profile');
   return response.data;
 };
 
-/**
- * WebAuthn: Generate registration options for passkey
- */
-export const generateRegistrationOptions = async () => {
-  const response = await apiClient.post('/auth/webauthn/register/options');
-  return response.data;
-};
-
-/**
- * WebAuthn: Verify passkey registration
- */
-export const verifyRegistration = async (credential) => {
-  const response = await apiClient.post('/auth/webauthn/register/verify', credential);
-  return response.data;
-};
-
-/**
- * WebAuthn: Generate authentication options for passkey login
- */
-export const generateAuthenticationOptions = async (qcuIdNumber) => {
-  const response = await apiClient.post('/auth/webauthn/login/options', { qcuIdNumber });
-  return response.data;
-};
-
-/**
- * WebAuthn: Verify passkey authentication
- */
-export const verifyAuthentication = async (credential) => {
-  const response = await apiClient.post('/auth/webauthn/login/verify', credential);
-  return response.data;
-};
-
-/**
- * Request OTP for fallback authentication
- */
-export const requestOTP = async (qcuIdNumber) => {
-  const response = await apiClient.post('/auth/otp/request', { qcuIdNumber });
-  return response.data;
-};
-
-/**
- * Verify OTP
- */
-export const verifyOTP = async (qcuIdNumber, otpCode) => {
-  const response = await apiClient.post('/auth/otp/verify', { qcuIdNumber, otpCode });
-  return response.data;
-};
-
-/**
- * Upload QCU ID photo for verification
- */
-export const uploadQcuIdPhoto = async (formData) => {
-  const response = await apiClient.post('/auth/verification/upload-id', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return response.data;
-};
-
-/**
- * Upload live selfie for verification
- */
-export const uploadLiveSelfie = async (formData) => {
-  const response = await apiClient.post('/auth/verification/upload-selfie', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return response.data;
-};
-
-/**
- * Get current user profile
- */
+/** Returns the current user object (unwrapped from the API envelope). */
 export const getCurrentUser = async () => {
-  const response = await apiClient.get('/auth/me');
-  return response.data;
-};
-
-/**
- * Logout
- */
-export const logout = async () => {
-  const response = await apiClient.post('/auth/logout');
-  return response.data;
-};
-
-/**
- * Register as seller (student enterprise, org, or independent)
- */
-export const registerSeller = async (sellerData) => {
-  const response = await apiClient.post('/auth/seller/register', sellerData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return response.data;
-};
-
-/**
- * Get seller profile
- */
-export const getSellerProfile = async () => {
-  const response = await apiClient.get('/auth/seller/profile');
-  return response.data;
+  const { data } = await getProfile();
+  return data;
 };
