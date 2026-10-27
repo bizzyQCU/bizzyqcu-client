@@ -1,0 +1,73 @@
+/* Circle reveal page transition - BrewedOps Motion Library, restyled for BizzyQCU.
+   https://brewedops.cloud/motionlibrary/?id=transitions-circle
+   The clip-path animation itself runs from CircleRevealOutlet.jsx (Web Animations API)
+   so the circle starts at the exact tap position. */
+
+.page-reveal {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The incoming page sits on top of the outgoing one */
+.page-reveal-layer {
+  position: relative;
+  z-index: 1;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The outgoing page stays visible underneath until the circle covers it */
+.page-reveal-layer.is-leaving {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* While revealing, the incoming page needs an opaque surface. This matches
+   DotGridBackground (navy base, amber dot grid, amber glow) so the swap is seamless. */
+.page-reveal-layer.is-entering {
+  background-color: #0b1120;
+  background-image:
+    radial-gradient(circle 420px at calc(100% - 120px) 80px, rgba(245, 158, 11, 0.12), transparent 70%),
+    radial-gradient(rgba(234, 179, 8, 0.18) 1.5px, transparent 1.5px);
+  background-size: auto, 28px 28px;
+  will-change: clip-path;
+}
+
+/* Tap ripple at the touch point (BizzyQCU amber instead of the original blue) */
+.page-reveal-tap {
+  position: fixed;
+  z-index: 60;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  border: 2px solid #fdb813;
+  background: rgba(253, 184, 19, 0.25);
+  pointer-events: none;
+  animation: page-reveal-tap 600ms ease-out forwards;
+}
+
+@keyframes page-reveal-tap {
+  0% {
+    opacity: 1;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-reveal-tap {
+    display: none;
+  }
+}
+

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import Footer from '../components/Footer.jsx'
-import { AuthLogo, DotGridBackground } from '../subsystems/auth/components'
+import { AuthLogo, DotGridBackground, CircleRevealOutlet } from '../subsystems/auth/components'
 
 // Scrolls to #hash targets on route change, or to top when there's no hash.
 function ScrollManager() {
@@ -26,7 +26,7 @@ export default function AuthLayout() {
     <DotGridBackground className="min-h-screen flex flex-col text-white overflow-x-hidden relative">
       <ScrollManager />
       <AuthLogo />
-      <Outlet />
+      <CircleRevealOutlet />
       <Footer />
     </DotGridBackground>
   )
