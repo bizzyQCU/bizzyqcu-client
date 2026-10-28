@@ -1,8 +1,9 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-
-// three.js is large; load the decorative coin scene in its own chunk so the form renders instantly.
-const CoinStack = lazy(() => import('../components/CoinStack.jsx'))
+import { AuthShowcase } from '../components'
+import { loginWithPassword } from '../api'
+import { useAuth } from '../../../hooks/useAuth'
+import { getErrorMessage } from '../../../lib/api-client'
 
 const tabBase =
   'flex-1 py-2 px-3 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70'
@@ -11,11 +12,6 @@ const tabIdle = `${tabBase} text-slate-400 hover:text-white hover:bg-white/5`
 
 const inputBase =
   'w-full py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-slate-500 text-sm transition-colors duration-200 hover:border-white/20 focus:outline-none focus:border-amber-400/60 focus:ring-2 focus:ring-amber-400/25 focus:bg-white/[0.07]'
-
-const highlights = [
-  { icon: 'verified_user', label: 'Verified QCUians Only' },
-  { icon: 'bolt', label: 'Fast & Secure' },
-]
 
 function Icon({ name, className = '' }) {
   return (
@@ -33,7 +29,9 @@ export default function Login() {
   const [remember, setRemember] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
   const [loginState, setLoginState] = useState('idle') // idle | loading | done
+  const [loginError, setLoginError] = useState(null)
   const [bioState, setBioState] = useState('idle') // idle | scanning | done
+  const { login: authLogin } = useAuth()
   const timers = useRef([])
 
   const later = (fn, ms) => {
@@ -41,14 +39,20 @@ export default function Login() {
   }
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
+    setLoginError(null)
     setLoginState('loading')
-    // Simulated auth. bizzyqcu-server has no /auth/login endpoint yet - replace with a real API call.
-    later(() => {
+    try {
+      const result = await loginWithPassword({ qcuIdNumber: identifier, password })
+      const { token, user } = result.data
+      authLogin(user, token)
       setLoginState('done')
       later(() => navigate('/dashboard'), 700)
-    }, 1100)
+    } catch (err) {
+      setLoginError(getErrorMessage(err))
+      setLoginState('idle')
+    }
   }
 
   const handleBiometric = () => {
@@ -71,46 +75,7 @@ export default function Login() {
 
   return (
     <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-4 lg:py-4 grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-      {/* ------------------------------------------------------------------
-          Left: brand message + 3D coin stack (hidden on small screens)
-         ------------------------------------------------------------------ */}
-      <section className="hidden lg:flex flex-col items-center text-center" aria-label="About BizzyQCU">
-        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/25 backdrop-blur-md">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
-          </span>
-          <p className="text-xs font-bold tracking-wider uppercase text-amber-300">Campus Marketplace</p>
-        </div>
-
-        <h2 className="mt-4 text-4xl xl:text-[44px] font-black tracking-tight leading-[1.1] text-white">
-          Every peso stays
-          <span className="block shine-text">on campus.</span>
-        </h2>
-        <p className="mt-3 max-w-md text-base text-slate-300/90 leading-relaxed">
-          Support QCU student entrepreneurs and shop from the people you share the halls with.
-        </p>
-
-        <div className="relative w-full max-w-[440px] aspect-[4/3]">
-          <Suspense fallback={null}>
-            <CoinStack />
-          </Suspense>
-        </div>
-
-        <ul className="flex flex-wrap items-center justify-center gap-3">
-          {highlights.map((h) => (
-            <li
-              key={h.label}
-              className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full bg-slate-900/60 backdrop-blur-md border border-white/10 hover:border-amber-400/40 transition-colors"
-            >
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-400">
-                <Icon name={h.icon} className="text-[16px]" />
-              </span>
-              <span className="text-sm font-semibold text-white/90">{h.label}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <AuthShowcase />
 
       {/* ------------------------------------------------------------------
           Right: login card
@@ -245,13 +210,21 @@ export default function Login() {
                   </div>
                 </div>
 
+                {/* Error Banner */}
+                {loginError && (
+                  <div role="alert" className="flex items-start gap-2.5 rounded-xl bg-red-500/10 border border-red-400/25 px-4 py-3 text-sm text-red-300">
+                    <Icon name="error" className="text-[18px] text-red-400 mt-px shrink-0" />
+                    <span>{loginError}</span>
+                  </div>
+                )}
+
                 {/* Submit */}
                 <button
                   type="submit"
                   disabled={loginState !== 'idle'}
                   className={`w-full py-3 rounded-xl font-extrabold text-base transition-all duration-200 flex items-center justify-center gap-2 group active:scale-[0.98] disabled:cursor-not-allowed ring-1 ring-inset focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 ${loginState === 'done'
-                      ? 'bg-emerald-500 text-white ring-emerald-300/40 shadow-lg shadow-emerald-500/25'
-                      : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:via-amber-400 hover:to-amber-500 text-slate-950 ring-amber-200/50 shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/40'
+                    ? 'bg-emerald-500 text-white ring-emerald-300/40 shadow-lg shadow-emerald-500/25'
+                    : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:via-amber-400 hover:to-amber-500 text-slate-950 ring-amber-200/50 shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/40'
                     }`}
                 >
                   <span>{submitText}</span>
@@ -291,8 +264,8 @@ export default function Login() {
                     disabled={bioState !== 'idle'}
                     onClick={handleBiometric}
                     className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 ${bioState === 'done'
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-lg shadow-amber-500/25'
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-lg shadow-amber-500/25'
                       }`}
                   >
                     <Icon name={bioIcon} className={`text-[20px] ${bioState === 'scanning' ? 'animate-spin' : ''}`} />

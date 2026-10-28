@@ -28,6 +28,16 @@ export const registerUser = async (userData) => {
 };
 
 /**
+ * POST /auth/login
+ * @param {{qcuIdNumber: string, password?: string}} credentials
+ * @returns {Promise<{ success: boolean, message: string, data: { token: string, user: object } }>}
+ */
+export const loginWithPassword = async (credentials) => {
+  const response = await apiClient.post('/auth/login', credentials);
+  return response.data;
+};
+
+/**
  * GET /auth/profile (requires Bearer token)
  * @returns {Promise<{success: boolean, data: object}>} data includes
  *   id, qcuIdNumber, email, fullName, memberType, role, verificationStatus,
