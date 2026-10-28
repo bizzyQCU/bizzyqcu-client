@@ -13,6 +13,9 @@ import {
 } from '../subsystems/auth';
 import Placeholder from '../components/Placeholder.jsx';
 
+// Import your new Admin Dashboard
+import AdminDashboard from '../subsystems/admin/pages/AdminDashboard.jsx';
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -66,11 +69,8 @@ export default function AppRoutes() {
           element={<Placeholder title="Order Details" text="Detailed order view." />}
         />
 
-        {/* Admin Routes (Subsystem 4) - Coming Soon */}
-        <Route
-          path="/admin"
-          element={<Placeholder title="Admin Dashboard" text="Platform administration." />}
-        />
+        {/* Admin Routes (Subsystem 4) - YOUR DASHBOARD */}
+        <Route path="/admin" element={<AdminDashboard />} />
 
         {/* Fallback */}
         <Route

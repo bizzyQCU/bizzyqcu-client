@@ -3,9 +3,6 @@ import apiClient from '../../lib/api-client';
 // ============================================================================
 // SUBSYSTEM 4: PLATFORM MANAGEMENT & ANALYTICS
 // Mirrors bizzyqcu-server: src/modules/admin (ADMIN role only)
-//
-// Not available on the server yet (do not call): store approval, analytics,
-// audit logs, user listing, complaint creation / single complaint lookup.
 // ============================================================================
 
 /**
@@ -64,5 +61,63 @@ export const getComplaints = async () => {
  */
 export const resolveComplaint = async (complaintId, status, adminResolutionNote) => {
   const response = await apiClient.patch(`/admin/complaints/${complaintId}`, { status, adminResolutionNote });
+  return response.data;
+};
+
+// ============================================================================
+// NEW ADDITIONS (Guades & Castro)
+// ============================================================================
+
+/**
+ * POST /admin/complaints
+ * Submit a new complaint (Buyer/Seller)
+ */
+export const submitComplaint = async (subject, description, orderId) => {
+  const response = await apiClient.post('/admin/complaints', { subject, description, orderId });
+  return response.data;
+};
+
+/**
+ * GET /admin/audit-logs
+ * View system activity / transaction monitoring logs
+ */
+export const getAuditLogs = async () => {
+  const response = await apiClient.get('/admin/audit-logs');
+  return response.data;
+};
+
+/**
+ * GET /admin/analytics/sales
+ * Get total sales and revenue reports
+ */
+export const getSalesAnalytics = async () => {
+  const response = await apiClient.get('/admin/analytics/sales');
+  return response.data;
+};
+
+/**
+ * GET /admin/analytics/demand
+ * Get campus demand trends
+ */
+export const getDemandAnalytics = async () => {
+  const response = await apiClient.get('/admin/analytics/demand');
+  return response.data;
+};
+
+/**
+ * GET /admin/duplicates
+ * Scan for duplicate registrations
+ */
+export const getDuplicates = async () => {
+  const response = await apiClient.get('/admin/duplicates');
+  return response.data;
+};
+
+/**
+ * POST /admin/disputes/:userId/reopen
+ * Reopen a rejected account
+ */
+export const reopenDispute = async (userId, reason) => {
+  const response = await apiClient.post(`/admin/disputes/${userId}/reopen`, { reason });
   return response.data;
 };
