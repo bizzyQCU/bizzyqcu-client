@@ -6,7 +6,19 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 export const AUTH_TOKEN_KEY = 'authToken';
 
 // Pages that are reachable while signed out; a 401 here must not trigger a redirect loop.
-const PUBLIC_PATHS = ['/', '/login', '/signup', '/seller-register', '/seller-auth', '/seller-signup'];
+const PUBLIC_PATHS = [
+  '/',
+  '/login',
+  '/signup',
+  '/seller-login-form',
+  '/seller-login',
+  '/seller-auth',
+  '/seller-signup',
+  '/seller-register',
+  '/seller-signup/enterprise',
+  '/seller-signup/individual',
+  '/seller-signup/organization',
+];
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

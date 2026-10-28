@@ -64,7 +64,7 @@ export default function Login() {
     }, 1300)
   }
 
-  const submitIcon = { idle: 'arrow_forward', loading: 'progress_activity', done: 'check_circle' }[loginState]
+  const submitIcon = { idle: null, loading: 'progress_activity', done: 'check_circle' }[loginState]
   const submitText = { idle: 'Log In', loading: 'Signing in...', done: 'Authenticated!' }[loginState]
   const bioIcon = { idle: 'center_focus_strong', scanning: 'progress_activity', done: 'verified' }[bioState]
   const bioText = {
@@ -228,11 +228,12 @@ export default function Login() {
                     }`}
                 >
                   <span>{submitText}</span>
-                  <Icon
-                    name={submitIcon}
-                    className={`text-[20px] transition-transform ${loginState === 'idle' ? 'group-hover:translate-x-1' : ''} ${loginState === 'loading' ? 'animate-spin' : ''
-                      }`}
-                  />
+                  {submitIcon && (
+                    <Icon
+                      name={submitIcon}
+                      className={`text-[20px] ${loginState === 'loading' ? 'animate-spin' : ''}`}
+                    />
+                  )}
                 </button>
                 <p className="sr-only" aria-live="polite">
                   {loginState !== 'idle' ? submitText : ''}
@@ -309,18 +310,16 @@ export default function Login() {
             <div className="mt-5 pt-4 border-t border-white/10 text-center space-y-3">
               <p className="text-sm text-slate-400">
                 Don&apos;t have an account yet?{' '}
-                <Link className="text-amber-300 font-bold hover:text-amber-200 hover:underline inline-flex items-center gap-0.5" to="/signup">
+                <Link className="text-amber-300 font-bold hover:text-amber-200 hover:underline" to="/signup">
                   Sign up here
-                  <Icon name="arrow_forward" className="text-[16px]" />
                 </Link>
               </p>
               <Link
-                to="/seller-register"
+                to="/seller-login-form"
                 className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full bg-amber-400/10 text-amber-300 hover:bg-amber-400/20 hover:text-amber-200 border border-amber-400/25 transition-colors"
               >
                 <Icon name="storefront" className="text-[16px]" />
                 <span>Want to sell? Register as Seller</span>
-                <Icon name="arrow_forward" className="text-[14px]" />
               </Link>
             </div>
           </div>

@@ -12,23 +12,6 @@ const badges = [
   },
 ]
 
-function Arrow({ className = 'w-4 h-4' }) {
-  return (
-    <svg
-      className={`${className} transition-transform duration-300 group-hover:translate-x-1 stroke-current`}
-      fill="none"
-      strokeWidth="2.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <line x1="5" x2="19" y1="12" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
-    </svg>
-  )
-}
-
 export default function LandingPage() {
   return (
     <>
@@ -72,15 +55,13 @@ export default function LandingPage() {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:via-amber-400 hover:to-amber-500 active:scale-[0.98] text-slate-950 font-black text-base sm:text-lg px-8 sm:px-9 py-3.5 sm:py-4 rounded-full shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/40 ring-1 ring-inset ring-amber-200/50 transition-all duration-200 group"
             >
               <span>Log in to Shop</span>
-              <Arrow className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
 
             <Link
-              to="/seller-register"
+              to="/seller-login-form"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white/[0.06] hover:bg-white/[0.12] active:scale-[0.98] text-white hover:text-amber-300 font-bold text-base sm:text-lg px-7 sm:px-8 py-3.5 sm:py-4 rounded-full border border-white/15 hover:border-amber-400/50 backdrop-blur-md shadow-sm transition-all duration-200 group"
             >
               <span>Open Your BizzyQCU Shop</span>
-              <Arrow className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
             </Link>
           </div>
 

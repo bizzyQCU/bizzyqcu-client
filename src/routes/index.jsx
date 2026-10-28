@@ -5,8 +5,11 @@ import {
   LandingPage,
   Login,
   Signup,
-  SellerAuth,
-  SellerRegister,
+  SellerLoginForm,
+  SellerSignup,
+  EnterpriseSeller,
+  IndividualSeller,
+  OrganizationSeller,
 } from '../subsystems/auth';
 import Placeholder from '../components/Placeholder.jsx';
 
@@ -17,13 +20,19 @@ export default function AppRoutes() {
       <Route element={<AuthLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/seller-register" element={<SellerRegister />} />
-        <Route path="/seller-auth" element={<SellerAuth />} />
-        <Route
-          path="/seller-signup"
-          element={<Placeholder title="Seller Sign Up" text="The seller registration form will live here." />}
-        />
         <Route path="/signup" element={<Signup />} />
+
+        {/* Seller Login Form */}
+        <Route path="/seller-login-form" element={<SellerLoginForm />} />
+        <Route path="/seller-login" element={<SellerLoginForm />} />
+        <Route path="/seller-auth" element={<SellerLoginForm />} />
+
+        {/* Seller Signup Portal Chooser & Type-Specific Registration Pages */}
+        <Route path="/seller-signup" element={<SellerSignup />} />
+        <Route path="/seller-register" element={<SellerSignup />} />
+        <Route path="/seller-signup/enterprise" element={<EnterpriseSeller />} />
+        <Route path="/seller-signup/individual" element={<IndividualSeller />} />
+        <Route path="/seller-signup/organization" element={<OrganizationSeller />} />
       </Route>
 
       {/* Main App Routes - With Navbar */}
