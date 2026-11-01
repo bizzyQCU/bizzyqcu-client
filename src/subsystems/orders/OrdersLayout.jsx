@@ -1,4 +1,7 @@
+import { useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import MessageWidget from '../../components/MessageWidget.jsx'
+import { useMessages } from '../../lib/MessageContext.jsx'
 import Icon from '../../components/Icon.jsx'
 import { useCart } from '../../lib/CartContext.jsx'
 import useIsMobile from '../../hooks/useIsMobile.js'
@@ -18,6 +21,12 @@ export default function OrdersLayout() {
   const { count } = useCart()
   const mobile = useIsMobile()
   const covered = /^\/(cart|messages)/.test(pathname)
+  const { open: chatOpen } = useMessages()
+
+  // On phones, "Message seller" opens the full-screen messages page instead of the chat window.
+  useEffect(() => {
+    if (mobile && chatOpen && pathname !== '/messages') navigate('/messages')
+  }, [mobile, chatOpen, pathname, navigate])
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F8FAFC] text-slate-800 antialiased">
@@ -55,6 +64,8 @@ export default function OrdersLayout() {
           </div>
         </header>
       )}
+
+      {!mobile && <MessageWidget />}
 
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-28 pt-6 md:pb-12 sm:px-6 lg:px-8">
         <Outlet />
