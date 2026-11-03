@@ -26,6 +26,8 @@ import MessagesPage from '../subsystems/orders/pages/MessagesPage.jsx';
 import OrdersLayout from '../subsystems/orders/OrdersLayout.jsx';
 import MarketplacePage from '../subsystems/marketplace/pages/MarketplacePage.jsx';
 import StorePage from '../subsystems/marketplace/pages/StorePage.jsx';
+import ProfilePage from '../subsystems/auth/pages/ProfilePage.jsx';
+import NotificationsPage from '../subsystems/orders/pages/NotificationsPage.jsx';
 
 // Import your new Admin Dashboard
 import AdminDashboard from '../subsystems/admin/pages/AdminDashboard.jsx';
@@ -56,6 +58,8 @@ export default function AppRoutes() {
     <Route element={<OrdersLayout />}>
       <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/stores/:id" element={<StorePage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/cart" element={<CartPage />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/payment" element={<PaymentPage />} />
