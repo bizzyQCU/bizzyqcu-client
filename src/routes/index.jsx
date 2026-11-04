@@ -12,6 +12,7 @@ import {
   OrganizationSeller,
 } from '../subsystems/auth';
 import Placeholder from '../components/Placeholder.jsx';
+import SellerMessages from '../subsystems/marketplace/pages/SellerMessages.jsx';
 
 // Import your new Admin Dashboard
 import AdminDashboard from '../subsystems/admin/pages/AdminDashboard.jsx';
@@ -40,6 +41,8 @@ export default function AppRoutes() {
 
       {/* Main App Routes - With Navbar */}
       <Route element={<Layout />}>
+
+        <Route path="/seller/messages" element={<SellerMessages />} />
 
         {/* Marketplace Routes (Subsystem 2) - Coming Soon */}
         <Route

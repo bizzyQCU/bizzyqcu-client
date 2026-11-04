@@ -22,12 +22,14 @@ function ScrollManager() {
 }
 
 export default function Layout() {
+  const { pathname } = useLocation()
+  const isSellerMessages = pathname === '/seller/messages'
   return (
-    <div className="min-h-screen flex flex-col text-white overflow-x-hidden">
+    <div className={`min-h-screen flex flex-col ${isSellerMessages ? 'bg-[#f1f3f6] text-slate-900' : 'text-white'} overflow-x-hidden`}>
       <ScrollManager />
       <Navbar />
       <Outlet />
-      <Footer />
+      {!isSellerMessages && <Footer />}
     </div>
   )
 }

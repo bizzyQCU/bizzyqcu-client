@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import Logo from './Logo.jsx'
 
 const CART_COUNT = 2
@@ -11,6 +11,8 @@ const hashLinks = [
 
 export default function Navbar() {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const isSellerMessages = pathname === '/seller/messages'
 
   return (
     <header className="w-full pt-4 md:pt-6 px-4 sm:px-6 lg:px-10 z-50">
@@ -20,22 +22,35 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center space-x-7 lg:space-x-10 text-xs sm:text-sm font-extrabold tracking-wider">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              `transition-colors hover:text-[#10439F] ${
-                isActive ? 'text-[#10439F] border-b-2 border-[#10439F] pb-0.5' : 'text-slate-700'
-              }`
-            }
-          >
-            HOME
-          </NavLink>
-          {hashLinks.map((l) => (
-            <Link key={l.label} to={l.to} className="text-slate-700 hover:text-[#10439F] transition-colors">
-              {l.label}
-            </Link>
-          ))}
+          {isSellerMessages ? (
+            <>
+              <NavLink to="/marketplace" className={({ isActive }) => `transition-colors hover:text-[#10439F] ${isActive ? 'text-[#10439F]' : 'text-slate-700'}`}>
+                MARKETPLACE
+              </NavLink>
+              <NavLink to="/orders" className={({ isActive }) => `transition-colors hover:text-[#10439F] ${isActive ? 'text-[#10439F]' : 'text-slate-700'}`}>
+                ORDERS
+              </NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) =>
+                  `transition-colors hover:text-[#10439F] ${
+                    isActive ? 'text-[#10439F] border-b-2 border-[#10439F] pb-0.5' : 'text-slate-700'
+                  }`
+                }
+              >
+                HOME
+              </NavLink>
+              {hashLinks.map((l) => (
+                <Link key={l.label} to={l.to} className="text-slate-700 hover:text-[#10439F] transition-colors">
+                  {l.label}
+                </Link>
+              ))}
+            </>
+          )}
         </div>
 
         <div className="flex items-center space-x-3 sm:space-x-4">
