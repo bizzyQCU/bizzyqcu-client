@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useSellerOrders } from "../components/useSellerOrders";
 import "../components/SellerOrders.css";
+import SellerMessages from "./SellerMessages";
+import "./SellerMessages.css";
 
 import {
   LayoutDashboard,
@@ -52,6 +54,9 @@ export default function SellerOrders() {
 
   // ── Filter dropdown open/close ──────────────────────────────────────────
   const [filterOpen, setFilterOpen] = useState(false);
+
+  // ── Messages modal state ────────────────────────────────────────────────
+  const [messagesOpen, setMessagesOpen] = useState(false);
 
   const hasActiveFilters =
     paymentFilter || statusFilter || thisWeekOnly || searchTerm;
@@ -143,10 +148,11 @@ export default function SellerOrders() {
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            {/* Messages — needs messaging API; no-op until backend exists */}
+            {/* Messages — opens SellerMessages modal */}
             <button
+              onClick={() => setMessagesOpen(true)}
               className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
-              title="Messages (coming soon)"
+              title="Messages"
             >
               <MessageSquare className="w-5 h-5" />
             </button>
@@ -629,6 +635,22 @@ export default function SellerOrders() {
           className="fixed inset-0 z-10"
           onClick={() => setFilterOpen(false)}
         />
+      )}
+
+      {/* Messages Modal - Full Screen Overlay */}
+      {messagesOpen && (
+        <div className="fixed inset-0 z-50 bg-white overflow-hidden">
+          {/* Close button overlay */}
+          <button
+            onClick={() => setMessagesOpen(false)}
+            className="absolute top-4 right-4 z-50 p-2 bg-white border border-slate-300 rounded-full shadow-lg hover:bg-slate-50 transition-colors"
+            title="Close Messages"
+          >
+            <X className="w-5 h-5 text-slate-700" />
+          </button>
+          {/* SellerMessages Component */}
+          <SellerMessages />
+        </div>
       )}
     </div>
   );
