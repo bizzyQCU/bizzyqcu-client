@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-import { useSellerOrders } from "../components/useSellerOrders";
-import FilterModal from "../components/FilterModal";
+import { useSellerOrders } from "../components/orders/useSellerOrders";
+import FilterModal from "../components/orders/FilterModal";
 import Sidebar from "../components/Sidebar";
 import SellerMessages from "../../pages/SellerMessages";
 
-import "../components/SellerOrders.css";
+import "../components/orders/SellerOrders.css";
 
 import {
   MessageSquare,
@@ -46,6 +46,11 @@ export default function Orders() {
     setSelectedOrder,
     thisWeekOnly,
     setThisWeekOnly,
+    loading,
+    error,
+    updating,
+    refresh,
+    markCompleted,
   } = useSellerOrders();
 
   const [messagesOpen, setMessagesOpen] = useState(false);
@@ -98,8 +103,13 @@ export default function Orders() {
                 Manage customer orders, payments, and fulfillment.
               </p>
             </div>
-            <button className="flex items-center space-x-2 px-4 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 shadow-sm transition-colors">
-              <RotateCw className="w-4 h-4" />
+            <button
+              onClick={refresh}
+              className="flex items-center space-x-2 px-4 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 shadow-sm transition-colors"
+            >
+              <RotateCw
+                className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+              />
               <span>Refresh</span>
             </button>
           </div>
@@ -206,122 +216,134 @@ export default function Orders() {
           </div>
 
           {/* HORIZONTALLY SCROLLABLE TABLE AREA */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[950px]">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50/50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Order ID</th>
-                    <th className="py-3.5 px-6">Order Date</th>
-                    <th className="py-3.5 px-6">Buyer</th>
-                    <th className="py-3.5 px-6">Items</th>
-                    <th className="py-3.5 px-6">Total</th>
-                    <th className="py-3.5 px-6">Payment Status</th>
-                    <th className="py-3.5 px-6">Order Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-sm">
-                  {orders.map((order) => (
-                    <tr
-                      key={order.id}
-                      onClick={() => setSelectedOrder(order)}
-                      className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                    >
-                      <td className="py-4 px-6 font-semibold text-[#0284C7] cursor-pointer hover:underline whitespace-nowrap">
-                        {order.id}
-                      </td>
-                      <td className="py-4 px-6 text-slate-500 text-xs whitespace-nowrap">
-                        {order.date}
-                      </td>
-                      <td className="py-4 px-6 font-medium text-slate-800 whitespace-nowrap">
-                        {order.buyer}
-                      </td>
-                      <td className="py-4 px-6 text-slate-700 whitespace-nowrap">
-                        {order.items}
-                      </td>
-                      <td className="py-4 px-6 font-bold text-slate-900 whitespace-nowrap">
-                        {order.total}
-                      </td>
-                      <td className="py-4 px-6 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            order.paymentStatus === "Paid"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-amber-50 text-amber-700"
-                          }`}
-                        >
-                          {order.paymentStatus}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 whitespace-nowrap text-slate-600 font-medium">
-                        {order.orderStatus}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+              {error}
             </div>
+          )}
+          {loading && !error && (
+            <div className="flex items-center justify-center py-16 text-slate-400 text-sm">
+              Loading orders…
+            </div>
+          )}
+          {!loading && !error && (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[950px]">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50/50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                      <th className="py-3.5 px-6">Order ID</th>
+                      <th className="py-3.5 px-6">Order Date</th>
+                      <th className="py-3.5 px-6">Buyer</th>
+                      <th className="py-3.5 px-6">Items</th>
+                      <th className="py-3.5 px-6">Total</th>
+                      <th className="py-3.5 px-6">Payment Status</th>
+                      <th className="py-3.5 px-6">Order Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-sm">
+                    {orders.map((order) => (
+                      <tr
+                        key={order.id}
+                        onClick={() => setSelectedOrder(order)}
+                        className="hover:bg-slate-50/80 transition-colors cursor-pointer"
+                      >
+                        <td className="py-4 px-6 font-semibold text-[#0284C7] cursor-pointer hover:underline whitespace-nowrap">
+                          {order.id}
+                        </td>
+                        <td className="py-4 px-6 text-slate-500 text-xs whitespace-nowrap">
+                          {order.date}
+                        </td>
+                        <td className="py-4 px-6 font-medium text-slate-800 whitespace-nowrap">
+                          {order.buyer}
+                        </td>
+                        <td className="py-4 px-6 text-slate-700 whitespace-nowrap">
+                          {order.items}
+                        </td>
+                        <td className="py-4 px-6 font-bold text-slate-900 whitespace-nowrap">
+                          {order.total}
+                        </td>
+                        <td className="py-4 px-6 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              order.paymentStatus === "Paid"
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-amber-50 text-amber-700"
+                            }`}
+                          >
+                            {order.paymentStatus}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 whitespace-nowrap text-slate-600 font-medium">
+                          {order.orderStatus}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-            {/* Pagination Footer */}
-            <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
-              <div>
-                {totalFiltered === 0 ? (
-                  "No orders match your filters."
-                ) : (
-                  <>
-                    Showing{" "}
-                    <span className="font-semibold text-slate-800">
-                      {startIndex + 1}
-                    </span>{" "}
-                    to{" "}
-                    <span className="font-semibold text-slate-800">
-                      {Math.min(startIndex + orders.length, totalFiltered)}
-                    </span>{" "}
-                    of{" "}
-                    <span className="font-semibold text-slate-800">
-                      {totalFiltered}
-                    </span>{" "}
-                    orders
-                  </>
+              {/* Pagination Footer */}
+              <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                <div>
+                  {totalFiltered === 0 ? (
+                    "No orders match your filters."
+                  ) : (
+                    <>
+                      Showing{" "}
+                      <span className="font-semibold text-slate-800">
+                        {startIndex + 1}
+                      </span>{" "}
+                      to{" "}
+                      <span className="font-semibold text-slate-800">
+                        {Math.min(startIndex + orders.length, totalFiltered)}
+                      </span>{" "}
+                      of{" "}
+                      <span className="font-semibold text-slate-800">
+                        {totalFiltered}
+                      </span>{" "}
+                      orders
+                    </>
+                  )}
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex items-center space-x-1">
+                    <button
+                      disabled={safePage === 1}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      className="flex items-center px-2 py-1 rounded text-slate-400 hover:text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft className="w-4 h-4 mr-0.5" /> Previous
+                    </button>
+                    {pageNumbers.map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-7 h-7 rounded flex items-center justify-center font-medium ${
+                          safePage === page
+                            ? "bg-[#0284C7] text-white"
+                            : "text-slate-600 hover:bg-slate-100"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      disabled={safePage === totalPages}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      className="flex items-center px-2 py-1 rounded text-slate-600 hover:text-slate-800 font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next <ChevronRight className="w-4 h-4 ml-0.5" />
+                    </button>
+                  </div>
                 )}
               </div>
-              {totalPages > 1 && (
-                <div className="flex items-center space-x-1">
-                  <button
-                    disabled={safePage === 1}
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    className="flex items-center px-2 py-1 rounded text-slate-400 hover:text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft className="w-4 h-4 mr-0.5" /> Previous
-                  </button>
-                  {pageNumbers.map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`w-7 h-7 rounded flex items-center justify-center font-medium ${
-                        safePage === page
-                          ? "bg-[#0284C7] text-white"
-                          : "text-slate-600 hover:bg-slate-100"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  <button
-                    disabled={safePage === totalPages}
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    className="flex items-center px-2 py-1 rounded text-slate-600 hover:text-slate-800 font-medium disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    Next <ChevronRight className="w-4 h-4 ml-0.5" />
-                  </button>
-                </div>
-              )}
             </div>
-          </div>
+          )}
         </main>
       </div>
 
@@ -563,14 +585,12 @@ export default function Orders() {
                 Close
               </button>
               <button
-                onClick={() => {
-                  alert(`Marked order ${selectedOrder.id} as completed!`);
-                  setSelectedOrder(null);
-                }}
-                className="w-1/2 px-4 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center justify-center space-x-1.5"
+                onClick={() => markCompleted(selectedOrder)}
+                disabled={updating}
+                className="w-1/2 px-4 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Mark as Completed</span>
+                <span>{updating ? "Updating…" : "Mark as Completed"}</span>
               </button>
             </div>
           </div>
