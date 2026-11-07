@@ -12,16 +12,18 @@ import {
   OrganizationSeller,
 } from "../subsystems/auth";
 import Placeholder from "../components/Placeholder.jsx";
+import SellerPlaceholder from "../subsystems/marketplace/components/SellerPlaceholder.jsx";
 import SellerMessages from "../subsystems/marketplace/pages/SellerMessages.jsx";
 import SellerOrders from "../subsystems/marketplace/pages/SellerOrders.jsx";
+import SellerAnalytics from "../subsystems/marketplace/pages/SellerAnalytics.jsx";
 
-// Import your new Admin Dashboard
+// Import Admin Dashboard
 import AdminDashboard from "../subsystems/admin/pages/AdminDashboard.jsx";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Auth Routes (Subsystem 1) - No Navbar */}
+      {/* Auth Routes - No Navbar */}
       <Route element={<AuthLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -32,7 +34,7 @@ export default function AppRoutes() {
         <Route path="/seller-login" element={<SellerLoginForm />} />
         <Route path="/seller-auth" element={<SellerLoginForm />} />
 
-        {/* Seller Signup Portal Chooser & Type-Specific Registration Pages */}
+        {/* Seller Signup Portal and Registration Pages */}
         <Route path="/seller-signup" element={<SellerSignup />} />
         <Route path="/seller-register" element={<SellerSignup />} />
         <Route
@@ -49,13 +51,52 @@ export default function AppRoutes() {
         />
       </Route>
 
-      {/* Seller Portal Routes - No Navbar */}
+      {/* Seller Portal Routes - No Global Navbar */}
       <Route path="/seller/messages" element={<SellerMessages />} />
       <Route path="/seller/orders" element={<SellerOrders />} />
 
-      {/* Main App Routes - With Navbar */}
+      {/* Main App Routes */}
       <Route element={<Layout />}>
-        {/* Marketplace Routes (Subsystem 2) - Coming Soon */}
+        {/* Seller Routes */}
+        <Route
+          path="/seller/dashboard"
+          element={
+            <SellerPlaceholder
+              title="Seller Dashboard"
+              text="Dashboard overview coming soon."
+            />
+          }
+        />
+        <Route
+          path="/seller/products"
+          element={
+            <SellerPlaceholder
+              title="Products"
+              text="Product management coming soon."
+            />
+          }
+        />
+        <Route
+          path="/seller/inventory"
+          element={
+            <SellerPlaceholder
+              title="Inventory"
+              text="Inventory management coming soon."
+            />
+          }
+        />
+        <Route
+          path="/seller/settings"
+          element={
+            <SellerPlaceholder
+              title="Settings"
+              text="Account settings coming soon."
+            />
+          }
+        />
+        <Route path="/seller/analytics" element={<SellerAnalytics />} />
+
+        {/* Marketplace Routes */}
         <Route
           path="/marketplace"
           element={
@@ -74,7 +115,7 @@ export default function AppRoutes() {
           element={<Placeholder title="Product" text="Product details page." />}
         />
 
-        {/* Orders Routes (Subsystem 3) - Coming Soon */}
+        {/* Orders Routes */}
         <Route
           path="/cart"
           element={
@@ -92,7 +133,7 @@ export default function AppRoutes() {
           }
         />
 
-        {/* Admin Routes (Subsystem 4) - YOUR DASHBOARD */}
+        {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
 
         {/* Fallback */}
