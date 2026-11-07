@@ -13,7 +13,7 @@
  * Expected DOM: `root` contains an element with class `.coin-stack-gl`.
  */
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 // BizzyQCU palette (keep in sync with tailwind.config.js -> brand)
 const PALETTE = {

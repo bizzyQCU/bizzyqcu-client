@@ -10,7 +10,7 @@
  * - Transparent canvas so DotGridBackground shows through
  */
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 const PALETTE = {
   floorFill: '#0f1b33',

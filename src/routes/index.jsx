@@ -12,8 +12,10 @@ import {
   OrganizationSeller,
 } from "../subsystems/auth";
 import Placeholder from "../components/Placeholder.jsx";
+import SellerPlaceholder from "../subsystems/marketplace/components/SellerPlaceholder.jsx";
 import SellerMessages from "../subsystems/marketplace/pages/SellerMessages.jsx";
 import SellerOrders from "../subsystems/marketplace/pages/SellerOrders.jsx";
+import SellerAnalytics from "../subsystems/marketplace/pages/SellerAnalytics.jsx";
 
 // Import your new Admin Dashboard
 import AdminDashboard from "../subsystems/admin/pages/AdminDashboard.jsx";
@@ -51,8 +53,13 @@ export default function AppRoutes() {
 
       {/* Main App Routes - With Navbar */}
       <Route element={<Layout />}>
+        <Route path="/seller/dashboard" element={<SellerPlaceholder title="Seller Dashboard" text="Dashboard overview coming soon." />} />
+        <Route path="/seller/products" element={<SellerPlaceholder title="Products" text="Product management coming soon." />} />
+        <Route path="/seller/inventory" element={<SellerPlaceholder title="Inventory" text="Inventory management coming soon." />} />
+        <Route path="/seller/settings" element={<SellerPlaceholder title="Settings" text="Account settings coming soon." />} />
         <Route path="/seller/messages" element={<SellerMessages />} />
         <Route path="/seller/orders" element={<SellerOrders />} />
+        <Route path="/seller/analytics" element={<SellerAnalytics />} />
 
         {/* Marketplace Routes (Subsystem 2) - Coming Soon */}
         <Route
