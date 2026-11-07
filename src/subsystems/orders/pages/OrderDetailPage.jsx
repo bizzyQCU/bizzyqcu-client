@@ -5,23 +5,39 @@ import RatingModal from "../../../components/RatingModal.jsx";
 import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
 import { useMessages } from "../../../lib/MessageContext.jsx";
 import { useRatings } from "../../../lib/RatingContext.jsx";
-import { orders, orderItems, orderTimeline, deliveryFee } from "../../../lib/mockData.js";
+import { orders, orderTimeline, deliveryFee } from "../../../lib/mockData.js";
+import ProductArt, { galleryFor } from "../../../components/ProductArt.jsx";
+import { canCancel, canConfirmReceived, canRequestRefund } from "../../../lib/orderRules.js";
 
 export default function OrderDetailPage() {
   const { id } = useParams();
   const { openSeller } = useMessages();
   const { addRating } = useRatings();
-  const order = orders.find((o) => o.id === id) ?? orders[0];
+  const order = orders.find((o) => o.id === id);
+  const [status, setStatus] = useState(order?.status);
+  const [refundRequested, setRefundRequested] = useState(false);
   const [rated, setRated] = useState(false);
   const [cancelled, setCancelled] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [showRating, setShowRating] = useState(false);
-  const subtotal = orderItems.reduce((s, i) => s + i.price, 0);
+  const items = order?.items ?? [];
+  const subtotal = items.reduce((s, i) => s + i.price, 0);
   const total = subtotal + deliveryFee;
+
+  if (!order) {
+    return (
+      <div className="mx-auto max-w-[1440px] py-20 text-center">
+        <p className="text-sm font-semibold text-slate-700">Order not found.</p>
+        <Link to="/orders" className="mt-2 inline-block text-xs font-semibold text-sky-600">Back to all orders</Link>
+      </div>
+    );
+  }
+
+  const live = { ...order, status, refundRequested };
 
   return (
     <div className="mx-auto max-w-[1440px]">
-      <ConfirmDialog open={confirmCancel} title="Cancel this order?" message="The seller will be notified. Cancelled orders can't be restored." confirmLabel="Cancel order" tone="danger" onCancel={() => setConfirmCancel(false)} onConfirm={() => { setConfirmCancel(false); setCancelled(true); }} />
+      <ConfirmDialog open={confirmCancel} title="Cancel this order?" message="The seller will be notified. Cancelled orders can't be restored." confirmLabel="Cancel order" tone="danger" onCancel={() => setConfirmCancel(false)} onConfirm={() => { setConfirmCancel(false); setCancelled(true); setStatus("Cancelled"); }} />
       <div className="mb-6">
         <nav className="mb-2 flex items-center space-x-2 text-xs font-semibold text-slate-500">
           <Link to="/orders" className="flex items-center hover:text-slate-800">
@@ -35,7 +51,7 @@ export default function OrderDetailPage() {
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Order #BZ-2024-{order.id}</h1>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FFD444]/60 bg-[#FFD444]/20 px-3 py-1 text-xs font-bold text-[#854D0E]">
             <span className="h-2 w-2 rounded-full bg-[#EAB308]" />
-            {cancelled ? "Cancelled" : order.status}
+            {cancelled ? "Cancelled" : status}
           </span>
         </div>
         <p className="mt-1 text-xs font-medium text-slate-500">{order.placed}</p>
@@ -134,14 +150,14 @@ export default function OrderDetailPage() {
                 <Icon name="bag" className="h-4 w-4 text-sky-600" />
                 <h2>Items in this Order</h2>
               </div>
-              <span className="text-xs font-semibold text-slate-500">{orderItems.length} Items</span>
+              <span className="text-xs font-semibold text-slate-500">{items.length} Items</span>
             </div>
             <ul className="divide-y divide-slate-100">
-              {orderItems.map((i) => (
+              {items.map((i) => (
                 <li key={i.id} className="flex items-center justify-between py-4">
                   <div className="flex items-center space-x-4">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
-                      <Icon name="book" className="h-6 w-6 text-slate-400" />
+                    <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-slate-200">
+                      <ProductArt art={i.art ?? galleryFor(i.id)[0]} />
                     </div>
                     <div>
                       <div className="flex items-center space-x-2">
@@ -177,7 +193,7 @@ export default function OrderDetailPage() {
             <h2 className="text-sm font-bold text-slate-900">Order Actions</h2>
             <p className="mb-5 mt-0.5 text-xs text-slate-500">Manage transaction status and campus communication</p>
             <div className="space-y-1.5 text-center">
-              <button type="button" disabled className="flex w-full cursor-not-allowed items-center justify-center space-x-2 rounded-xl border border-slate-200 bg-slate-200 px-4 py-3 text-sm font-bold text-slate-400">
+              <button type="button" disabled={!canConfirmReceived(live)} onClick={() => setStatus("Completed")} className="flex w-full items-center justify-center space-x-2 rounded-xl border border-[#0284C7] bg-[#0284C7] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#0369A1] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-200 disabled:text-slate-400">
                 <Icon name="check" className="h-4 w-4" strokeWidth={2.5} />
                 <span>Confirm received</span>
               </button>
@@ -192,19 +208,28 @@ export default function OrderDetailPage() {
                 <span>Message seller</span>
               </button>
             </div>
+            {canCancel(live) && (
             <div className="mt-3 text-center">
-              <button type="button" disabled={cancelled || order.status === "Completed"} onClick={() => setConfirmCancel(true)} className="text-xs font-semibold text-slate-500 transition-colors hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-40">{cancelled ? "Order cancelled" : "Cancel order"}</button>
+              <button type="button" disabled={cancelled} onClick={() => setConfirmCancel(true)} className="text-xs font-semibold text-slate-500 transition-colors hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-40">{cancelled ? "Order cancelled" : "Cancel order"}</button>
             </div>
+            )}
             <div className="mt-4">
               <button
                 type="button"
-                disabled={rated || order.status !== "Completed"}
+                disabled={rated || status !== "Completed"}
                 onClick={() => setShowRating(true)}
                 className="w-full rounded-full border border-amber-300 px-4 py-2.5 text-sm font-bold text-amber-600 transition hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {rated ? "Rating submitted" : "★ Rate seller"}
               </button>
             </div>
+
+            {canRequestRefund(live) && (
+              <button type="button" onClick={() => setRefundRequested(true)} className="mt-3 w-full rounded-full border border-rose-300 px-4 py-2.5 text-sm font-bold text-rose-600 transition hover:bg-rose-50">
+                Request refund (stale item)
+              </button>
+            )}
+            {refundRequested && <p className="mt-2 text-center text-[11px] text-rose-600">Refund requested. Customer support will review it.</p>}
 
             <div className="mt-6 space-y-3.5 border-t border-slate-100 pt-5 text-xs">
               <div className="flex items-center justify-between">

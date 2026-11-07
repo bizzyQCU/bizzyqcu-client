@@ -7,10 +7,7 @@ export const checkoutItems = [
   { id: 2, qty: 1, title: "Scientific Calculator..", meta: "Hardcase Shockproof", price: 180 },
 ];
 
-export const orderItems = [
-  { id: 1, title: "Data Structures & Algorithms Textbook", badge: "Like New", meta: "Qty 1 · College of Computer Studies", price: 450 },
-  { id: 2, title: "QCU Official PE Shirt", badge: "Size Medium", meta: "Qty 1 · Official Campus Wear", price: 180 },
-];
+export const orderItems = [];
 
 export const orderTimeline = [
   { label: "Order Placed", time: "10:14 AM", desc: "Item reservation registered in marketplace system", state: "done" },
@@ -91,17 +88,7 @@ export const stores = [
   },
 ];
 
-export const orders = [
-  { id: "0930", status: "To pay", seller: "Maria Santos", storeName: "The Crafty Sparks", total: 320, placed: "Today, Oct 26 · 11:02 AM", fulfillment: "GCash · waiting for payment", tone: "amber" },
-  { id: "0931", status: "Waiting for approval", seller: "Alyssa Bautista", storeName: "QCU Print & Bind", total: 150, placed: "Today, Oct 26 · 11:05 AM", fulfillment: "Cash · waiting for seller approval", tone: "amber" },
-  { id: "0891", status: "Preparing", seller: "Maria Santos", storeName: "The Crafty Sparks", total: 630, placed: "Placed today, Oct 26 · 10:14 AM", fulfillment: "Room delivery · Tech Bldg Room 402", tone: "amber" },
-  { id: "0740", status: "Ready for pickup", seller: "Kevin Cruz", storeName: "Metro Silicon Lab", total: 850, placed: "Yesterday, 4:50 PM", fulfillment: "Pickup · Library Ground Gate", tone: "sky" },
-  { id: "0777", status: "Out for delivery", seller: "Metro Silicon Lab", total: 250, placed: "Today, Oct 26 · 9:40 AM", fulfillment: "Room delivery · Library 3rd Floor", tone: "sky" },
-  { id: "0612", status: "Completed", seller: "Andrea Torres", storeName: "Express Bites QC", total: 420, placed: "Oct 24, 2026", fulfillment: "Completed at Main Canteen", tone: "emerald" },
-  { id: "0899", status: "Out for delivery", seller: "Alyssa Bautista", storeName: "QCU Print & Bind", total: 240, placed: "Today, 9:10 AM", fulfillment: "Room delivery · Main Bldg 210", tone: "sky" },
-  { id: "0477", status: "Return requested", seller: "Kevin Cruz", storeName: "Metro Silicon Lab", total: 180, placed: "Oct 22, 2026", fulfillment: "Return requested · Calculator", tone: "rose" },
-  { id: "0555", status: "Cancelled", seller: "Express Bites QC", storeName: "Express Bites QC", total: 180, placed: "Oct 20, 2026", fulfillment: "Cancelled by buyer", tone: "rose" },
-];
+export const orders = []; // seeded orders removed; real orders come from the backend
 
 export const conversations = [
   { id: 1, name: "Maria Santos", initials: "MS", order: "#BZ-2024-0891", preview: "I'm heading over now! I'm outside Room 402.", time: "10:32 AM", unread: true, online: true },

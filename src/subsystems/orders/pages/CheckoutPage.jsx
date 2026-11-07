@@ -200,9 +200,6 @@ export default function CheckoutPage() {
                 </p>
               </div>
 
-              <div className="flex justify-end lg:hidden">
-                <button type="submit" className="w-full rounded-full bg-[#0284C7] px-4 py-3 text-xs font-semibold text-white">Continue to payment</button>
-              </div>
             </form>
           </div>
         </section>
