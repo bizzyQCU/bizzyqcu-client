@@ -74,3 +74,32 @@ export const getSellerDashboard = async () => {
   const response = await apiClient.get('/marketplace/seller/dashboard');
   return response.data;
 };
+
+// ============================================================================
+// STORES
+// ============================================================================
+
+/**
+ * GET /marketplace/stores/me (seller only)
+ */
+export const getMyStore = async () => {
+  const response = await apiClient.get('/marketplace/stores/me');
+  return response.data;
+};
+
+/**
+ * PATCH /marketplace/stores/me (seller only)
+ */
+export const updateMyStore = async (storeData) => {
+  const response = await apiClient.patch('/marketplace/stores/me', storeData);
+  return response.data;
+};
+
+/**
+ * POST /marketplace/stores (seller only)
+ */
+export const createStore = async (storeData) => {
+  const response = await apiClient.post('/marketplace/stores', storeData);
+  return response.data;
+};
+
