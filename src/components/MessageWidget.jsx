@@ -4,11 +4,48 @@ import { SUPPORT, useMessages } from "../lib/MessageContext.jsx";
 
 const quickReplies = ["Track my order", "Payment problem", "Delivery question"];
 
+// Bubble that pops up from the bottom when it appears (same motion as the typing-indicator demo).
+function PopIn({ className = "", children }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current?.animate(
+      [
+        { opacity: 0, transform: "translateY(8px) scale(0.94)", transformOrigin: "0 100%" },
+        { opacity: 1, transform: "none" },
+      ],
+      { duration: 587, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
+    );
+  }, []);
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  );
+}
+
+// Three dots that pulse while the other side is typing.
+function TypingBubble({ initials }) {
+  return (
+    <PopIn className="flex items-end gap-2">
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0284C7] text-[10px] font-bold text-white">{initials}</span>
+      <div className="flex items-center gap-[5px] rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-3.5 py-3 shadow-sm">
+        {[0, 0.16, 0.32].map((delay) => (
+          <i
+            key={delay}
+            className="block h-[7px] w-[7px] rounded-full bg-[#4FA3FF]"
+            style={{ animation: "msgTypingDot 1.2s ease-in-out infinite", animationDelay: `${delay}s` }}
+          />
+        ))}
+      </div>
+    </PopIn>
+  );
+}
+
 export default function MessageWidget() {
   const { open, setOpen, view, setView, activeId, contacts, threads, typing, openChat, sendText } = useMessages();
   const [minimized, setMinimized] = useState(false);
   const [draft, setDraft] = useState("");
-  const endRef = useRef(null);
+  const scrollRef = useRef(null);
   const inputRef = useRef(null);
   const [closing, setClosing] = useState(false);
   const panelRef = useRef(null);
@@ -37,7 +74,7 @@ export default function MessageWidget() {
   const activeMessages = threads[activeId] ?? [];
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [threads, typing, view, activeId, open, minimized]);
 
   useEffect(() => {
@@ -69,7 +106,8 @@ export default function MessageWidget() {
       role="dialog"
       aria-label="Messages"
       ref={panelRef}
-      className={`fixed bottom-6 right-8 z-50 flex w-[380px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl ${minimized ? "h-auto" : "h-[580px] max-h-[calc(100vh-3rem)]"} ${closing ? "anim-out" : "anim-in"}`}
+      className={`fixed bottom-6 right-8 z-50 flex w-[380px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl ${closing ? "anim-out" : "anim-in"}`}
+      style={{ maxHeight: minimized ? undefined : "min(580px, calc(100vh - 3rem))" }}
     >
       <div className="flex items-center justify-between gap-2 bg-[#0284C7] px-4 py-3 text-white">
         {view === "chat" && !minimized ? (
@@ -127,38 +165,30 @@ export default function MessageWidget() {
 
       {!minimized && view === "chat" && (
         <>
-          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4 text-xs">
+          <style>{"@keyframes msgTypingDot { 0%, 70%, 100% { opacity: 0.3; transform: scale(0.8); } 35% { opacity: 1; transform: scale(1.15); } }"}</style>
+          <div ref={scrollRef} className="space-y-3 overflow-y-auto bg-slate-50 p-4 text-xs"
+            style={{ maxHeight: "min(400px, calc(100vh - 14rem))" }}>
             {activeMessages.map((m) =>
               m.type === "system" ? (
                 <div key={m.id} className="flex justify-center">
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-medium text-slate-500">{m.text}</span>
                 </div>
               ) : m.from === "me" ? (
-                <div key={m.id} className="ml-auto max-w-[80%]">
+                <PopIn key={m.id} className="ml-auto max-w-[80%]">
                   <div className="rounded-2xl rounded-br-sm bg-[#0284C7] px-3.5 py-2.5 leading-relaxed text-white shadow-sm">{m.text}</div>
                   <span className="mt-1 block text-right text-[10px] text-slate-400">{m.time}</span>
-                </div>
+                </PopIn>
               ) : (
-                <div key={m.id} className="flex max-w-[85%] items-end gap-2">
+                <PopIn key={m.id} className="flex max-w-[85%] items-end gap-2">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-sky-600 text-[10px] font-bold text-white">{activeContact?.initials}</span>
                   <div>
                     <div className="rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-3.5 py-2.5 leading-relaxed text-slate-800 shadow-sm">{m.text}</div>
                     <span className="ml-1 mt-1 block text-[10px] text-slate-400">{m.time}</span>
                   </div>
-                </div>
+                </PopIn>
               )
             )}
-            {typing && isSupport && (
-              <div className="flex items-end gap-2">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0284C7] text-[10px] font-bold text-white">BQ</span>
-                <div className="flex gap-1 rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-3.5 py-3 shadow-sm">
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400" />
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:150ms]" />
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:300ms]" />
-                </div>
-              </div>
-            )}
-            <div ref={endRef} />
+            {typing && isSupport && <TypingBubble initials="BQ" />}
           </div>
 
           {isSupport && (

@@ -23,7 +23,7 @@ function MessagesDesktop() {
 
   const conv = conversations.find((c) => c.id === activeId);
   const messages = [...(threads[activeId] ?? []), ...(extra[activeId] ?? [])];
-  const order = orders.find((o) => conv && conv.order.endsWith(o.id)) ?? orders[0];
+  const order = orders.find((o) => conv && conv.order.endsWith(o.id)) ?? { id: "----", status: "No order" };
 
   function send(e) {
     e.preventDefault();

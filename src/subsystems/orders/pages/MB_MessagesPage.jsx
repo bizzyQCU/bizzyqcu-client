@@ -151,25 +151,27 @@ export default function MB_MessagesPage() {
 
       {contact && (
         <>
-          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4 text-sm">
-            {messages.map((m) =>
-              m.type === "system" ? (
-                <div key={m.id} className="flex justify-center">
-                  <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-medium text-slate-500">{m.text}</span>
-                </div>
-              ) : m.from === "me" ? (
-                <div key={m.id} className="ml-auto max-w-[78%]">
-                  <div className="rounded-2xl rounded-br-sm bg-[#0284C7] px-3.5 py-2.5 leading-relaxed text-white shadow-sm">{m.text}</div>
-                  <span className="mt-1 block text-right text-[10px] text-slate-400">{m.time}</span>
-                </div>
-              ) : (
-                <div key={m.id} className="max-w-[78%]">
-                  <div className="rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-3.5 py-2.5 leading-relaxed text-slate-800 shadow-sm">{m.text}</div>
-                  <span className="mt-1 block text-[10px] text-slate-400">{m.time}</span>
-                </div>
-              )
-            )}
-            <div ref={endRef} />
+          <div className="min-h-0 flex-1 overflow-y-auto bg-white">
+            <div className="h-fit space-y-3 bg-slate-50 p-4 text-sm">
+              {messages.map((m) =>
+                m.type === "system" ? (
+                  <div key={m.id} className="flex justify-center">
+                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-medium text-slate-500">{m.text}</span>
+                  </div>
+                ) : m.from === "me" ? (
+                  <div key={m.id} className="ml-auto max-w-[78%]">
+                    <div className="rounded-2xl rounded-br-sm bg-[#0284C7] px-3.5 py-2.5 leading-relaxed text-white shadow-sm">{m.text}</div>
+                    <span className="mt-1 block text-right text-[10px] text-slate-400">{m.time}</span>
+                  </div>
+                ) : (
+                  <div key={m.id} className="max-w-[78%]">
+                    <div className="rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-3.5 py-2.5 leading-relaxed text-slate-800 shadow-sm">{m.text}</div>
+                    <span className="mt-1 block text-[10px] text-slate-400">{m.time}</span>
+                  </div>
+                )
+              )}
+              <div ref={endRef} />
+            </div>
           </div>
 
           <form onSubmit={send} className="flex shrink-0 items-center gap-2 border-t border-slate-200 bg-white p-3 pb-[max(env(safe-area-inset-bottom),12px)]">
