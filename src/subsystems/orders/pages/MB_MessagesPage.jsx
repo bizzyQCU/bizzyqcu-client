@@ -9,7 +9,7 @@ const filters = ["All", "Unread"];
 
 // Full-screen messages on phones: a conversation list, then a thread.
 // Back returns to the list, then to the previous screen. Swiping from the left edge does the same.
-export default function MessagesMobile() {
+export default function MB_MessagesPage() {
   const navigate = useNavigate();
   const { open, setOpen, view, activeId: openedId, contacts, threads, sendText } = useMessages();
   const [activeId, setActiveId] = useState(open && view === "chat" ? openedId : null);

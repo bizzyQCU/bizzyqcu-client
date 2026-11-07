@@ -24,8 +24,8 @@ import OrdersPage from '../subsystems/orders/pages/OrdersPage.jsx';
 import OrderDetailPage from '../subsystems/orders/pages/OrderDetailPage.jsx';
 import MessagesPage from '../subsystems/orders/pages/MessagesPage.jsx';
 import OrdersLayout from '../subsystems/orders/OrdersLayout.jsx';
-import MarketplacePage from '../subsystems/marketplace/pages/MarketplacePage.jsx';
-import StorePage from '../subsystems/marketplace/pages/StorePage.jsx';
+import MarketPage from '../subsystems/orders/pages/MarketPage.jsx';
+import StorePage from '../subsystems/orders/pages/StorePage.jsx';
 import ProfilePage from '../subsystems/auth/pages/ProfilePage.jsx';
 import NotificationsPage from '../subsystems/orders/pages/NotificationsPage.jsx';
 
@@ -56,7 +56,7 @@ export default function AppRoutes() {
 
     {/* Subsystem 3: Orders, cart, checkout, payment, messages (prototype shell) */}
     <Route element={<OrdersLayout />}>
-      <Route path="/marketplace" element={<MarketplacePage />} />
+      <Route path="/marketplace" element={<MarketPage />} />
           <Route path="/stores/:id" element={<StorePage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/profile" element={<ProfilePage />} />

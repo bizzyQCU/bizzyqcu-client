@@ -1,5 +1,5 @@
 import useIsMobile from "../../../hooks/useIsMobile.js";
-import MessagesMobile from "./MessagesMobile.jsx";
+import MB_MessagesPage from "./MB_MessagesPage.jsx";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
@@ -227,5 +227,5 @@ function MessagesDesktop() {
 }
 
 export default function MessagesPage() {
-  return useIsMobile() ? <MessagesMobile /> : <MessagesDesktop />;
+  return useIsMobile() ? <MB_MessagesPage /> : <MessagesDesktop />;
 }

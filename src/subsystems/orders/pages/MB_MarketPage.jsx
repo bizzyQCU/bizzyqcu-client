@@ -6,7 +6,7 @@ import { sellerTypes, stores } from "../../../lib/mockData.js";
 
 const shortLabel = (t) => t.replace(" Seller", "");
 
-export default function MarketplaceMobile() {
+export default function MB_MarketPage() {
   const navigate = useNavigate();
   const [type, setType] = useState(null);
   const [query, setQuery] = useState("");

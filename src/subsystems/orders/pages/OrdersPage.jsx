@@ -1,7 +1,7 @@
 import useIsMobile from "../../../hooks/useIsMobile.js";
 import OrdersDesktop from "./OrdersDesktop.jsx";
-import OrdersMobile from "./OrdersMobile.jsx";
+import MB_OrdersPage from "./MB_OrdersPage.jsx";
 
 export default function OrdersPage() {
-  return useIsMobile() ? <OrdersMobile /> : <OrdersDesktop />;
+  return useIsMobile() ? <MB_OrdersPage /> : <OrdersDesktop />;
 }

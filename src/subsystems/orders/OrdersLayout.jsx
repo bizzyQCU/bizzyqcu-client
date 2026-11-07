@@ -99,7 +99,7 @@ export default function OrdersLayout() {
             <img src={logo} alt="BizzyQCU logo" className="h-7 w-auto" />
           </Link>
           <div className="flex items-center gap-1">
-            <button type="button" aria-label="Cart" onClick={() => navigate('/cart')} className="relative rounded-full p-2 text-slate-600">
+            <button type="button" id="cart-button" aria-label="Cart" onClick={() => navigate('/cart')} className="relative rounded-full p-2 text-slate-600">
               <Icon name="cart" className="h-5 w-5" strokeWidth={1.8} />
               {count > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#0284C7] text-[10px] font-bold text-white ring-2 ring-white">{count}</span>}
             </button>
@@ -119,7 +119,7 @@ export default function OrdersLayout() {
               <NavLink to="/orders" className={navClass}>Orders</NavLink>
             </nav>
             <div className="flex items-center gap-5">
-              <button type="button" aria-label="Cart" onClick={() => navigate('/cart')} className="relative p-1.5 text-slate-500 transition hover:text-slate-700">
+              <button type="button" id="cart-button" aria-label="Cart" onClick={() => navigate('/cart')} className="relative p-1.5 text-slate-500 transition hover:text-slate-700">
                 <Icon name="cart" className="h-5 w-5" strokeWidth={1.8} />
                 {count > 0 && <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#0284C7] text-[10px] font-bold text-white ring-2 ring-white">{count}</span>}
               </button>

@@ -8,7 +8,7 @@ import { categories } from "./orderCategories.js";
 
 const tiles = categories.filter((c) => c.id !== "all");
 
-export default function OrdersMobile() {
+export default function MB_OrdersPage() {
   const { addRating } = useRatings();
   const [active, setActive] = useState("all");
   const [ratingFor, setRatingFor] = useState(null);

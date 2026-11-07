@@ -6,7 +6,7 @@ import Icon from "../../../components/Icon.jsx";
 import SelectCircle from "../../../components/SelectCircle.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";
 
-export default function CartMobile() {
+export default function MB_CartPage() {
   const navigate = useNavigate();
   const location = useLocation();
   // React Router marks the first page of a session with key "default".

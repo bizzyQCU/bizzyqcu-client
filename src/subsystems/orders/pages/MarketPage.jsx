@@ -1,12 +1,12 @@
 import useIsMobile from "../../../hooks/useIsMobile.js";
-import MarketplaceMobile from "./MarketplaceMobile.jsx";
+import MB_MarketPage from "./MB_MarketPage.jsx";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
 import VerifiedSeal from "../../../components/VerifiedSeal.jsx";
 import { categories, sellerTypes, stores } from "../../../lib/mockData.js";
 
-function MarketplaceDesktop() {
+function MarketDesktop() {
   const navigate = useNavigate();
   const [category, setCategory] = useState("All Categories");
   const [sellerType, setSellerType] = useState(null);
@@ -130,6 +130,6 @@ function MarketplaceDesktop() {
   );
 }
 
-export default function MarketplacePage() {
-  return useIsMobile() ? <MarketplaceMobile /> : <MarketplaceDesktop />;
+export default function MarketPage() {
+  return useIsMobile() ? <MB_MarketPage /> : <MarketDesktop />;
 }

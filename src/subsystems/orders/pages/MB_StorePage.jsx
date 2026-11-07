@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { flyToCart } from "../../../lib/flyToCart.js";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
 import FullScreenPage from "../../../components/FullScreenPage.jsx";
@@ -19,7 +20,7 @@ function Stat({ value, label }) {
   );
 }
 
-export default function StoreMobile() {
+export default function MB_StorePage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,7 +32,6 @@ export default function StoreMobile() {
   const { getRating } = useRatings();
   const store = stores.find((s) => String(s.id) === id);
   const [selectedId, setSelectedId] = useState(store?.products[0]?.id);
-  const [added, setAdded] = useState(false);
   const [confirm, setConfirm] = useState(null);
 
   if (!store) {
@@ -47,10 +47,9 @@ export default function StoreMobile() {
   const selected = store.products.find((p) => p.id === selectedId) ?? store.products[0];
   const toItem = (p) => ({ id: p.id, title: p.title, meta: p.detail, price: p.price });
 
-  function addSelected() {
+  function addSelected(fromEl) {
     add(toItem(selected));
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    flyToCart(fromEl, "cart-button-store");
   }
 
   function buySelected() {
@@ -79,7 +78,12 @@ export default function StoreMobile() {
             <Icon name="arrowLeft" className="h-5 w-5" />
           </button>
           <span className="truncate px-2 text-sm font-bold text-slate-900">{store.name}</span>
-          <span className="w-8" />
+          <button type="button" id="cart-button-store" aria-label="Cart" onClick={() => navigate("/cart")} className="relative rounded-full p-1.5 text-slate-700">
+            <Icon name="cart" className="h-5 w-5" />
+            {count > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0284C7] px-1 text-[9px] font-bold text-white ring-2 ring-white">{count}</span>
+            )}
+          </button>
         </div>
       }
       footer={
@@ -94,10 +98,10 @@ export default function StoreMobile() {
           </button>
           <button
             type="button"
-            onClick={addSelected}
+            onClick={(e) => addSelected(e.currentTarget)}
             className="flex-1 rounded-full border-[1.5px] border-[#8ACFF8] bg-white py-2.5 text-xs font-bold text-[#0369A1] transition active:scale-95"
           >
-            {added ? "Added ✓" : "Add to Cart"}
+            Add to Cart
           </button>
           <button
             type="button"
