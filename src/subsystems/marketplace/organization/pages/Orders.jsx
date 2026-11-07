@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-import { useSellerOrders } from "../../components/useSellerOrders";
-import FilterModal from "../../components/FilterModal";
-import Sidebar from "../../components/Sidebar";
+import { useSellerOrders } from "../components/useSellerOrders";
+import FilterModal from "../components/FilterModal";
+import Sidebar from "../components/Sidebar";
 import SellerMessages from "../../pages/SellerMessages";
 
-import "../../components/SellerOrders.css";
+import "../components/SellerOrders.css";
 
 import {
   MessageSquare,

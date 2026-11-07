@@ -12,10 +12,18 @@ import {
   OrganizationSeller,
 } from "../subsystems/auth";
 import Placeholder from "../components/Placeholder.jsx";
-import SellerPlaceholder from "../subsystems/marketplace/components/SellerPlaceholder.jsx";
+import SellerPlaceholder from "../subsystems/marketplace/organization/components/SellerPlaceholder.jsx";
 import SellerMessages from "../subsystems/marketplace/pages/SellerMessages.jsx";
 import SellerOrders from "../subsystems/marketplace/organization/pages/Orders.jsx";
 import SellerAnalytics from "../subsystems/marketplace/pages/SellerAnalytics.jsx";
+
+// Organization seller portal pages
+import OrgDashboard from "../subsystems/marketplace/organization/pages/Dashboard.jsx";
+import OrgProducts from "../subsystems/marketplace/organization/pages/Products.jsx";
+import OrgInventory from "../subsystems/marketplace/organization/pages/Inventory.jsx";
+import OrgAnalytics from "../subsystems/marketplace/organization/pages/Analytics.jsx";
+import OrgMessages from "../subsystems/marketplace/organization/pages/Messages.jsx";
+import OrgSettings from "../subsystems/marketplace/organization/pages/Settings.jsx";
 
 // Import Admin Dashboard
 import AdminDashboard from "../subsystems/admin/pages/AdminDashboard.jsx";
@@ -54,6 +62,15 @@ export default function AppRoutes() {
       {/* Seller Portal Routes - No Global Navbar */}
       <Route path="/seller/messages" element={<SellerMessages />} />
       <Route path="/seller/orders" element={<SellerOrders />} />
+
+      {/* Organization Seller Portal Routes */}
+      <Route path="/seller/org/dashboard" element={<OrgDashboard />} />
+      <Route path="/seller/org/products" element={<OrgProducts />} />
+      <Route path="/seller/org/inventory" element={<OrgInventory />} />
+      <Route path="/seller/org/orders" element={<SellerOrders />} />
+      <Route path="/seller/org/analytics" element={<OrgAnalytics />} />
+      <Route path="/seller/org/messages" element={<OrgMessages />} />
+      <Route path="/seller/org/settings" element={<OrgSettings />} />
 
       {/* Main App Routes */}
       <Route element={<Layout />}>
