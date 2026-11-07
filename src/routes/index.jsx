@@ -49,11 +49,12 @@ export default function AppRoutes() {
         />
       </Route>
 
+      {/* Seller Portal Routes - No Navbar */}
+      <Route path="/seller/messages" element={<SellerMessages />} />
+      <Route path="/seller/orders" element={<SellerOrders />} />
+
       {/* Main App Routes - With Navbar */}
       <Route element={<Layout />}>
-        <Route path="/seller/messages" element={<SellerMessages />} />
-        <Route path="/seller/orders" element={<SellerOrders />} />
-
         {/* Marketplace Routes (Subsystem 2) - Coming Soon */}
         <Route
           path="/marketplace"

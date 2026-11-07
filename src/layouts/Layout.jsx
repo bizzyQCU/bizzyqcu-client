@@ -24,20 +24,14 @@ function ScrollManager() {
 export default function Layout() {
   const { pathname } = useLocation();
   const isSellerMessages = pathname === "/seller/messages";
-  const isSellerOrders = pathname === "/seller/orders";
-
-  // Pages that have their own full-page layout (sidebar + internal header)
-  // should not render the global Navbar or Footer.
-  const hideShell = isSellerMessages || isSellerOrders;
-
   return (
     <div
-      className={`min-h-screen flex flex-col ${isSellerMessages ? "bg-[#f1f3f6] text-slate-900" : isSellerOrders ? "bg-[#F8FAFC]" : "text-white"} overflow-x-hidden`}
+      className={`min-h-screen flex flex-col ${isSellerMessages ? "bg-[#f1f3f6] text-slate-900" : "text-white"} overflow-x-hidden`}
     >
       <ScrollManager />
-      {!hideShell && <Navbar />}
+      <Navbar />
       <Outlet />
-      {!hideShell && <Footer />}
+      {!isSellerMessages && <Footer />}
     </div>
   );
 }
