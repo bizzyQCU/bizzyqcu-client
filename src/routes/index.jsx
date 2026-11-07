@@ -14,7 +14,7 @@ import {
 import Placeholder from "../components/Placeholder.jsx";
 import SellerPlaceholder from "../subsystems/marketplace/components/SellerPlaceholder.jsx";
 import SellerMessages from "../subsystems/marketplace/pages/SellerMessages.jsx";
-import SellerOrders from "../subsystems/marketplace/pages/SellerOrders.jsx";
+import SellerOrders from "../subsystems/marketplace/organization/pages/Orders.jsx";
 import SellerAnalytics from "../subsystems/marketplace/pages/SellerAnalytics.jsx";
 
 // Import Admin Dashboard
