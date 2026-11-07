@@ -25,10 +25,22 @@ export function MessageProvider({ children }) {
     ...seedThreads,
   }));
   const replyIndex = useRef(0);
+  // Last activity per contact. Seeded so the list starts in its original order.
+  const [lastActive, setLastActive] = useState(() => {
+    const now = Date.now();
+    return Object.fromEntries([SUPPORT, ...conversations.map((c) => c.id)].map((id, i) => [id, now - i * 1000]));
+  });
 
   const appendTo = useCallback((id, msg) => {
     setThreads((t) => ({ ...t, [id]: [...(t[id] ?? []), msg] }));
+    setLastActive((a) => ({ ...a, [id]: Date.now() }));
   }, []);
+
+  // Most recently active conversation first.
+  const sortedContacts = useMemo(
+    () => [...contacts].sort((a, b) => (lastActive[b.id] ?? 0) - (lastActive[a.id] ?? 0)),
+    [contacts, lastActive]
+  );
 
   const openChat = useCallback((id) => {
     setActiveId(id);
@@ -69,8 +81,8 @@ export function MessageProvider({ children }) {
   );
 
   const value = useMemo(
-    () => ({ open, setOpen, view, setView, activeId, setActiveId, contacts, threads, typing, openChat, openSeller, sendText }),
-    [open, view, activeId, contacts, threads, typing, openChat, openSeller, sendText]
+    () => ({ open, setOpen, view, setView, activeId, setActiveId, contacts: sortedContacts, threads, typing, openChat, openSeller, sendText }),
+    [open, view, activeId, sortedContacts, threads, typing, openChat, openSeller, sendText]
   );
 
   return <MessageContext.Provider value={value}>{children}</MessageContext.Provider>;

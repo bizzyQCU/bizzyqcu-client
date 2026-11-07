@@ -92,6 +92,8 @@ export const stores = [
 ];
 
 export const orders = [
+  { id: "0930", status: "To pay", seller: "Maria Santos", storeName: "The Crafty Sparks", total: 320, placed: "Today, Oct 26 · 11:02 AM", fulfillment: "GCash · waiting for payment", tone: "amber" },
+  { id: "0931", status: "Waiting for approval", seller: "Alyssa Bautista", storeName: "QCU Print & Bind", total: 150, placed: "Today, Oct 26 · 11:05 AM", fulfillment: "Cash · waiting for seller approval", tone: "amber" },
   { id: "0891", status: "Preparing", seller: "Maria Santos", storeName: "The Crafty Sparks", total: 630, placed: "Placed today, Oct 26 · 10:14 AM", fulfillment: "Room delivery · Tech Bldg Room 402", tone: "amber" },
   { id: "0740", status: "Ready for pickup", seller: "Kevin Cruz", storeName: "Metro Silicon Lab", total: 850, placed: "Yesterday, 4:50 PM", fulfillment: "Pickup · Library Ground Gate", tone: "sky" },
   { id: "0777", status: "Out for delivery", seller: "Metro Silicon Lab", total: 250, placed: "Today, Oct 26 · 9:40 AM", fulfillment: "Room delivery · Library 3rd Floor", tone: "sky" },

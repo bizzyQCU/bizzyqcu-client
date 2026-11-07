@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Icon from "./Icon.jsx";
 import { SUPPORT, useMessages } from "../lib/MessageContext.jsx";
 
 const quickReplies = ["Track my order", "Payment problem", "Delivery question"];
 
 export default function MessageWidget() {
-  const navigate = useNavigate();
   const { open, setOpen, view, setView, activeId, contacts, threads, typing, openChat, sendText } = useMessages();
   const [minimized, setMinimized] = useState(false);
   const [draft, setDraft] = useState("");
@@ -108,7 +106,7 @@ export default function MessageWidget() {
 
       {!minimized && view === "list" && (
         <>
-          <div className="flex-1 overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto">
             {listItems.map((c) => (
               <button key={c.id} type="button" onClick={() => openChat(c.id)} className="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3.5 text-left transition hover:bg-sky-50/60">
                 <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold ${c.id === SUPPORT ? "bg-[#0284C7] text-white" : "bg-sky-100 text-sky-700"}`}>
@@ -124,24 +122,12 @@ export default function MessageWidget() {
               </button>
             ))}
           </div>
-          <div className="border-t border-slate-100 bg-white p-3">
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                navigate("/messages");
-              }}
-              className="w-full rounded-full border-[1.5px] border-[#8ACFF8] bg-white py-2 text-xs font-semibold text-[#0369A1] transition hover:bg-sky-50"
-            >
-              Open full inbox
-            </button>
-          </div>
         </>
       )}
 
       {!minimized && view === "chat" && (
         <>
-          <div className="flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4 text-xs">
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4 text-xs">
             {activeMessages.map((m) =>
               m.type === "system" ? (
                 <div key={m.id} className="flex justify-center">
