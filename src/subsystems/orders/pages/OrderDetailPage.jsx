@@ -1,28 +1,139 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
 import RatingModal from "../../../components/RatingModal.jsx";
 import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
 import { useMessages } from "../../../lib/MessageContext.jsx";
 import { useRatings } from "../../../lib/RatingContext.jsx";
-import { orders, orderTimeline, deliveryFee } from "../../../lib/mockData.js";
 import ProductArt, { galleryFor } from "../../../components/ProductArt.jsx";
-import { canCancel, canConfirmReceived, canRequestRefund } from "../../../lib/orderRules.js";
+import { canRequestRefund } from "../../../lib/orderRules.js";
+import { getOrderById, cancelOrder } from "../api.js";
+import { getErrorMessage } from "../../../lib/api-client.js";
+
+const STATUS_LABELS = {
+  PENDING_PAYMENT: "To pay",
+  PENDING_CONFIRMATION: "Waiting for approval",
+  PREPARING: "Preparing",
+  READY_FOR_PICKUP: "Ready for pickup",
+  OUT_FOR_DELIVERY: "Out for delivery",
+  COMPLETED: "Completed",
+  CANCELLED: "Cancelled",
+};
+
+function getTimelineSteps(orderStatus, deliveryMethod) {
+  if (orderStatus === "CANCELLED") {
+    return [
+      { label: "Order Placed", state: "done" },
+      { label: "Cancelled", state: "current" },
+    ];
+  }
+
+  const fulfillmentLabel = deliveryMethod === "ROOM_TO_ROOM" ? "Out for delivery" : "Ready for pickup";
+
+  const stages = [
+    { label: "Waiting for approval" },
+    { label: "Preparing" },
+    { label: fulfillmentLabel },
+    { label: "Completed" },
+  ];
+
+  const rankMap = {
+    PENDING_PAYMENT: 0,
+    PENDING_CONFIRMATION: 0,
+    PREPARING: 1,
+    READY_FOR_PICKUP: 2,
+    OUT_FOR_DELIVERY: 2,
+    COMPLETED: 3,
+  };
+
+  const currentRank = rankMap[orderStatus] ?? 0;
+
+  return stages.map((stage, idx) => ({
+    label: stage.label,
+    state: idx < currentRank ? "done" : idx === currentRank ? "current" : "todo",
+  }));
+}
 
 export default function OrderDetailPage() {
   const { id } = useParams();
   const { openSeller } = useMessages();
   const { addRating } = useRatings();
-  const order = orders.find((o) => o.id === id);
-  const [status, setStatus] = useState(order?.status);
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState(null);
   const [refundRequested, setRefundRequested] = useState(false);
   const [rated, setRated] = useState(false);
-  const [cancelled, setCancelled] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState(null);
   const [showRating, setShowRating] = useState(false);
-  const items = order?.items ?? [];
-  const subtotal = items.reduce((s, i) => s + i.price, 0);
-  const total = subtotal + deliveryFee;
+
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    setError(null);
+    getOrderById(id)
+      .then((res) => {
+        if (!ignore) {
+          setOrder(res.data);
+          setStatus(STATUS_LABELS[res.data.orderStatus] ?? res.data.orderStatus);
+        }
+      })
+      .catch((err) => {
+        if (!ignore) {
+          setError(err);
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [id]);
+
+  const handleCancel = async () => {
+    setConfirmCancel(false);
+    setCancelling(true);
+    setCancelError(null);
+    try {
+      const res = await cancelOrder(order.id);
+      setOrder(res.data);
+      setStatus(STATUS_LABELS[res.data.orderStatus] ?? res.data.orderStatus);
+    } catch (err) {
+      setCancelError(getErrorMessage(err));
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-[1440px] py-20 text-center">
+        <p className="text-sm text-slate-500">Loading order…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    if (error?.response?.status === 404) {
+      return (
+        <div className="mx-auto max-w-[1440px] py-20 text-center">
+          <p className="text-sm font-semibold text-slate-700">Order not found.</p>
+          <Link to="/orders" className="mt-2 inline-block text-xs font-semibold text-sky-600">Back to all orders</Link>
+        </div>
+      );
+    }
+    return (
+      <div className="mx-auto max-w-[1440px] py-20 text-center">
+        <p className="text-sm font-semibold text-rose-600">{getErrorMessage(error)}</p>
+        <Link to="/orders" className="mt-2 inline-block text-xs font-semibold text-sky-600">Back to all orders</Link>
+      </div>
+    );
+  }
 
   if (!order) {
     return (
@@ -33,11 +144,25 @@ export default function OrderDetailPage() {
     );
   }
 
+  const seller = order.store.name;
+  const initials = seller.split(" ").filter(Boolean).map((w) => w[0]).join("").slice(0, 2);
+  const items = order.items ?? [];
+  const subtotal = items.reduce((s, i) => s + Number(i.unitPriceSnapshot) * i.quantity, 0);
+  const total = Number(order.totalAmount);
   const live = { ...order, status, refundRequested };
+  const canCancelOrder = order.orderStatus === "PENDING_PAYMENT" || order.orderStatus === "PENDING_CONFIRMATION";
 
   return (
     <div className="mx-auto max-w-[1440px]">
-      <ConfirmDialog open={confirmCancel} title="Cancel this order?" message="The seller will be notified. Cancelled orders can't be restored." confirmLabel="Cancel order" tone="danger" onCancel={() => setConfirmCancel(false)} onConfirm={() => { setConfirmCancel(false); setCancelled(true); setStatus("Cancelled"); }} />
+      <ConfirmDialog
+        open={confirmCancel}
+        title="Cancel this order?"
+        message="The seller will be notified. Cancelled orders can't be restored."
+        confirmLabel="Cancel order"
+        tone="danger"
+        onCancel={() => setConfirmCancel(false)}
+        onConfirm={handleCancel}
+      />
       <div className="mb-6">
         <nav className="mb-2 flex items-center space-x-2 text-xs font-semibold text-slate-500">
           <Link to="/orders" className="flex items-center hover:text-slate-800">
@@ -48,13 +173,13 @@ export default function OrderDetailPage() {
           <span className="font-medium text-slate-800">Order Tracking</span>
         </nav>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Order #BZ-2024-{order.id}</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Order #{order.orderNumber}</h1>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FFD444]/60 bg-[#FFD444]/20 px-3 py-1 text-xs font-bold text-[#854D0E]">
             <span className="h-2 w-2 rounded-full bg-[#EAB308]" />
-            {cancelled ? "Cancelled" : status}
+            {status}
           </span>
         </div>
-        <p className="mt-1 text-xs font-medium text-slate-500">{order.placed}</p>
+        <p className="mt-1 text-xs font-medium text-slate-500">{new Date(order.createdAt).toLocaleDateString()}</p>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
@@ -71,8 +196,8 @@ export default function OrderDetailPage() {
               </div>
             </div>
             <ol className="relative pl-1">
-              {orderTimeline.map((step, idx) => {
-                const last = idx === orderTimeline.length - 1;
+              {getTimelineSteps(order.orderStatus, order.deliveryMethod).map((step, idx, arr) => {
+                const last = idx === arr.length - 1;
                 const isDone = step.state === "done";
                 const isCurrent = step.state === "current";
                 return (
@@ -93,15 +218,7 @@ export default function OrderDetailPage() {
                           <h3 className={`text-sm ${isCurrent ? "font-extrabold text-[#0284C7]" : isDone ? "font-bold text-slate-800" : "font-semibold text-slate-600"}`}>{step.label}</h3>
                           {isCurrent && <span className="rounded-full bg-[#FFD444] px-2 py-0.5 text-[10px] font-extrabold tracking-wide text-slate-900">NOW</span>}
                         </div>
-                        <span className={`text-xs ${isCurrent ? "font-bold text-[#0284C7]" : "font-medium text-slate-400"}`}>{step.time}</span>
                       </div>
-                      {step.desc && <p className="mt-0.5 text-xs text-slate-500">{step.desc}</p>}
-                      {isCurrent && (
-                        <div className="mt-2.5 rounded-xl border border-sky-100 bg-[#EFF6FF] p-3.5">
-                          <p className="text-xs font-bold text-[#0369A1]">Seller packaging items at Tech Bldg Hub</p>
-                          <p className="mt-1 text-[11px] leading-relaxed text-[#475569]">Verification seals applied for textbook edition checks and apparel sizes.</p>
-                        </div>
-                      )}
                     </div>
                   </li>
                 );
@@ -157,17 +274,16 @@ export default function OrderDetailPage() {
                 <li key={i.id} className="flex items-center justify-between py-4">
                   <div className="flex items-center space-x-4">
                     <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-slate-200">
-                      <ProductArt art={i.art ?? galleryFor(i.id)[0]} />
+                      <ProductArt art={galleryFor(i.productId)[0]} />
                     </div>
                     <div>
                       <div className="flex items-center space-x-2">
-                        <h4 className="text-sm font-bold text-slate-900">{i.title}</h4>
-                        <span className="rounded border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-600">{i.badge}</span>
+                        <h4 className="text-sm font-bold text-slate-900">{i.productNameSnapshot}</h4>
+                        <span className="rounded border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-600">Qty: {i.quantity}</span>
                       </div>
-                      <p className="mt-1 text-xs text-slate-500">{i.meta}</p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-slate-900">₱{i.price.toFixed(2)}</span>
+                  <span className="text-sm font-bold text-slate-900">₱{Number(i.unitPriceSnapshot).toFixed(2)}</span>
                 </li>
               ))}
             </ul>
@@ -192,26 +308,29 @@ export default function OrderDetailPage() {
           <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
             <h2 className="text-sm font-bold text-slate-900">Order Actions</h2>
             <p className="mb-5 mt-0.5 text-xs text-slate-500">Manage transaction status and campus communication</p>
-            <div className="space-y-1.5 text-center">
-              <button type="button" disabled={!canConfirmReceived(live)} onClick={() => setStatus("Completed")} className="flex w-full items-center justify-center space-x-2 rounded-xl border border-[#0284C7] bg-[#0284C7] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#0369A1] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-200 disabled:text-slate-400">
-                <Icon name="check" className="h-4 w-4" strokeWidth={2.5} />
-                <span>Confirm received</span>
-              </button>
-              <p className="flex items-center justify-center gap-1 pt-1 text-[11px] text-slate-400">
-                <Icon name="clock" className="h-3 w-3 text-slate-400" />
-                Active once the order is handed to you
-              </p>
-            </div>
-            <div className="mt-4">
-              <button type="button" className="flex w-full items-center justify-center space-x-2 rounded-full border-[1.5px] border-[#8ACFF8] bg-white px-4 py-2.5 text-sm font-bold text-[#0369A1] transition-colors hover:bg-sky-50" onClick={() => openSeller({ key: `order-${order.id}`, name: order.seller, initials: order.seller.split(" ").map((w) => w[0]).join("").slice(0, 2) })}>
+            
+            {/* Confirm received is hidden pending a backend endpoint */}
+
+            <div>
+              <button type="button" className="flex w-full items-center justify-center space-x-2 rounded-full border-[1.5px] border-[#8ACFF8] bg-white px-4 py-2.5 text-sm font-bold text-[#0369A1] transition-colors hover:bg-sky-50" onClick={() => openSeller({ key: `order-${order.id}`, name: seller, initials })}>
                 <Icon name="chat" className="h-4 w-4 text-[#0369A1]" />
                 <span>Message seller</span>
               </button>
             </div>
-            {canCancel(live) && (
-            <div className="mt-3 text-center">
-              <button type="button" disabled={cancelled} onClick={() => setConfirmCancel(true)} className="text-xs font-semibold text-slate-500 transition-colors hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-40">{cancelled ? "Order cancelled" : "Cancel order"}</button>
-            </div>
+            {canCancelOrder && (
+              <div className="mt-3 text-center">
+                <button
+                  type="button"
+                  disabled={cancelling}
+                  onClick={() => setConfirmCancel(true)}
+                  className="text-xs font-semibold text-slate-500 transition-colors hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {cancelling ? "Cancelling…" : "Cancel order"}
+                </button>
+              </div>
+            )}
+            {cancelError && (
+              <p className="mt-2 text-center text-xs font-medium text-rose-600">{cancelError}</p>
             )}
             <div className="mt-4">
               <button
@@ -242,7 +361,7 @@ export default function OrderDetailPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Seller</span>
-                <span className="font-semibold text-slate-800">{order.seller}</span>
+                <span className="font-semibold text-slate-800">{seller}</span>
               </div>
             </div>
             <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs">
@@ -258,12 +377,12 @@ export default function OrderDetailPage() {
 
       {showRating && (
         <RatingModal
-          seller={order.seller}
-          initials={order.seller.split(" ").map((w) => w[0]).join("").slice(0, 2)}
-          orderRef={`#BZ-2024-${order.id}`}
+          seller={seller}
+          initials={initials}
+          orderRef={`#${order.orderNumber}`}
           onClose={() => setShowRating(false)}
           onSubmit={({ rating, comment }) => {
-            addRating(order.storeName, rating, comment);
+            addRating(seller, rating, comment);
             setRated(true);
             setShowRating(false);
           }}
