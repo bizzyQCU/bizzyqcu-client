@@ -49,3 +49,18 @@ export const updateOrderStatus = async (orderId, status) => {
 
 /** Cancels an order (server restores stock). */
 export const cancelOrder = (orderId) => updateOrderStatus(orderId, 'CANCELLED');
+
+/**
+ * GET /orders/:id
+ * Retrieves a single order by ID for the authenticated buyer, seller, or admin.
+ *
+ * @param {string} orderId  uuid
+ * @returns {Promise<{success: boolean, data: object}>}
+ *   data includes: id, orderNumber, orderStatus, totalAmount, deliveryMethod,
+ *   paymentMethod, createdAt, store: { id, name, pickupLocation },
+ *   buyer: { id, fullName, email }, items[], payment: { amount, method, status }
+ */
+export const getOrderById = async (orderId) => {
+  const response = await apiClient.get(`/orders/${orderId}`);
+  return response.data;
+};

@@ -1,6 +1,6 @@
 import useIsMobile from "../../../hooks/useIsMobile.js";
 import MB_StorePage from "./MB_StorePage.jsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { flyToCart } from "../../../lib/flyToCart.js";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
@@ -12,7 +12,15 @@ import { galleryFor } from "../../../components/ProductArt.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";
 import { useMessages } from "../../../lib/MessageContext.jsx";
 import { useRatings } from "../../../lib/RatingContext.jsx";
-import { stores } from "../../../lib/mockData.js";
+import { getStore } from "../../marketplace/api.js";
+import { createOrder } from "../api.js";
+import { getErrorMessage } from "../../../lib/api-client.js";
+
+const SELLER_TYPE_LABELS = {
+  STUDENT_ENTERPRISE: "Enterprise",
+  RECOGNIZED_ORGANIZATION: "Organization",
+  INDEPENDENT_SELLER: "Independent Seller",
+};
 
 function Stars({ value, size = "h-3.5 w-3.5" }) {
   return (
@@ -27,12 +35,40 @@ function Stars({ value, size = "h-3.5 w-3.5" }) {
 function StoreDesktop() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { add, buyNow, count } = useCart();
+  const { add } = useCart();
   const { openSeller } = useMessages();
   const { getRating } = useRatings();
-  const store = stores.find((s) => String(s.id) === id);
+
+  const [store, setStore] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [zoomProduct, setZoomProduct] = useState(null);
   const [confirm, setConfirm] = useState(null);
+  // Per-product Buy Now state
+  const [buyingId, setBuyingId] = useState(null);
+  const [buyError, setBuyError] = useState(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    getStore(id)
+      .then((data) => setStore(data.data))
+      .catch((err) => setError(getErrorMessage(err)))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return <p className="py-20 text-center text-sm text-slate-500">Loading store…</p>;
+  }
+
+  if (error) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-sm text-rose-600">{error}</p>
+        <Link to="/marketplace" className="mt-3 inline-block text-sm font-semibold text-sky-600">Back to marketplace</Link>
+      </div>
+    );
+  }
 
   if (!store) {
     return (
@@ -44,9 +80,51 @@ function StoreDesktop() {
   }
 
   const rating = getRating(store.name);
+  const initials = store.name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
 
+  /** Add to cart — uses the local CartContext; does not create an order. */
   function toCartItem(p) {
-    return { id: p.id, title: p.title, meta: p.detail, price: p.price };
+    return {
+      id: p.id,
+      title: p.name,
+      meta: p.category?.name ?? "",
+      price: parseFloat(p.price),
+    };
+  }
+
+  /**
+   * Buy Now — calls POST /orders directly.
+   * Defaults to PICKUP + CASH (no checkout flow is selected at this point).
+   * Does NOT touch the cart.
+   */
+  async function handleBuyNow(p) {
+    setBuyingId(p.id);
+    setBuyError(null);
+    try {
+      const result = await createOrder({
+        storeId: store.id,
+        deliveryMethod: "PICKUP",
+        paymentMethod: "CASH",
+        items: [{ productId: p.id, quantity: 1 }],
+      });
+      // POST /orders returns { success, data: { orders: [<order>, …] } }
+      // createOrder is always one store → one order → orders[0]
+      const orderId = result.data.orders[0].id;
+      navigate(`/orders/${orderId}`);
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        setBuyError("You must be logged in as a buyer to place an order.");
+      } else {
+        setBuyError(getErrorMessage(err));
+      }
+    } finally {
+      setBuyingId(null);
+    }
   }
 
   return (
@@ -61,15 +139,17 @@ function StoreDesktop() {
         <div className="flex flex-wrap items-start justify-between gap-4 px-6 pb-6">
           <div className="flex items-start gap-5">
             <div className="-mt-10 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white bg-sky-100 text-xl font-bold text-sky-700 shadow-sm">
-              {store.initials}
+              {initials}
             </div>
             <div className="pt-3">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-extrabold leading-tight tracking-tight text-slate-900">{store.name}</h1>
                 <VerifiedSeal className="h-5 w-5" />
               </div>
-              <p className="mt-1 text-xs leading-relaxed text-slate-500">{store.desc}</p>
-              <span className="mt-2 inline-block rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-[11px] font-semibold text-sky-700">{store.type}</span>
+              <p className="mt-1 text-xs leading-relaxed text-slate-500">{store.description}</p>
+              <span className="mt-2 inline-block rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-[11px] font-semibold text-sky-700">
+                {SELLER_TYPE_LABELS[store.sellerProfile?.sellerType] ?? store.sellerProfile?.sellerType}
+              </span>
             </div>
           </div>
 
@@ -81,7 +161,7 @@ function StoreDesktop() {
             </div>
             <button
               type="button"
-              onClick={() => openSeller({ key: `store-${store.id}`, name: store.name, initials: store.initials })}
+              onClick={() => openSeller({ key: `store-${store.id}`, name: store.name, initials })}
               className="mt-1 rounded-full border-[1.5px] border-[#8ACFF8] bg-white px-4 py-2 text-xs font-semibold text-[#0369A1] transition hover:bg-sky-50 active:scale-95"
             >
               Message seller
@@ -92,8 +172,15 @@ function StoreDesktop() {
 
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-bold text-slate-900">Products</h2>
-        <span className="text-xs text-slate-500">{store.products.length} items · {store.category}</span>
+        <span className="text-xs text-slate-500">
+          {store.products.length} {store.products.length === 1 ? "item" : "items"}
+        </span>
       </div>
+
+      {/* Buy Now error banner */}
+      {buyError && (
+        <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs text-rose-700">{buyError}</p>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {store.products.map((p) => (
@@ -101,7 +188,7 @@ function StoreDesktop() {
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
-                aria-label={`View photos of ${p.title}`}
+                aria-label={`View photos of ${p.name}`}
                 onClick={() => setZoomProduct(p)}
                 className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-sky-100 bg-sky-50 transition hover:scale-105 hover:shadow-md active:scale-95"
               >
@@ -113,9 +200,9 @@ function StoreDesktop() {
                 </svg>
               </button>
               <div className="min-w-0">
-                <h3 className="text-sm font-bold leading-snug text-slate-900">{p.title}</h3>
-                <p className="mt-0.5 text-[11px] text-slate-500">{p.detail}</p>
-                <p className="mt-1 text-sm font-extrabold text-slate-900">₱{p.price.toFixed(2)}</p>
+                <h3 className="text-sm font-bold leading-snug text-slate-900">{p.name}</h3>
+                <p className="mt-0.5 text-[11px] text-slate-500">{p.category?.name ?? ""}</p>
+                <p className="mt-1 text-sm font-extrabold text-slate-900">₱{Number(p.price).toLocaleString("en-PH")}</p>
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -131,20 +218,11 @@ function StoreDesktop() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  const go = () => {
-                    buyNow(toCartItem(p));
-                    navigate("/checkout");
-                  };
-                  if (count > 0) {
-                    setConfirm({ title: "Replace your cart?", message: `Buy now will replace the ${count} ${count === 1 ? "item" : "items"} in your cart with ${p.title}.`, confirmLabel: "Buy now", tone: "primary", action: go });
-                  } else {
-                    go();
-                  }
-                }}
-                className="rounded-full bg-[#0284C7] px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0369A1] active:scale-95"
+                disabled={buyingId === p.id}
+                onClick={() => handleBuyNow(p)}
+                className="rounded-full bg-[#0284C7] px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0369A1] active:scale-95 disabled:opacity-60"
               >
-                Buy now
+                {buyingId === p.id ? "Placing…" : "Buy now"}
               </button>
             </div>
           </div>
@@ -153,13 +231,21 @@ function StoreDesktop() {
 
       <ReviewsSection storeName={store.name} />
 
-      <ConfirmDialog open={!!confirm} title={confirm?.title} message={confirm?.message} confirmLabel={confirm?.confirmLabel} tone={confirm?.tone} onCancel={() => setConfirm(null)} onConfirm={() => { confirm?.action(); setConfirm(null); }} />
+      <ConfirmDialog
+        open={!!confirm}
+        title={confirm?.title}
+        message={confirm?.message}
+        confirmLabel={confirm?.confirmLabel}
+        tone={confirm?.tone}
+        onCancel={() => setConfirm(null)}
+        onConfirm={() => { confirm?.action(); setConfirm(null); }}
+      />
 
       <Lightbox
         key={zoomProduct?.id}
         open={!!zoomProduct}
         onClose={() => setZoomProduct(null)}
-        title={zoomProduct?.title}
+        title={zoomProduct?.name}
         images={zoomProduct ? galleryFor(zoomProduct.id) : []}
       />
     </div>
