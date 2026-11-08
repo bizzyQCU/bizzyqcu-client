@@ -11,7 +11,7 @@ import {
   Circle,
   Eye,
 } from "lucide-react";
-import { MOCK_CATEGORIES } from "./useProducts";
+import { DEFAULT_CATEGORIES } from "./useProducts";
 import ProductCardPreview from "./ProductCardPreview";
 import {
   fileToDataUrl,
@@ -23,7 +23,15 @@ const MAX_IMAGES = 3;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-export default function EditProduct({ product, onUpdateProduct, onCancel }) {
+export default function EditProduct({
+  product,
+  categories = [],
+  onUpdateProduct,
+  onCancel,
+}) {
+  const availableCategories =
+    categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES;
+
   // Form Fields
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -35,6 +43,7 @@ export default function EditProduct({ product, onUpdateProduct, onCancel }) {
   // Direct Image Upload State: Array of { id, url, file, name, type, isLocal }
   const [images, setImages] = useState([]);
   const [imageError, setImageError] = useState(null);
+  const [apiError, setApiError] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
@@ -55,7 +64,12 @@ export default function EditProduct({ product, onUpdateProduct, onCancel }) {
   useEffect(() => {
     if (product) {
       setName(product.name || "");
-      setCategoryId(product.categoryId || MOCK_CATEGORIES[0]?.id || "");
+      setCategoryId(
+        product.categoryId ||
+          availableCategories.find((c) => c.name === product.categoryName)?.id ||
+          availableCategories[0]?.id ||
+          ""
+      );
       setDescription(product.description || "");
       setPrice(
         product.price !== undefined && product.price !== null
@@ -228,37 +242,35 @@ export default function EditProduct({ product, onUpdateProduct, onCancel }) {
 
     if (!product?.id) return;
     setIsSubmitting(true);
+    setApiError(null);
 
-    // Save/update images in IndexedDB
-    let finalImageUrls = [];
     try {
-      const savedRecord = await saveProductImages(product.id, images);
-      if (savedRecord && savedRecord.images && savedRecord.images.length > 0) {
-        finalImageUrls = savedRecord.images.map((img) => img.url).filter(Boolean);
-      }
+      const categoryObj = availableCategories.find((c) => c.id === categoryId);
+      const imageFiles = images.map((img) => img.file).filter(Boolean);
+      const localUrls = images.map((img) => img.url).filter(Boolean);
+
+      await onUpdateProduct(
+        product.id,
+        {
+          name: name.trim(),
+          categoryId,
+          categoryName: categoryObj?.name || product.categoryName,
+          description: description.trim(),
+          price: parseFloat(price),
+          stockQuantity: parseInt(stockQuantity, 10),
+          imageUrls: localUrls,
+          rawImages: images,
+          isAvailable,
+        },
+        imageFiles
+      );
+
+      onCancel();
     } catch (err) {
-      console.warn("Failed to persist updated images to IndexedDB:", err);
+      console.error("EditProduct error:", err);
+      setApiError(err?.message || "Failed to update product. Please try again.");
+      setIsSubmitting(false);
     }
-
-    if (finalImageUrls.length === 0) {
-      finalImageUrls = images.map((img) => img.url);
-    }
-
-    const categoryObj = MOCK_CATEGORIES.find((c) => c.id === categoryId);
-
-    onUpdateProduct(product.id, {
-      name: name.trim(),
-      categoryId,
-      categoryName: categoryObj?.name || "Apparel & Uniforms",
-      description: description.trim(),
-      price: parseFloat(price),
-      stockQuantity: parseInt(stockQuantity, 10),
-      imageUrls: finalImageUrls,
-      isAvailable,
-      // Retains existing approvalStatus without resetting to PENDING
-    });
-
-    onCancel();
   };
 
   return (
@@ -288,6 +300,14 @@ export default function EditProduct({ product, onUpdateProduct, onCancel }) {
         {/* Main Product Entry Form */}
         <div className="lg:col-span-7 xl:col-span-8">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Backend API Error Banner */}
+            {apiError && (
+              <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs px-4 py-3 rounded-xl flex items-center space-x-2 shadow-xs">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{apiError}</span>
+              </div>
+            )}
+
             {/* Section 1: Product Information */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-5">
               <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center space-x-2">
@@ -352,7 +372,7 @@ export default function EditProduct({ product, onUpdateProduct, onCancel }) {
                       : "border-slate-200"
                   }`}
                 >
-                  {MOCK_CATEGORIES.map((cat) => (
+                  {availableCategories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
@@ -654,9 +674,16 @@ export default function EditProduct({ product, onUpdateProduct, onCancel }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-lg text-sm font-semibold shadow-sm transition-colors disabled:opacity-60"
+                className="flex items-center space-x-2 px-6 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-lg text-sm font-semibold shadow-sm transition-colors disabled:opacity-60 cursor-pointer"
               >
-                {isSubmitting ? "Saving…" : "Save Changes"}
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <span>Save Changes</span>
+                )}
               </button>
             </div>
           </form>
@@ -684,7 +711,7 @@ export default function EditProduct({ product, onUpdateProduct, onCancel }) {
             <ProductCardPreview
               name={name}
               categoryName={
-                MOCK_CATEGORIES.find((c) => c.id === categoryId)?.name ||
+                availableCategories.find((c) => c.id === categoryId)?.name ||
                 product?.categoryName
               }
               description={description}

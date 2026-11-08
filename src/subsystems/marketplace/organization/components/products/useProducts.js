@@ -1,7 +1,12 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { deleteProductImages, getProductImages } from "./productImageStorage";
+import apiClient, { getErrorMessage } from "../../../../../lib/api-client";
+import {
+  deleteProductImages,
+  getProductImages,
+  saveProductImages,
+} from "./productImageStorage";
 
-export const MOCK_CATEGORIES = [
+export const DEFAULT_CATEGORIES = [
   { id: "cat-apparel", name: "Apparel & Uniforms" },
   { id: "cat-stationery", name: "Academic Stationery" },
   { id: "cat-food", name: "Food & Beverages" },
@@ -9,248 +14,51 @@ export const MOCK_CATEGORIES = [
   { id: "cat-events", name: "Event Tickets & Merch" },
 ];
 
-/**
- * 10 strategic mock product samples designed to demonstrate:
- * - All 5 categories
- * - All 3 approval statuses: APPROVED, PENDING, REJECTED
- * - Both availability options: AVAILABLE, UNAVAILABLE / PAUSED
- * - All 3 stock levels: In Stock (>5), Low Stock (1-5), Out of Stock (0)
- */
-export const INITIAL_MOCK_PRODUCTS = [
-  {
-    id: "prod-1",
-    name: "QCU CCS Official Org Hoodie",
-    categoryId: "cat-apparel",
-    categoryName: "Apparel & Uniforms",
-    description:
-      "Heavy-blend fleece navy blue org sweatshirt with collegiate QCU CS chest embroidery and custom drawstring hood. Warm, durable, and officially accredited.",
-    price: 650.0,
-    stockQuantity: 25, // In Stock (>5)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: true, // AVAILABLE
-    approvalStatus: "APPROVED", // APPROVED
-    createdAt: "2026-11-01T08:00:00.000Z",
-  },
-  {
-    id: "prod-2",
-    name: "CCS Tech Summit 2024 Lanyard",
-    categoryId: "cat-stationery",
-    categoryName: "Academic Stationery",
-    description:
-      "Standard 1-inch satin weave lanyard with silver swivel clasp and conference security badge holder. Ideal for student IDs and campus event passes.",
-    price: 70.0,
-    stockQuantity: 4, // Low Stock (1-5)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: true, // AVAILABLE
-    approvalStatus: "APPROVED", // APPROVED
-    createdAt: "2026-11-02T09:30:00.000Z",
-  },
-  {
-    id: "prod-3",
-    name: "QCU Collegiate Canvas Tote Bag",
-    categoryId: "cat-apparel",
-    categoryName: "Apparel & Uniforms",
-    description:
-      "Reinforced organic canvas carryall featuring vibrant university blueprint screenprint with inner stash pocket. Spacious enough for laptops and textbooks.",
-    price: 220.0,
-    stockQuantity: 15, // In Stock (>5)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: false, // UNAVAILABLE / PAUSED
-    approvalStatus: "APPROVED", // APPROVED
-    createdAt: "2026-11-03T11:00:00.000Z",
-  },
-  {
-    id: "prod-4",
-    name: "University Spirit Cold Brew Bottle",
-    categoryId: "cat-food",
-    categoryName: "Food & Beverages",
-    description:
-      "Handcrafted cold-brew bottled coffee infused with Madagascar vanilla, brewed by BSE Hospitality student society. Refreshing campus favorite.",
-    price: 120.0,
-    stockQuantity: 0, // Out of Stock (0)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: false, // UNAVAILABLE / PAUSED
-    approvalStatus: "APPROVED", // APPROVED
-    createdAt: "2026-11-04T15:30:00.000Z",
-  },
-  {
-    id: "prod-5",
-    name: "QCU Engineering Calculator Pouch",
-    categoryId: "cat-tech",
-    categoryName: "Tech & Accessories",
-    description:
-      "Shockproof neoprene protective zipper sleeve designed for standard scientific and graphing calculators with internal mesh accessory pocket.",
-    price: 130.0,
-    stockQuantity: 18, // In Stock (>5)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1585336261026-78c6e26b38c2?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: true, // AVAILABLE
-    approvalStatus: "PENDING", // PENDING
-    createdAt: "2026-11-05T14:20:00.000Z",
-  },
-  {
-    id: "prod-6",
-    name: "Cybersecurity League Vinyl Sticker Pack",
-    categoryId: "cat-events",
-    categoryName: "Event Tickets & Merch",
-    description:
-      "Die-cut waterproof vinyl sticker bundle featuring terminal commands, retro cyber art, and IT puns. Scratch resistant with matte finish.",
-    price: 55.0,
-    stockQuantity: 3, // Low Stock (1-5)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1572375992501-4b0892d50c69?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: true, // AVAILABLE
-    approvalStatus: "PENDING", // PENDING
-    createdAt: "2026-11-06T08:45:00.000Z",
-  },
-  {
-    id: "prod-7",
-    name: "Student Council Hardbound Planner 2025",
-    categoryId: "cat-stationery",
-    categoryName: "Academic Stationery",
-    description:
-      "Academic year planner with weekly sprint layouts, campus academic calendar, grade trackers, and motivational monthly dividers.",
-    price: 280.0,
-    stockQuantity: 0, // Out of Stock (0)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: false, // UNAVAILABLE / PAUSED
-    approvalStatus: "PENDING", // PENDING
-    createdAt: "2026-11-06T12:00:00.000Z",
-  },
-  {
-    id: "prod-8",
-    name: "Algorithm & Coding Bootcamp Pass",
-    categoryId: "cat-events",
-    categoryName: "Event Tickets & Merch",
-    description:
-      "Full weekend pass including interactive algorithm workshops, guest speaker sessions, coding contest entry, and digital certificate.",
-    price: 150.0,
-    stockQuantity: 30, // In Stock (>5)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: true, // AVAILABLE
-    approvalStatus: "REJECTED", // REJECTED
-    createdAt: "2026-11-07T11:15:00.000Z",
-  },
-  {
-    id: "prod-9",
-    name: "Campus Artisanal Pastry Box",
-    categoryId: "cat-food",
-    categoryName: "Food & Beverages",
-    description:
-      "Freshly baked box of assorted chocolate chunk and matcha cookies prepared by the Young Hoteliers Society for student scholarship fundraisers.",
-    price: 180.0,
-    stockQuantity: 2, // Low Stock (1-5)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: true, // AVAILABLE
-    approvalStatus: "APPROVED", // APPROVED
-    createdAt: "2026-11-07T14:40:00.000Z",
-  },
-  {
-    id: "prod-10",
-    name: "Commuter Multi-Port USB-C Hub",
-    categoryId: "cat-tech",
-    categoryName: "Tech & Accessories",
-    description:
-      "Compact aluminum 5-in-1 dongle adapter featuring 4K HDMI, 2x USB 3.0 ports, SD reader, and 100W Power Delivery pass-through charging.",
-    price: 499.0,
-    stockQuantity: 0, // Out of Stock (0)
-    imageUrls: [
-      "https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&w=600&q=80",
-    ],
-    isAvailable: false, // UNAVAILABLE / PAUSED
-    approvalStatus: "REJECTED", // REJECTED
-    createdAt: "2026-11-08T09:10:00.000Z",
-  },
-];
+export const MOCK_CATEGORIES = DEFAULT_CATEGORIES;
 
-const LOCAL_STORAGE_KEY = "bizzyqcu_org_products_v2";
 const PAGE_SIZE = 9;
 
+/**
+ * Normalises a raw product returned from the server into standard UI fields.
+ */
+function normaliseProduct(raw) {
+  if (!raw) return null;
+  return {
+    id: raw.id,
+    storeId: raw.storeId,
+    categoryId: raw.categoryId || raw.category?.id || "",
+    categoryName: raw.category?.name || raw.categoryName || "General",
+    name: raw.name || "Untitled Product",
+    description: raw.description || "",
+    price: Number(raw.price) || 0,
+    stockQuantity: Number(raw.stockQuantity) || 0,
+    imageUrls: Array.isArray(raw.imageUrls) ? raw.imageUrls : [],
+    isAvailable: raw.isAvailable !== false,
+    approvalStatus: raw.approvalStatus || "PENDING",
+    rejectionReason: raw.rejectionReason || null,
+    createdAt: raw.createdAt || new Date().toISOString(),
+    updatedAt: raw.updatedAt || new Date().toISOString(),
+  };
+}
+
 export function useProducts() {
-  const [products, setProducts] = useState(() => {
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      console.warn("Could not load products from localStorage:", e);
-    }
-    return INITIAL_MOCK_PRODUCTS;
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+  const [storeInfo, setStoreInfo] = useState({
+    id: null,
+    name: "Organization Store",
+    pickupLocation: "Campus Store / Booth",
   });
 
-  // Sync products to localStorage on update
-  useEffect(() => {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(products));
-    } catch (e) {
-      console.warn("Could not save products to localStorage:", e);
-    }
-  }, [products]);
-
-  // Retrieve stored images from IndexedDB for any products that have locally saved images
-  useEffect(() => {
-    let isMounted = true;
-    const hydrateImagesFromDB = async () => {
-      try {
-        let hasUpdates = false;
-        const updated = await Promise.all(
-          products.map(async (prod) => {
-            const storedImages = await getProductImages(prod.id);
-            if (storedImages && storedImages.length > 0) {
-              const dbUrls = storedImages.map((img) => img.url).filter(Boolean);
-              if (
-                dbUrls.length > 0 &&
-                JSON.stringify(dbUrls) !== JSON.stringify(prod.imageUrls)
-              ) {
-                hasUpdates = true;
-                return { ...prod, imageUrls: dbUrls };
-              }
-            }
-            return prod;
-          })
-        );
-        if (isMounted && hasUpdates) {
-          setProducts(updated);
-        }
-      } catch (err) {
-        console.warn("Failed to hydrate images from IndexedDB:", err);
-      }
-    };
-
-    hydrateImagesFromDB();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState(null);
 
   // Search input state
   const [searchTerm, setSearchTerm] = useState("");
 
   // Filter groups state:
-  // categories: string[]
-  // approvalStatuses: string[]
-  // availabilities: string[]
-  // stockLevels: string[]
   const [appliedFilters, setAppliedFilters] = useState({
     categories: [],
     approvalStatuses: [],
@@ -264,12 +72,87 @@ export function useProducts() {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Dynamic Overview Cards Metrics
-  // Calculates strictly based on publication rules:
-  // - Total: Total products in dataset
-  // - Active for Sale: Marked Available AND (APPROVED or VERIFIED)
-  // - Pending: PENDING approval status
-  // - Stock Alerts: Low Stock (1 to 5) or Out of Stock (0)
+  // 1. Fetch Store Info from backend (GET /marketplace/stores/me)
+  const fetchStoreInfo = useCallback(async () => {
+    try {
+      const res = await apiClient.get("/marketplace/stores/me");
+      const store = res.data?.data || res.data;
+      if (store && store.id) {
+        setStoreInfo({
+          id: store.id,
+          name: store.name || "Organization Store",
+          pickupLocation: store.pickupLocation || "Campus Store / Booth",
+        });
+        return store;
+      }
+    } catch (err) {
+      console.warn("Could not fetch seller store profile from backend:", err);
+    }
+    return null;
+  }, []);
+
+  // 2. Fetch Categories from backend (GET /marketplace/categories)
+  const fetchCategories = useCallback(async () => {
+    try {
+      const res = await apiClient.get("/marketplace/categories");
+      const list = res.data?.data || res.data;
+      if (Array.isArray(list) && list.length > 0) {
+        setCategories(list);
+      }
+    } catch (err) {
+      console.warn("Could not fetch categories from backend:", err);
+    }
+  }, []);
+
+  // 3. Fetch Seller's Products from backend (GET /marketplace/seller/products)
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiClient.get("/marketplace/seller/products", {
+        params: { limit: 100 },
+      });
+      const rawList = res.data?.items || res.data?.data || [];
+      const normalised = (Array.isArray(rawList) ? rawList : [])
+        .map(normaliseProduct)
+        .filter(Boolean);
+
+      // Hydrate local images from IndexedDB if stored
+      const hydrated = await Promise.all(
+        normalised.map(async (prod) => {
+          try {
+            const stored = await getProductImages(prod.id);
+            if (stored && stored.length > 0) {
+              const urls = stored.map((img) => img.url).filter(Boolean);
+              if (urls.length > 0) {
+                return { ...prod, imageUrls: urls };
+              }
+            }
+          } catch (e) {
+            console.warn("IndexedDB hydration error:", e);
+          }
+          return prod;
+        })
+      );
+
+      setProducts(hydrated);
+    } catch (err) {
+      console.warn("Failed to fetch seller products from backend:", err);
+      setError(getErrorMessage(err));
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    fetchStoreInfo();
+    fetchCategories();
+    fetchProducts();
+  }, [fetchStoreInfo, fetchCategories, fetchProducts]);
+
+  // Dynamic Overview Cards Metrics calculated from current backend product data
   const metrics = useMemo(() => {
     const total = products.length;
     const active = products.filter(
@@ -415,92 +298,271 @@ export function useProducts() {
     [totalPages]
   );
 
-  // Add Product (local mock + PENDING status)
-  const addProduct = useCallback((newProductData) => {
-    const categoryObj = MOCK_CATEGORIES.find(
-      (c) => c.id === newProductData.categoryId
-    );
+  // Add Product (calls POST /marketplace/products & persists uploaded images to IndexedDB)
+  const addProduct = useCallback(
+    async (newProductData, imageFiles = []) => {
+      setActionLoading(true);
+      setActionError(null);
+      try {
+        // 1. Ensure we have seller storeId
+        let currentStoreId = storeInfo?.id;
+        if (!currentStoreId) {
+          const store = await fetchStoreInfo();
+          currentStoreId = store?.id;
+        }
 
-    const newProduct = {
-      id: newProductData.id || `prod-${Date.now()}`,
-      name: newProductData.name.trim(),
-      categoryId: newProductData.categoryId || "cat-apparel",
-      categoryName:
-        newProductData.categoryName || categoryObj?.name || "Apparel & Uniforms",
-      description: newProductData.description.trim(),
-      price: parseFloat(newProductData.price) || 0,
-      stockQuantity: parseInt(newProductData.stockQuantity, 10) || 0,
-      imageUrls: newProductData.imageUrls || [],
-      isAvailable:
-        newProductData.isAvailable !== undefined
-          ? Boolean(newProductData.isAvailable)
-          : true,
-      approvalStatus: "PENDING",
-      createdAt: new Date().toISOString(),
-    };
+        if (!currentStoreId) {
+          throw new Error(
+            "Store profile not found. Please complete store registration before adding products."
+          );
+        }
 
-    setProducts((prev) => [newProduct, ...prev]);
-    setCurrentPage(1);
-    return newProduct;
-  }, []);
+        // 2. Upload images to backend if files were provided
+        let uploadedUrls = [];
+        if (Array.isArray(imageFiles) && imageFiles.length > 0) {
+          try {
+            const formData = new FormData();
+            imageFiles.forEach((file) => {
+              if (file instanceof File || file instanceof Blob) {
+                formData.append("files", file);
+              }
+            });
+            formData.append("folder", "products");
+            const uploadRes = await apiClient.post("/upload/multiple", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            });
+            uploadedUrls =
+              uploadRes.data?.urls ||
+              uploadRes.data?.data?.map((d) => d.url) ||
+              [];
+          } catch (uploadErr) {
+            console.warn("Direct file upload to backend skipped or failed:", uploadErr);
+          }
+        }
 
-  // Edit Product (preserves existing approvalStatus & creation date)
-  const editProduct = useCallback((productId, updatedData) => {
-    setProducts((prev) =>
-      prev.map((item) => {
-        if (item.id !== productId) return item;
-
-        const categoryObj = MOCK_CATEGORIES.find(
-          (c) => c.id === updatedData.categoryId
+        // Determine final image URLs (backend schema requires valid URL strings)
+        let candidateUrls = uploadedUrls.filter(Boolean);
+        if (candidateUrls.length === 0 && Array.isArray(newProductData.imageUrls)) {
+          candidateUrls = newProductData.imageUrls.filter(Boolean);
+        }
+        const validHttpUrls = candidateUrls.filter(
+          (u) =>
+            typeof u === "string" &&
+            (u.startsWith("http://") || u.startsWith("https://"))
         );
+        const backendImageUrls =
+          validHttpUrls.length > 0
+            ? validHttpUrls
+            : [
+                "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80",
+              ];
 
-        return {
-          ...item,
-          name: updatedData.name ? updatedData.name.trim() : item.name,
-          categoryId: updatedData.categoryId || item.categoryId,
-          categoryName:
-            updatedData.categoryName ||
-            categoryObj?.name ||
-            item.categoryName,
-          description:
-            updatedData.description !== undefined
-              ? updatedData.description.trim()
-              : item.description,
-          price:
-            updatedData.price !== undefined
-              ? parseFloat(updatedData.price) || item.price
-              : item.price,
-          stockQuantity:
-            updatedData.stockQuantity !== undefined
-              ? parseInt(updatedData.stockQuantity, 10)
-              : item.stockQuantity,
-          imageUrls: updatedData.imageUrls || item.imageUrls,
-          isAvailable:
-            updatedData.isAvailable !== undefined
-              ? Boolean(updatedData.isAvailable)
-              : item.isAvailable,
-          // Preserves existing approvalStatus unless explicitly changed
-          approvalStatus: item.approvalStatus,
-          createdAt: item.createdAt,
+        // 3. POST /marketplace/products
+        const payload = {
+          storeId: currentStoreId,
+          categoryId: newProductData.categoryId,
+          name: newProductData.name.trim(),
+          description: newProductData.description.trim(),
+          price: parseFloat(newProductData.price),
+          stockQuantity: parseInt(newProductData.stockQuantity, 10),
+          imageUrls: backendImageUrls,
         };
-      })
-    );
-  }, []);
 
-  // Delete Product (local mock + cleanup associated IndexedDB images)
-  const deleteProduct = useCallback((productId) => {
-    setProducts((prev) => prev.filter((item) => item.id !== productId));
-    // Clean up stored images from IndexedDB
-    deleteProductImages(productId).catch((err) => {
-      console.warn("Failed to delete product images from IndexedDB:", err);
-    });
+        const res = await apiClient.post("/marketplace/products", payload);
+        const createdRaw = res.data?.data || res.data;
+        const created = normaliseProduct(createdRaw);
+
+        // 4. Save actual images to IndexedDB using productImageStorage.js
+        if (newProductData.rawImages && newProductData.rawImages.length > 0) {
+          try {
+            await saveProductImages(created.id, newProductData.rawImages);
+            const localUrls = newProductData.rawImages
+              .map((img) => img.url)
+              .filter(Boolean);
+            if (localUrls.length > 0) {
+              created.imageUrls = localUrls;
+            }
+          } catch (e) {
+            console.warn("Failed to persist images to IndexedDB:", e);
+          }
+        }
+
+        // 5. If availability was set to false, call PATCH availability
+        if (newProductData.isAvailable === false) {
+          try {
+            await apiClient.patch(
+              `/marketplace/products/${created.id}/availability`,
+              { isAvailable: false }
+            );
+            created.isAvailable = false;
+          } catch (availErr) {
+            console.warn("Failed to update availability on create:", availErr);
+          }
+        }
+
+        setProducts((prev) => [created, ...prev]);
+        setCurrentPage(1);
+        return created;
+      } catch (err) {
+        const msg = getErrorMessage(err);
+        setActionError(msg);
+        throw err;
+      } finally {
+        setActionLoading(false);
+      }
+    },
+    [storeInfo?.id, fetchStoreInfo]
+  );
+
+  // Edit Product (calls PATCH /marketplace/products/:id & updates IndexedDB)
+  const editProduct = useCallback(
+    async (productId, updatedData, imageFiles = []) => {
+      setActionLoading(true);
+      setActionError(null);
+      try {
+        // 1. Upload new image files if any
+        let uploadedUrls = [];
+        if (Array.isArray(imageFiles) && imageFiles.length > 0) {
+          try {
+            const formData = new FormData();
+            imageFiles.forEach((file) => {
+              if (file instanceof File || file instanceof Blob) {
+                formData.append("files", file);
+              }
+            });
+            formData.append("folder", "products");
+            const uploadRes = await apiClient.post("/upload/multiple", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            });
+            uploadedUrls =
+              uploadRes.data?.urls ||
+              uploadRes.data?.data?.map((d) => d.url) ||
+              [];
+          } catch (uploadErr) {
+            console.warn("Direct file upload to backend skipped or failed:", uploadErr);
+          }
+        }
+
+        // Determine final image URLs
+        let candidateUrls = uploadedUrls.filter(Boolean);
+        if (candidateUrls.length === 0 && Array.isArray(updatedData.imageUrls)) {
+          candidateUrls = updatedData.imageUrls.filter(Boolean);
+        }
+        const validHttpUrls = candidateUrls.filter(
+          (u) =>
+            typeof u === "string" &&
+            (u.startsWith("http://") || u.startsWith("https://"))
+        );
+        const backendImageUrls =
+          validHttpUrls.length > 0
+            ? validHttpUrls
+            : [
+                "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80",
+              ];
+
+        // 2. PATCH /marketplace/products/:id
+        const payload = {};
+        if (updatedData.categoryId) payload.categoryId = updatedData.categoryId;
+        if (updatedData.name) payload.name = updatedData.name.trim();
+        if (updatedData.description !== undefined)
+          payload.description = updatedData.description.trim();
+        if (updatedData.price !== undefined)
+          payload.price = parseFloat(updatedData.price);
+        if (updatedData.stockQuantity !== undefined)
+          payload.stockQuantity = parseInt(updatedData.stockQuantity, 10);
+        if (backendImageUrls.length > 0) payload.imageUrls = backendImageUrls;
+
+        const res = await apiClient.patch(
+          `/marketplace/products/${productId}`,
+          payload
+        );
+        const updatedRaw = res.data?.data || res.data;
+
+        // 3. Save actual updated images to IndexedDB
+        if (updatedData.rawImages && updatedData.rawImages.length > 0) {
+          try {
+            await saveProductImages(productId, updatedData.rawImages);
+          } catch (e) {
+            console.warn("Failed to persist updated images to IndexedDB:", e);
+          }
+        }
+
+        // 4. Update availability if explicitly provided
+        if (updatedData.isAvailable !== undefined) {
+          try {
+            await apiClient.patch(
+              `/marketplace/products/${productId}/availability`,
+              { isAvailable: Boolean(updatedData.isAvailable) }
+            );
+          } catch (availErr) {
+            console.warn("Failed to update availability on edit:", availErr);
+          }
+        }
+
+        // Update in local state
+        setProducts((prev) =>
+          prev.map((item) => {
+            if (item.id === productId) {
+              const cat =
+                categories.find((c) => c.id === updatedData.categoryId) ||
+                item.category;
+              return {
+                ...item,
+                ...updatedRaw,
+                categoryName: cat?.name || item.categoryName,
+                isAvailable:
+                  updatedData.isAvailable !== undefined
+                    ? Boolean(updatedData.isAvailable)
+                    : item.isAvailable,
+                imageUrls:
+                  updatedData.rawImages?.map((img) => img.url).filter(Boolean) ||
+                  item.imageUrls,
+              };
+            }
+            return item;
+          })
+        );
+      } catch (err) {
+        const msg = getErrorMessage(err);
+        setActionError(msg);
+        throw err;
+      } finally {
+        setActionLoading(false);
+      }
+    },
+    [categories]
+  );
+
+  // Delete Product (calls DELETE /marketplace/products/:id & removes from IndexedDB)
+  const deleteProduct = useCallback(async (productId) => {
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      await apiClient.delete(`/marketplace/products/${productId}`);
+      await deleteProductImages(productId);
+      setProducts((prev) => prev.filter((item) => item.id !== productId));
+    } catch (err) {
+      const msg = getErrorMessage(err);
+      setActionError(msg);
+      throw err;
+    } finally {
+      setActionLoading(false);
+    }
   }, []);
 
   return {
     products,
     filteredProducts,
     paginatedProducts,
-    categories: MOCK_CATEGORIES,
+    categories,
+    storeInfo,
+
+    // Loading & Error states
+    loading,
+    error,
+    actionLoading,
+    actionError,
+    fetchProducts,
 
     // Overview cards metrics
     metrics,
