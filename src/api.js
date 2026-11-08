@@ -237,13 +237,13 @@ export const getSettingsData = async () => {
     store: org || store,
     user,
     orgInfo: {
-      name: org?.name || store?.name || user?.fullName || 'QCU Bookworms Guild',
-      location: org?.location || store?.pickupLocation || 'San Bartolome Campus (Main), IK Building, Booth 3',
-      bio: org?.bio || store?.description || 'Campus-approved pre-loved engineering textbooks and reviewers.',
+      name: org?.name || store?.name || user?.fullName || '',
+      location: org?.location || store?.pickupLocation || '',
+      bio: org?.bio || store?.description || '',
     },
     credentials: {
-      email: org?.email || user?.email || 'bookworms@qcu.edu.ph',
-      contact: org?.contactNumber || localStorage.getItem('bizzy_contact_number') || '09123456789',
+      email: org?.email || user?.email || '',
+      contact: org?.contactNumber || user?.contactNumber || store?.contactNumber || '',
     },
     cooldowns: org?.cooldowns || null,
     avatarPreview: org?.logoUrl || store?.logoUrl || null,
