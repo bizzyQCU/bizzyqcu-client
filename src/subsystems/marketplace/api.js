@@ -67,6 +67,23 @@ export const setProductAvailability = async (productId, isAvailable) => {
 };
 
 /**
+ * GET /marketplace/stores/:id (public)
+ * Returns the store with its VERIFIED products.
+ *
+ * @param {string} storeId  uuid
+ * @returns {Promise<{success: boolean, data: {
+ *   id: string, name: string, description: string, pickupLocation: string,
+ *   isOpen: boolean, sellerProfile: { sellerType: string },
+ *   products: Array<{ id: string, name: string, price: string, stockQuantity: number,
+ *                      imageUrls: string[], category: { id: string, name: string, slug: string } }>
+ * }}>}
+ */
+export const getStore = async (storeId) => {
+  const response = await apiClient.get(`/marketplace/stores/${storeId}`);
+  return response.data;
+};
+
+/**
  * GET /marketplace/seller/dashboard (seller only)
  * @returns data: { store, sales, ordersByStatus, productsByApproval, lowStock, topSelling }
  */
