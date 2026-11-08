@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  getSettingsData,
+import apiClient, {
   updateStoreSettings,
   updateSettingField,
   updateUserEmail,
@@ -65,19 +64,16 @@ export function useAccountSettings() {
     calculateInitialTimeLefts(getStoredCooldowns())
   );
 
-  // Form States
+  // Form States - cleanly initialized without mock data
   const [orgInfo, setOrgInfo] = useState({
-    name: 'QCU Bookworms Guild',
-    location: 'San Bartolome Campus (Main), IK Building, Booth 3',
-    bio: 'Campus-approved pre-loved engineering textbooks and reviewers.',
+    name: '',
+    location: '',
+    bio: '',
   });
 
-  const [credentials, setCredentials] = useState(() => {
-    const savedContact = localStorage.getItem('bizzy_contact_number');
-    return {
-      email: 'bookworms@qcu.edu.ph',
-      contact: savedContact || '09123456789',
-    };
+  const [credentials, setCredentials] = useState({
+    email: '',
+    contact: '',
   });
 
   // Password States
@@ -113,41 +109,68 @@ export function useAccountSettings() {
     return () => clearInterval(interval);
   }, [cooldowns]);
 
-  // Load Organization and User Profile from Backend
+  // Actual API Call using useEffect and apiClient.get() to fetch real user/organization data
   useEffect(() => {
     let isMounted = true;
 
     async function fetchSettings() {
       setIsLoading(true);
       setErrorMessage('');
+
       try {
-        const data = await getSettingsData();
+        let org = null;
+        let store = null;
+        let user = null;
+
+        // Fetch real data from backend endpoints in parallel
+        const results = await Promise.allSettled([
+          apiClient.get('/organization/profile'),
+          apiClient.get('/marketplace/stores/me'),
+          apiClient.get('/auth/profile'),
+        ]);
+
+        if (results[0].status === 'fulfilled') {
+          org = results[0].value.data?.data || results[0].value.data;
+        }
+        if (results[1].status === 'fulfilled') {
+          store = results[1].value.data?.data || results[1].value.data;
+        }
+        if (results[2].status === 'fulfilled') {
+          user = results[2].value.data?.data || results[2].value.data;
+        }
+
         if (!isMounted) return;
 
-        if (data.orgInfo) {
-          setOrgInfo({
-            name: data.orgInfo.name || 'QCU Bookworms Guild',
-            location: data.orgInfo.location || 'San Bartolome Campus (Main), IK Building, Booth 3',
-            bio: data.orgInfo.bio || 'Campus-approved pre-loved engineering textbooks and reviewers.',
-          });
-        }
+        const realName = org?.name || store?.name || user?.fullName || '';
+        const realLocation = org?.location || store?.pickupLocation || '';
+        const realBio = org?.bio || store?.description || '';
+        const realEmail = org?.email || user?.email || '';
+        const realContact = org?.contactNumber || user?.contactNumber || store?.contactNumber || '';
+        const realLogo = org?.logoUrl || store?.logoUrl || null;
 
-        const savedContact = localStorage.getItem('bizzy_contact_number');
-        setCredentials({
-          email: data.credentials?.email || 'bookworms@qcu.edu.ph',
-          contact: savedContact || '09123456789',
+        setOrgInfo({
+          name: realName,
+          location: realLocation,
+          bio: realBio,
         });
 
-        if (data.avatarPreview) {
-          setAvatarPreview(data.avatarPreview);
+        setCredentials({
+          email: realEmail,
+          contact: realContact,
+        });
+
+        if (realLogo) {
+          setAvatarPreview(realLogo);
         }
 
-        if (data.cooldowns) {
+        // Synchronize server-side cooldown timestamps if returned
+        const cooldownsData = org?.cooldowns;
+        if (cooldownsData) {
           const now = Date.now();
           const serverCooldowns = {};
           for (const key of ['name', 'location', 'bio', 'email', 'contact', 'password']) {
-            if (data.cooldowns[key]) {
-              const expireTime = new Date(data.cooldowns[key]).getTime() + SEVEN_DAYS_MS;
+            if (cooldownsData[key]) {
+              const expireTime = new Date(cooldownsData[key]).getTime() + SEVEN_DAYS_MS;
               if (expireTime > now) {
                 serverCooldowns[key] = expireTime;
               }
@@ -239,15 +262,10 @@ export function useAccountSettings() {
     setStatusMessage('');
 
     try {
-      try {
-        await updatePassword({
-          currentPassword,
-          newPassword,
-        });
-      } catch (apiErr) {
-        // Fallback: if server is temporarily unreachable in dev, record change
-        console.warn('Backend updatePassword failed, proceeding locally:', apiErr);
-      }
+      await updatePassword({
+        currentPassword,
+        newPassword,
+      });
 
       applyFieldCooldown('password');
 
@@ -339,7 +357,6 @@ export function useAccountSettings() {
       await updateSettingField(activeModal, trimmed);
 
       if (activeModal === 'contact') {
-        localStorage.setItem('bizzy_contact_number', trimmed);
         setCredentials((prev) => ({
           ...prev,
           contact: trimmed,

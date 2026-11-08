@@ -103,10 +103,14 @@ export default function Settings() {
                   <div className="w-24 h-24 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center overflow-hidden">
                     {avatarPreview ? (
                       <img src={avatarPreview} alt="Org Logo" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-2xl font-bold text-slate-400">
-                        {orgInfo.name ? orgInfo.name.substring(0, 2).toUpperCase() : 'QB'}
+                    ) : orgInfo.name ? (
+                      <span className="text-2xl font-bold text-slate-500">
+                        {orgInfo.name.trim().substring(0, 2).toUpperCase()}
                       </span>
+                    ) : (
+                      <svg className="w-10 h-10 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
                     )}
                   </div>
                   <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 border-2 border-white rounded-full flex items-center justify-center text-white">
@@ -522,7 +526,7 @@ export default function Settings() {
                         setModalInput(val);
                         setModalError(validateContact(val));
                       }}
-                      placeholder="09123456789"
+                      placeholder="09XXXXXXXXX"
                       className={`w-full px-4 py-2.5 bg-slate-50 border rounded-lg text-sm focus:ring-2 outline-none ${
                         modalError ? 'border-red-400 focus:ring-red-400' : 'border-slate-300 focus:ring-blue-500'
                       }`}
