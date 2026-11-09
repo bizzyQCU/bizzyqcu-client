@@ -13,7 +13,6 @@ import { useCart } from "../../../lib/CartContext.jsx";
 import { useMessages } from "../../../lib/MessageContext.jsx";
 import { useRatings } from "../../../lib/RatingContext.jsx";
 import { getStore } from "../../marketplace/api.js";
-import { createOrder } from "../api.js";
 import { getErrorMessage } from "../../../lib/api-client.js";
 
 const SELLER_TYPE_LABELS = {
@@ -44,9 +43,6 @@ function StoreDesktop() {
   const [error, setError] = useState(null);
   const [zoomProduct, setZoomProduct] = useState(null);
   const [confirm, setConfirm] = useState(null);
-  // Per-product Buy Now state
-  const [buyingId, setBuyingId] = useState(null);
-  const [buyError, setBuyError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -98,33 +94,24 @@ function StoreDesktop() {
   }
 
   /**
-   * Buy Now — calls POST /orders directly.
-   * Defaults to PICKUP + CASH (no checkout flow is selected at this point).
-   * Does NOT touch the cart.
+   * Buy Now — navigates to checkout with product as a single-item order group.
+   * Does NOT create an order, does NOT touch the cart.
    */
-  async function handleBuyNow(p) {
-    setBuyingId(p.id);
-    setBuyError(null);
-    try {
-      const result = await createOrder({
+  function handleBuyNow(p) {
+    navigate("/checkout", {
+      state: {
+        items: [
+          {
+            productId: p.id,
+            storeId: store.id,
+            name: p.name,
+            price: parseFloat(p.price),
+            quantity: 1,
+          },
+        ],
         storeId: store.id,
-        deliveryMethod: "PICKUP",
-        paymentMethod: "CASH",
-        items: [{ productId: p.id, quantity: 1 }],
-      });
-      // POST /orders returns { success, data: { orders: [<order>, …] } }
-      // createOrder is always one store → one order → orders[0]
-      const orderId = result.data.orders[0].id;
-      navigate(`/orders/${orderId}`);
-    } catch (err) {
-      if (err?.response?.status === 401) {
-        setBuyError("You must be logged in as a buyer to place an order.");
-      } else {
-        setBuyError(getErrorMessage(err));
-      }
-    } finally {
-      setBuyingId(null);
-    }
+      },
+    });
   }
 
   return (
@@ -177,11 +164,6 @@ function StoreDesktop() {
         </span>
       </div>
 
-      {/* Buy Now error banner */}
-      {buyError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs text-rose-700">{buyError}</p>
-      )}
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {store.products.map((p) => (
           <div key={p.id} className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -218,11 +200,10 @@ function StoreDesktop() {
               </button>
               <button
                 type="button"
-                disabled={buyingId === p.id}
                 onClick={() => handleBuyNow(p)}
-                className="rounded-full bg-[#0284C7] px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0369A1] active:scale-95 disabled:opacity-60"
+                className="rounded-full bg-[#0284C7] px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0369A1] active:scale-95"
               >
-                {buyingId === p.id ? "Placing…" : "Buy now"}
+                Buy now
               </button>
             </div>
           </div>

@@ -10,7 +10,6 @@ import { useMessages } from "../../../lib/MessageContext.jsx";
 import { useRatings } from "../../../lib/RatingContext.jsx";
 import ReviewsSection from "../components/ReviewsSection.jsx";
 import { getStore } from "../../marketplace/api.js";
-import { createOrder } from "../api.js";
 import { getErrorMessage } from "../../../lib/api-client.js";
 
 const SELLER_TYPE_LABELS = {
@@ -43,8 +42,6 @@ export default function MB_StorePage() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [confirm, setConfirm] = useState(null);
-  const [buying, setBuying] = useState(false);
-  const [buyError, setBuyError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -110,32 +107,25 @@ export default function MB_StorePage() {
   }
 
   /**
-   * Buy Now — calls POST /orders directly with PICKUP + CASH defaults.
-   * Does NOT touch the cart.
+   * Buy Now — navigates to checkout with product as a single-item order group.
+   * Does NOT create an order, does NOT touch the cart.
    */
-  async function buySelected() {
-    setBuying(true);
-    setBuyError(null);
-    try {
-      const result = await createOrder({
+  function buySelected() {
+    if (!selected) return;
+    navigate("/checkout", {
+      state: {
+        items: [
+          {
+            productId: selected.id,
+            storeId: store.id,
+            name: selected.name,
+            price: parseFloat(selected.price),
+            quantity: 1,
+          },
+        ],
         storeId: store.id,
-        deliveryMethod: "PICKUP",
-        paymentMethod: "CASH",
-        items: [{ productId: selected.id, quantity: 1 }],
-      });
-      // POST /orders returns { success, data: { orders: [<order>, …] } }
-      // createOrder is always one store → one order → orders[0]
-      const orderId = result.data.orders[0].id;
-      navigate(`/orders/${orderId}`);
-    } catch (err) {
-      if (err?.response?.status === 401) {
-        setBuyError("You must be logged in as a buyer to place an order.");
-      } else {
-        setBuyError(getErrorMessage(err));
-      }
-    } finally {
-      setBuying(false);
-    }
+      },
+    });
   }
 
   return (
@@ -156,10 +146,6 @@ export default function MB_StorePage() {
       }
       footer={
         <div className="flex flex-col gap-2">
-          {/* Buy Now error shown above footer buttons */}
-          {buyError && (
-            <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-[11px] text-rose-700">{buyError}</p>
-          )}
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -178,11 +164,10 @@ export default function MB_StorePage() {
             </button>
             <button
               type="button"
-              disabled={buying}
               onClick={buySelected}
-              className="flex-1 rounded-full bg-[#0284C7] py-2.5 text-xs font-bold text-white shadow-sm transition active:scale-95 disabled:opacity-60"
+              className="flex-1 rounded-full bg-[#0284C7] py-2.5 text-xs font-bold text-white shadow-sm transition active:scale-95"
             >
-              {buying ? "Placing…" : "Buy Now"}
+              Buy Now
             </button>
           </div>
         </div>
