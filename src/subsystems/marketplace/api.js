@@ -246,3 +246,31 @@ export const createStore = async (storeData) => {
   return response.data;
 };
 
+// ============================================================================
+// ANALYTICS
+// ============================================================================
+
+/**
+ * GET /marketplace/seller/dashboard (seller only)
+ * Returns seller analytics and dashboard data including:
+ * - Store information
+ * - Sales metrics (completed orders, total revenue)
+ * - Orders by status
+ * - Products by approval status
+ * - Low stock products
+ * - Top selling products
+ * 
+ * @param {object} [dateRange] Optional date range filter
+ * @param {string} [dateRange.start] Start date in YYYY-MM-DD format
+ * @param {string} [dateRange.end] End date in YYYY-MM-DD format
+ * @returns {Promise<{ success: boolean, data: object }>}
+ */
+export const getSellerAnalytics = async (dateRange) => {
+  const params = {};
+  if (dateRange?.start) params.start = dateRange.start;
+  if (dateRange?.end) params.end = dateRange.end;
+  
+  const response = await apiClient.get('/marketplace/seller/dashboard', { params });
+  return response.data;
+};
+
