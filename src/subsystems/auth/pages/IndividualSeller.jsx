@@ -12,7 +12,7 @@ import {
   validateUploadFile,
 } from '../components/SellerFormParts.jsx'
 import { getErrorMessage, getFieldErrors } from '../../../lib/api-client'
-import { MEMBER_TYPES, MIN_PASSWORD_LENGTH, QCU_ID_PATTERN } from '../../../lib/constants'
+import { MEMBER_TYPES, MIN_PASSWORD_LENGTH, QCU_ID_PATTERN, formatStudentId } from '../../../lib/constants'
 
 export default function IndividualSeller() {
   const [form, setForm] = useState({
@@ -36,7 +36,11 @@ export default function IndividualSeller() {
   const [errors, setErrors] = useState({})
 
   const update = (key) => (e) => {
-    setForm((f) => ({ ...f, [key]: e.target.value }))
+    let val = e.target.value
+    if (key === 'studentId') {
+      val = formatStudentId(val, form.studentId)
+    }
+    setForm((f) => ({ ...f, [key]: val }))
     setErrors((prev) => ({ ...prev, [key]: undefined }))
   }
 
@@ -67,7 +71,7 @@ export default function IndividualSeller() {
     if (!form.birthday) next.birthday = 'Birthday is required'
     if (!/^09\d{9}$/.test(form.contactNumber.replace(/\s|-/g, ''))) next.contactNumber = 'Enter a valid 11-digit number'
     if (!form.program) next.program = 'Select your program'
-    if (!QCU_ID_PATTERN.test(form.studentId.trim())) next.studentId = 'Format: YY-NNNN (e.g. 24-1679)'
+    if (!QCU_ID_PATTERN.test(form.studentId.trim())) next.studentId = 'Student number must be formatted as YY-NNNN (e.g. 24-1685)'
     if (!idFile) next.idFile = 'Please upload your QCU ID'
     if (scanState !== 'done') next.liveness = 'Please complete the facial liveness scan'
     return next
@@ -242,15 +246,16 @@ export default function IndividualSeller() {
           </select>
         </SellerInputField>
 
-        <SellerInputField id="ind-student-id" label="Student ID" icon="badge" error={errors.studentId}>
+        <SellerInputField id="ind-student-id" label="Student ID Number" icon="badge" error={errors.studentId}>
           <input
             id="ind-student-id"
             type="text"
             required
+            maxLength={7}
             value={form.studentId}
             onChange={update('studentId')}
-            placeholder="e.g. 24-1679"
-            className={`${sellerInputBase} ${fieldBorder(errors.studentId)} pl-10 pr-3.5`}
+            placeholder="24-1685"
+            className={`${sellerInputBase} ${fieldBorder(errors.studentId)} pl-10 pr-3.5 font-mono tracking-wider`}
           />
         </SellerInputField>
       </div>

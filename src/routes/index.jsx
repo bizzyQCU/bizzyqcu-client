@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import Layout from '../layouts/Layout.jsx';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import {
@@ -11,26 +11,64 @@ import {
   IndividualSeller,
   OrganizationSeller,
 } from '../subsystems/auth';
-import Placeholder from '../components/Placeholder.jsx';
 
-// Import your new Admin Dashboard
+// Admin Subsystem Pages
 import AdminDashboard from '../subsystems/admin/pages/AdminDashboard.jsx';
+import AdminLogin from '../subsystems/admin/pages/AdminLogin.jsx';
+import ContactAdmin from '../subsystems/admin/pages/ContactAdmin.jsx';
+
+// Marketplace & Orders Pages
+import Marketplace from '../subsystems/marketplace/pages/Marketplace.jsx';
+import OrdersPage from '../subsystems/orders/pages/OrdersPage.jsx';
+import CartPage from '../subsystems/orders/pages/CartPage.jsx';
+
+function NotFoundPage() {
+  return (
+    <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center text-slate-900">
+      <div className="bg-white rounded-3xl max-w-md p-10 shadow-xl space-y-4">
+        <div className="text-4xl">🔍</div>
+        <h1 className="text-2xl font-black text-slate-900">Page Not Found</h1>
+        <p className="text-sm text-slate-500">
+          The page or product you are looking for does not exist or may have been moved.
+        </p>
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <Link
+            to="/marketplace"
+            className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition-colors shadow-md"
+          >
+            Go to Marketplace
+          </Link>
+          <Link
+            to="/contact-admin"
+            className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+          >
+            Contact Admin
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Auth Routes (Subsystem 1) - No Navbar */}
+      {/* Hidden / Standalone Admin Portal Routes (No Public Navbar) */}
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+
+      {/* Auth Routes (No Navbar) */}
       <Route element={<AuthLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Seller Login Form */}
+        {/* Seller Login Forms */}
         <Route path="/seller-login-form" element={<SellerLoginForm />} />
         <Route path="/seller-login" element={<SellerLoginForm />} />
         <Route path="/seller-auth" element={<SellerLoginForm />} />
 
-        {/* Seller Signup Portal Chooser & Type-Specific Registration Pages */}
+        {/* Seller Signup Portals */}
         <Route path="/seller-signup" element={<SellerSignup />} />
         <Route path="/seller-register" element={<SellerSignup />} />
         <Route path="/seller-signup/enterprise" element={<EnterpriseSeller />} />
@@ -38,49 +76,26 @@ export default function AppRoutes() {
         <Route path="/seller-signup/organization" element={<OrganizationSeller />} />
       </Route>
 
-      {/* Main App Routes - With Navbar */}
+      {/* Main Student & Customer App Routes (With Navbar & Layout) */}
       <Route element={<Layout />}>
+        {/* Marketplace Routes */}
+        <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/dashboard" element={<Marketplace />} />
+        <Route path="/stores/:storeId" element={<Marketplace />} />
+        <Route path="/products/:productId" element={<Marketplace />} />
 
-        {/* Marketplace Routes (Subsystem 2) - Coming Soon */}
-        <Route
-          path="/marketplace"
-          element={<Placeholder title="Marketplace" text="Browse products and stores." />}
-        />
-        <Route
-          path="/stores/:storeId"
-          element={<Placeholder title="Store" text="Store details page." />}
-        />
-        <Route
-          path="/products/:productId"
-          element={<Placeholder title="Product" text="Product details page." />}
-        />
+        {/* Cart & Orders Routes */}
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/:orderId" element={<OrdersPage />} />
 
-        {/* Orders Routes (Subsystem 3) - Coming Soon */}
-        <Route
-          path="/cart"
-          element={<Placeholder title="Shopping Cart" text="Your cart items." />}
-        />
-        <Route
-          path="/orders"
-          element={<Placeholder title="Orders" text="Your order history." />}
-        />
-        <Route
-          path="/orders/:orderId"
-          element={<Placeholder title="Order Details" text="Detailed order view." />}
-        />
+        {/* Customer Contact Admin & Support Ticket Resolution Desk */}
+        <Route path="/contact-admin" element={<ContactAdmin />} />
+        <Route path="/support" element={<ContactAdmin />} />
+        <Route path="/complaints" element={<ContactAdmin />} />
 
-        {/* Admin Routes (Subsystem 4) - YOUR DASHBOARD */}
-        <Route path="/admin" element={<AdminDashboard />} />
-
-        {/* Fallback */}
-        <Route
-          path="/dashboard"
-          element={<Placeholder title="Marketplace Dashboard" text="You're signed in. The marketplace will live here." />}
-        />
-        <Route
-          path="*"
-          element={<Placeholder title="Page not found" text="The page you're looking for doesn't exist." />}
-        />
+        {/* Fallback 404 */}
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );

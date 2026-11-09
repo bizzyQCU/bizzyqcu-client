@@ -12,7 +12,7 @@ import {
   validateUploadFile,
 } from '../components/SellerFormParts.jsx'
 import { getErrorMessage, getFieldErrors } from '../../../lib/api-client'
-import { MEMBER_TYPES, MIN_PASSWORD_LENGTH, QCU_ID_PATTERN } from '../../../lib/constants'
+import { MEMBER_TYPES, MIN_PASSWORD_LENGTH, QCU_ID_PATTERN, formatStudentId } from '../../../lib/constants'
 
 export default function OrganizationSeller() {
   const [form, setForm] = useState({
@@ -37,7 +37,11 @@ export default function OrganizationSeller() {
   const [errors, setErrors] = useState({})
 
   const update = (key) => (e) => {
-    setForm((f) => ({ ...f, [key]: e.target.value }))
+    let val = e.target.value
+    if (key === 'studentId') {
+      val = formatStudentId(val, form.studentId)
+    }
+    setForm((f) => ({ ...f, [key]: val }))
     setErrors((prev) => ({ ...prev, [key]: undefined }))
   }
 
@@ -76,7 +80,7 @@ export default function OrganizationSeller() {
     if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = 'Valid email required'
     if (form.password.length < MIN_PASSWORD_LENGTH) next.password = `Min ${MIN_PASSWORD_LENGTH} characters`
     if (form.confirmPassword !== form.password) next.confirmPassword = 'Passwords do not match'
-    if (!QCU_ID_PATTERN.test(form.studentId.trim())) next.studentId = 'Format: YY-NNNN (e.g. 24-1879)'
+    if (!QCU_ID_PATTERN.test(form.studentId.trim())) next.studentId = 'Student number must be formatted as YY-NNNN (e.g. 24-1685)'
     if (!/^09\d{9}$/.test(form.contactNumber.replace(/\s|-/g, ''))) next.contactNumber = 'Enter a valid 11-digit number'
     if (!form.college) next.college = 'Select your college or branch'
     if (!osaFile) next.osaFile = 'OSA certificate is required'
@@ -225,15 +229,16 @@ export default function OrganizationSeller() {
           />
         </SellerInputField>
 
-        <SellerInputField id="org-student-id" label="Org Officer Student ID" icon="badge" error={errors.studentId}>
+        <SellerInputField id="org-student-id" label="Org Officer Student ID Number" icon="badge" error={errors.studentId}>
           <input
             id="org-student-id"
             type="text"
             required
+            maxLength={7}
             value={form.studentId}
             onChange={update('studentId')}
-            placeholder="e.g. 24-1879"
-            className={`${sellerInputBase} ${fieldBorder(errors.studentId)} pl-10 pr-3.5`}
+            placeholder="24-1685"
+            className={`${sellerInputBase} ${fieldBorder(errors.studentId)} pl-10 pr-3.5 font-mono tracking-wider`}
           />
         </SellerInputField>
 

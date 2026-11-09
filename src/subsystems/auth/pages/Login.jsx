@@ -44,11 +44,29 @@ export default function Login() {
     setLoginError(null)
     setLoginState('loading')
     try {
-      const result = await loginWithPassword({ qcuIdNumber: identifier, password })
+      const result = await loginWithPassword({ qcuIdNumber: identifier.trim(), password })
       const { token, user } = result.data
+
+      // Block unapproved accounts from logging in
+      if (user?.role !== 'ADMIN' && user?.verificationStatus !== 'VERIFIED') {
+        if (user?.verificationStatus === 'REJECTED') {
+          throw new Error('Your account verification was rejected by an administrator. Please visit the QCU Admin Office or contact admin@bizzyqcu.edu.ph.')
+        } else {
+          throw new Error('Your account is pending administrator verification. Please wait for an administrator to review and approve your QCU ID and camera selfie before logging in.')
+        }
+      }
+
       authLogin(user, token)
       setLoginState('done')
-      later(() => navigate('/dashboard'), 700)
+      later(() => {
+        if (user?.role === 'ADMIN') {
+          navigate('/admin')
+        } else if (user?.role === 'SELLER') {
+          navigate('/dashboard')
+        } else {
+          navigate('/marketplace')
+        }
+      }, 700)
     } catch (err) {
       setLoginError(getErrorMessage(err))
       setLoginState('idle')
@@ -214,7 +232,16 @@ export default function Login() {
                 {loginError && (
                   <div role="alert" className="flex items-start gap-2.5 rounded-xl bg-red-500/10 border border-red-400/25 px-4 py-3 text-sm text-red-300">
                     <Icon name="error" className="text-[18px] text-red-400 mt-px shrink-0" />
-                    <span>{loginError}</span>
+                    <div className="space-y-1">
+                      <span>{loginError}</span>
+                      {loginError.includes('pending administrator verification') && (
+                        <div className="pt-1">
+                          <Link to="/contact-admin" className="text-amber-400 font-bold hover:underline text-xs block">
+                            Contact Campus Admin Office →
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 

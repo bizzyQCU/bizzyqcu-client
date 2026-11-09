@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import SellerShowcase from '../components/SellerShowcase.jsx'
+import { useAuth } from '../../../hooks'
+import { loginWithPassword } from '../api'
+import { getErrorMessage } from '../../../lib/api-client'
 
 const PORTALS = {
   entrepreneur: {
@@ -50,6 +53,7 @@ function Icon({ name, className = '' }) {
 
 export default function SellerLoginForm() {
   const navigate = useNavigate()
+  const { login: authLogin } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const rawType = searchParams.get('type')
   const portal = PORTALS[rawType] || PORTALS.entrepreneur
@@ -60,6 +64,7 @@ export default function SellerLoginForm() {
   const [remember, setRemember] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
   const [loginState, setLoginState] = useState('idle') // idle | loading | done
+  const [loginError, setLoginError] = useState(null)
   const [bioState, setBioState] = useState('idle') // idle | scanning | done
   const timers = useRef([])
 
@@ -68,13 +73,36 @@ export default function SellerLoginForm() {
   }
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
+    setLoginError(null)
     setLoginState('loading')
-    later(() => {
+    try {
+      const result = await loginWithPassword({ qcuIdNumber: identifier.trim(), password })
+      const { token, user } = result.data
+
+      // Block unapproved accounts from logging in
+      if (user?.role !== 'ADMIN' && user?.verificationStatus !== 'VERIFIED') {
+        if (user?.verificationStatus === 'REJECTED') {
+          throw new Error('Your account verification was rejected by an administrator. Please visit the QCU Admin Office or contact admin@bizzyqcu.edu.ph.')
+        } else {
+          throw new Error('Your account is pending administrator verification. Please wait for an administrator to review and approve your QCU ID and camera selfie before logging in.')
+        }
+      }
+
+      authLogin(user, token)
       setLoginState('done')
-      later(() => navigate('/dashboard'), 700)
-    }, 1100)
+      later(() => {
+        if (user?.role === 'ADMIN') {
+          navigate('/admin')
+        } else {
+          navigate('/dashboard')
+        }
+      }, 700)
+    } catch (err) {
+      setLoginError(getErrorMessage(err))
+      setLoginState('idle')
+    }
   }
 
   const handleBiometric = () => {
@@ -269,6 +297,23 @@ export default function SellerLoginForm() {
                     <span>SSL Secured</span>
                   </div>
                 </div>
+
+                {/* Error Banner */}
+                {loginError && (
+                  <div role="alert" className="flex items-start gap-2.5 rounded-xl bg-red-500/10 border border-red-400/25 px-4 py-3 text-xs sm:text-sm text-red-300">
+                    <Icon name="error" className="text-[18px] text-red-400 mt-px shrink-0" />
+                    <div className="space-y-1">
+                      <span>{loginError}</span>
+                      {loginError.includes('pending administrator verification') && (
+                        <div className="pt-1">
+                          <Link to="/contact-admin" className="text-amber-400 font-bold hover:underline text-xs block">
+                            Contact Campus Admin Office →
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Submit */}
                 <button

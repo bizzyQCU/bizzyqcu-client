@@ -75,8 +75,26 @@ export const PRODUCT_SORT = {
 };
 
 // Validation rules mirrored from bizzyqcu-server (auth.validation.ts)
-export const QCU_ID_PATTERN = /^\d{2}-\d{4}$/; // YY-NNNN, e.g. 24-0001
+export const QCU_ID_PATTERN = /^\d{2}-\d{4}$/; // YY-NNNN, e.g. 24-1685
 export const MIN_PASSWORD_LENGTH = 8;
+
+/**
+ * Formats a student ID into the strict QCU format: YY-NNNN (e.g. 24-1685).
+ * Restricts input to numeric digits and automatically manages the hyphen.
+ * Capped strictly at 7 characters (2 digits, hyphen, 4 digits).
+ */
+export function formatStudentId(value, prevValue = '') {
+  if (!value) return '';
+  if (value.length < prevValue.length && value.endsWith('-')) {
+    return value.slice(0, -1);
+  }
+  const digits = value.replace(/\D/g, '').slice(0, 6);
+  if (digits.length < 2) return digits;
+  if (digits.length === 2) {
+    return value.endsWith('-') ? `${digits}-` : digits;
+  }
+  return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+}
 
 // Delivery Methods
 export const DELIVERY_METHODS = {

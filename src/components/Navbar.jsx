@@ -1,16 +1,27 @@
+import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks'
 import Logo from './Logo.jsx'
-
-const CART_COUNT = 2
-
-const hashLinks = [
-  { label: 'PRODUCTS', to: '/#products' },
-  { label: 'ENTERPRISES', to: '/#enterprises' },
-  { label: 'ABOUT US', to: '/#about' },
-]
 
 export default function Navbar() {
   const navigate = useNavigate()
+  const { user, isAdmin, logout } = useAuth()
+  const [cartCount, setCartCount] = useState(0)
+
+  // Sync cart count
+  useEffect(() => {
+    const updateCount = () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem('bizzyqcu_cart') || '[]')
+        setCartCount(saved.reduce((sum, item) => sum + (item.quantity || 1), 0))
+      } catch {
+        setCartCount(0)
+      }
+    }
+    updateCount()
+    window.addEventListener('storage', updateCount)
+    return () => window.removeEventListener('storage', updateCount)
+  }, [])
 
   return (
     <header className="w-full pt-4 md:pt-6 px-4 sm:px-6 lg:px-10 z-50">
@@ -19,7 +30,8 @@ export default function Navbar() {
           <Logo />
         </Link>
 
-        <div className="hidden md:flex items-center space-x-7 lg:space-x-10 text-xs sm:text-sm font-extrabold tracking-wider">
+        {/* Navigation Links */}
+        <div className="hidden md:flex items-center space-x-6 lg:space-x-8 text-xs sm:text-sm font-extrabold tracking-wider">
           <NavLink
             to="/"
             end
@@ -31,40 +43,112 @@ export default function Navbar() {
           >
             HOME
           </NavLink>
-          {hashLinks.map((l) => (
-            <Link key={l.label} to={l.to} className="text-slate-700 hover:text-[#10439F] transition-colors">
-              {l.label}
-            </Link>
-          ))}
+
+          <NavLink
+            to="/marketplace"
+            className={({ isActive }) =>
+              `transition-colors hover:text-[#10439F] ${
+                isActive ? 'text-[#10439F] border-b-2 border-[#10439F] pb-0.5' : 'text-slate-700'
+              }`
+            }
+          >
+            MARKETPLACE
+          </NavLink>
+
+          {user && (
+            <NavLink
+              to="/orders"
+              className={({ isActive }) =>
+                `transition-colors hover:text-[#10439F] ${
+                  isActive ? 'text-[#10439F] border-b-2 border-[#10439F] pb-0.5' : 'text-slate-700'
+                }`
+              }
+            >
+              MY ORDERS
+            </NavLink>
+          )}
+
+          {/* CONTACT ADMIN (Visible to all students, customers, and sellers) */}
+          <NavLink
+            to="/contact-admin"
+            className={({ isActive }) =>
+              `transition-colors flex items-center gap-1.5 ${
+                isActive
+                  ? 'text-amber-600 border-b-2 border-amber-600 pb-0.5'
+                  : 'text-amber-600 hover:text-amber-700 font-bold'
+              }`
+            }
+          >
+            <span>🛡️</span>
+            <span>CONTACT ADMIN</span>
+          </NavLink>
+
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `transition-colors hover:text-[#10439F] ${
+                  isActive ? 'text-[#10439F] border-b-2 border-[#10439F] pb-0.5' : 'text-slate-900 font-black'
+                }`
+              }
+            >
+              ADMIN PORTAL
+            </NavLink>
+          )}
         </div>
 
+        {/* Right Action Icons & Auth Profile */}
         <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Cart Icon */}
           <button
             type="button"
             aria-label="Cart"
-            onClick={() => navigate('/#cart')}
+            onClick={() => navigate('/cart')}
             className="relative p-2 text-[#103D84] hover:text-amber-500 transition-colors"
           >
-            <svg className="w-6 h-6 stroke-current" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" viewBox="0 0 24 24">
+            <svg
+              className="w-6 h-6 stroke-current"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2.2"
+              viewBox="0 0 24 24"
+            >
               <circle cx="9" cy="21" r="1" />
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
-            <span className="absolute top-1 right-0.5 bg-[#E88E0E] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white">
-              {CART_COUNT}
-            </span>
+            {cartCount > 0 && (
+              <span className="absolute top-1 right-0.5 bg-[#E88E0E] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white">
+                {cartCount}
+              </span>
+            )}
           </button>
 
-          <button
-            type="button"
-            aria-label="Profile"
-            onClick={() => navigate('/login')}
-            className="text-[#103D84] hover:opacity-85 transition-opacity"
-          >
-            <svg className="w-8 h-8 fill-[#103D84]" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.93 0 3.5 1.57 3.5 3.5S13.93 12 12 12s-3.5-1.57-3.5-3.5S10.07 5 12 5zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-            </svg>
-          </button>
+          {/* User Status / Login Button */}
+          {user ? (
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:block text-right">
+                <div className="text-xs font-bold text-slate-800 line-clamp-1">{user.fullName}</div>
+                <div className="text-[10px] font-mono text-slate-500">{user.qcuIdNumber || user.role}</div>
+              </div>
+              <button
+                type="button"
+                onClick={logout}
+                title="Sign Out"
+                className="px-3 py-1.5 rounded-full text-xs font-bold text-slate-700 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="px-4 py-1.5 rounded-full bg-[#10439F] hover:bg-[#0c347d] text-white text-xs font-extrabold shadow-sm transition-colors"
+            >
+              Log In
+            </Link>
+          )}
         </div>
       </nav>
     </header>

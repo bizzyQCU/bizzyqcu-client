@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { registerUser } from '../api'
 import { AuthShowcase } from '../components'
 import { getErrorMessage, getFieldErrors } from '../../../lib/api-client'
-import { MEMBER_TYPES, QCU_ID_PATTERN, MIN_PASSWORD_LENGTH } from '../../../lib/constants'
+import { MEMBER_TYPES, QCU_ID_PATTERN, MIN_PASSWORD_LENGTH, formatStudentId } from '../../../lib/constants'
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024 // 5MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf']
@@ -71,7 +71,11 @@ export default function Signup() {
   const [errors, setErrors] = useState({})
 
   const update = (key) => (e) => {
-    setForm((f) => ({ ...f, [key]: e.target.value }))
+    let val = e.target.value
+    if (key === 'studentId') {
+      val = formatStudentId(val, form.studentId)
+    }
+    setForm((f) => ({ ...f, [key]: val }))
     setErrors((prev) => ({ ...prev, [key]: undefined }))
   }
 
@@ -100,7 +104,7 @@ export default function Signup() {
     if (!form.birthday) next.birthday = 'Birthday is required'
     if (!/^09\d{9}$/.test(form.contactNumber.replace(/\s|-/g, ''))) next.contactNumber = 'Enter a valid 11-digit number'
     if (!form.section) next.section = 'Select your section'
-    if (!QCU_ID_PATTERN.test(form.studentId.trim())) next.studentId = 'Format: YY-NNNN (e.g. 24-1679)'
+    if (!QCU_ID_PATTERN.test(form.studentId.trim())) next.studentId = 'Student number must be formatted as YY-NNNN (e.g. 24-1685)'
     if (!idFile) next.idFile = 'Please upload your QCU ID'
     return next
   }
@@ -359,15 +363,16 @@ export default function Signup() {
                   </select>
                 </InputField>
 
-                <InputField id="signup-student-id" label="Student ID" icon="badge" error={errors.studentId}>
+                <InputField id="signup-student-id" label="Student ID Number" icon="badge" error={errors.studentId}>
                   <input
                     id="signup-student-id"
                     type="text"
                     required
+                    maxLength={7}
                     value={form.studentId}
                     onChange={update('studentId')}
-                    placeholder="e.g. 24-1679"
-                    className={`${inputBase} ${border('studentId')} pl-10 pr-3.5`}
+                    placeholder="24-1685"
+                    className={`${inputBase} ${border('studentId')} pl-10 pr-3.5 font-mono tracking-wider`}
                   />
                 </InputField>
               </div>
