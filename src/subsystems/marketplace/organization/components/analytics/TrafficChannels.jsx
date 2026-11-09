@@ -1,16 +1,14 @@
 export default function TrafficChannels({ traffic }) {
   return (
     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-base font-bold text-slate-900">Primary Traffic Channels</h3>
-          <p className="text-xs text-slate-500">Attribution for {traffic.total.toLocaleString()} unique visits</p>
-        </div>
+      <div className="mb-4">
+        <h3 className="text-base font-bold text-slate-900">Primary Traffic Channels</h3>
+        <p className="text-xs text-slate-500">Attribution for {traffic.total.toLocaleString()} unique visits</p>
       </div>
 
       <div className="space-y-4">
         {traffic.channels.map((channel) => {
-          const pct = Math.round((channel.visits / traffic.total) * 100)
+          const percentage = Math.round((channel.visits / traffic.total) * 100);
           return (
             <div key={channel.id}>
               <div className="flex items-center justify-between text-sm mb-1.5">
@@ -19,17 +17,17 @@ export default function TrafficChannels({ traffic }) {
                   <span className="font-medium text-slate-700">{channel.label}</span>
                 </div>
                 <span className="font-semibold text-slate-900">
-                  {pct}% <span className="text-slate-500 font-normal">({channel.visits})</span>
+                  {percentage}% <span className="text-slate-500 font-normal">({channel.visits})</span>
                 </span>
               </div>
               <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                 <div 
                   className={`h-full ${channel.color} transition-all duration-500`} 
-                  style={{ width: `${pct}%` }}
+                  style={{ width: `${percentage}%` }}
                 />
               </div>
             </div>
-          )
+          );
         })}
       </div>
 
@@ -44,5 +42,5 @@ export default function TrafficChannels({ traffic }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

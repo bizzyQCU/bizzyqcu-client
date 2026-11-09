@@ -1,24 +1,22 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 
-const severityStyles = {
+const SEVERITY_STYLES = {
   urgent: {
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
+    container: 'bg-amber-50 border-amber-200',
     icon: 'text-amber-600',
     title: 'text-amber-900',
   },
   info: {
-    bg: 'bg-sky-50',
-    border: 'border-sky-200',
+    container: 'bg-sky-50 border-sky-200',
     icon: 'text-sky-600',
     title: 'text-sky-900',
   },
-}
+};
 
-const variantStyles = {
+const BUTTON_STYLES = {
   primary: 'bg-[#0091FF] hover:bg-[#0284C7] text-white',
   secondary: 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200',
-}
+};
 
 export default function PriorityActions({ actions, nextReview }) {
   return (
@@ -26,7 +24,7 @@ export default function PriorityActions({ actions, nextReview }) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-base font-bold text-slate-900">Priority Actions</h3>
-          <p className="text-xs text-slate-500">Inventory &amp; sales priorities requiring attention</p>
+          <p className="text-xs text-slate-500">Inventory & sales priorities requiring attention</p>
         </div>
         <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-1 rounded">
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -38,22 +36,19 @@ export default function PriorityActions({ actions, nextReview }) {
 
       <div className="space-y-3">
         {actions.map((action) => {
-          const style = severityStyles[action.severity]
+          const styles = SEVERITY_STYLES[action.severity];
           return (
-            <div 
-              key={action.id} 
-              className={`${style.bg} ${style.border} border rounded-lg p-4`}
-            >
+            <div key={action.id} className={`${styles.container} border rounded-lg p-4`}>
               <div className="flex items-start gap-3">
-                <svg className={`w-5 h-5 ${style.icon} shrink-0 mt-0.5`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className={`w-5 h-5 ${styles.icon} shrink-0 mt-0.5`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div className="flex-1">
-                  <h4 className={`text-sm font-bold ${style.title}`}>{action.title}</h4>
+                  <h4 className={`text-sm font-bold ${styles.title}`}>{action.title}</h4>
                   <p className="text-xs text-slate-600 mt-1">{action.body}</p>
                   <Link 
                     to={action.to}
-                    className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${variantStyles[action.variant]}`}
+                    className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${BUTTON_STYLES[action.variant]}`}
                   >
                     {action.cta}
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -63,7 +58,7 @@ export default function PriorityActions({ actions, nextReview }) {
                 </div>
               </div>
             </div>
-          )
+          );
         })}
       </div>
 
@@ -79,5 +74,5 @@ export default function PriorityActions({ actions, nextReview }) {
         </button>
       </div>
     </div>
-  )
+  );
 }
