@@ -104,9 +104,11 @@ function StoreDesktop() {
           {
             productId: p.id,
             storeId: store.id,
+            storeName: store.name,
             name: p.name,
             price: parseFloat(p.price),
             quantity: 1,
+            stockQuantity: p.stockQuantity,
           },
         ],
         storeId: store.id,

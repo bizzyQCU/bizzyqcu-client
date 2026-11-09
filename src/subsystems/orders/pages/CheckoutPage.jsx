@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
 import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";
@@ -39,7 +39,19 @@ function PhoneInput({ id, value, onChange, invalid, placeholder }) {
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { selected: items, selectedCount, remove, selectedTotal: total } = useCart();
+  const location = useLocation();
+  const { selected: cartItems, selectedCount, remove, selectedTotal } = useCart();
+  
+  // Use Buy Now items if they exist, otherwise use cart items
+  const buyNowItems = location.state?.items;
+  const isBuyNow = !!buyNowItems;
+  const items = isBuyNow ? buyNowItems : cartItems;
+  
+  // For Buy Now, track quantities separately
+  const [buyNowQuantities, setBuyNowQuantities] = useState(
+    isBuyNow ? Object.fromEntries(buyNowItems.map((item) => [item.productId, item.quantity])) : {}
+  );
+  
   const [delivery, setDelivery] = useState("room");
   const [collapsed, setCollapsed] = useState(false);
   const [building, setBuilding] = useState("Tech Building / San Bartolome Campus");
@@ -58,6 +70,24 @@ export default function CheckoutPage() {
     if (smsIncomplete || items.length === 0) return;
     navigate("/payment");
   }
+  
+  function updateBuyNowQuantity(productId, newQty) {
+    setBuyNowQuantities((prev) => ({
+      ...prev,
+      [productId]: newQty,
+    }));
+  }
+  
+  // Calculate Buy Now totals
+  const buyNowCount = Object.values(buyNowQuantities).reduce((sum, qty) => sum + qty, 0);
+  const buyNowTotal = buyNowItems ? buyNowItems.reduce((sum, item) => {
+    const qty = buyNowQuantities[item.productId] || item.quantity;
+    return sum + item.price * qty;
+  }, 0) : 0;
+  
+  // Display values depend on flow
+  const displayCount = isBuyNow ? buyNowCount : selectedCount;
+  const displayTotal = isBuyNow ? buyNowTotal : selectedTotal;
 
   return (
     <>
@@ -209,7 +239,7 @@ export default function CheckoutPage() {
             <div className={`flex items-center justify-between ${collapsed ? "" : "border-b border-slate-100 pb-3.5"}`}>
               <div>
                 <h2 className="text-sm font-bold text-slate-900">Order summary</h2>
-                <p className="text-[11px] font-medium text-slate-400">({selectedCount} items) · ₱{total.toFixed(2)}</p>
+                <p className="text-[11px] font-medium text-slate-400">({displayCount} items) · ₱{displayTotal.toFixed(2)}</p>
               </div>
               <button type="button" aria-label={collapsed ? "Expand summary" : "Collapse summary"} aria-expanded={!collapsed} onClick={() => setCollapsed((c) => !c)} className="rounded p-1 text-slate-400 transition hover:text-slate-600">
                 <Icon name={collapsed ? "chevronDown" : "chevronUp"} className="h-4 w-4" />
@@ -220,29 +250,84 @@ export default function CheckoutPage() {
               <>
                 <div className="my-2 divide-y divide-slate-100">
                   {items.length === 0 && <p className="py-4 text-center text-xs text-slate-500">Your cart is empty.</p>}
-                  {items.map((i) => (
-                    <div key={i.id} className="flex items-center justify-between gap-3 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-sky-100 bg-sky-50 text-sky-600">
-                          <Icon name="tag" className="h-4 w-4" />
+                  {isBuyNow ? (
+                    // Buy Now flow: show quantity stepper
+                    items.map((item) => {
+                      const isOutOfStock = item.stockQuantity === 0;
+                      const maxQty = Math.min(item.stockQuantity || 99, 99);
+                      const currentQty = buyNowQuantities[item.productId] || item.quantity;
+                      const lineTotal = item.price * currentQty;
+                      
+                      return (
+                        <div key={item.productId} className="flex items-center justify-between gap-3 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-sky-100 bg-sky-50 text-sky-600">
+                              <Icon name="tag" className="h-4 w-4" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <h3 className="text-xs font-bold leading-snug text-slate-800">{item.name}</h3>
+                              <p className="text-[10px] text-slate-400">{item.storeName}</p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            {isOutOfStock ? (
+                              <span className="text-xs font-bold text-rose-600">Out of stock</span>
+                            ) : (
+                              <>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    disabled={currentQty <= 1}
+                                    onClick={() => updateBuyNowQuantity(item.productId, currentQty - 1)}
+                                    className="rounded p-0.5 text-slate-400 transition hover:text-slate-600 disabled:opacity-30"
+                                    aria-label="Decrease quantity"
+                                  >
+                                    <Icon name="minus" className="h-3 w-3" />
+                                  </button>
+                                  <span className="w-6 text-center text-xs font-bold text-slate-800">{currentQty}</span>
+                                  <button
+                                    type="button"
+                                    disabled={currentQty >= maxQty}
+                                    onClick={() => updateBuyNowQuantity(item.productId, currentQty + 1)}
+                                    className="rounded p-0.5 text-slate-400 transition hover:text-slate-600 disabled:opacity-30"
+                                    aria-label="Increase quantity"
+                                  >
+                                    <Icon name="plus" className="h-3 w-3" />
+                                  </button>
+                                </div>
+                                <span className="text-xs font-bold text-slate-800">₱{lineTotal.toFixed(2)}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-xs font-bold leading-snug text-slate-800">{i.title}</h3>
-                          <p className="text-[10px] text-slate-400">{i.meta}</p>
+                      );
+                    })
+                  ) : (
+                    // Cart flow: original code, no stepper
+                    cartItems.map((i) => (
+                      <div key={i.id} className="flex items-center justify-between gap-3 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-sky-100 bg-sky-50 text-sky-600">
+                            <Icon name="tag" className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h3 className="text-xs font-bold leading-snug text-slate-800">{i.title}</h3>
+                            <p className="text-[10px] text-slate-400">{i.meta}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-800">₱{i.price.toFixed(2)}</span>
+                          <button type="button" aria-label={`Remove ${i.title}`} onClick={() => setConfirm({ title: "Remove this item?", message: `${i.title} will be removed from your order.`, confirmLabel: "Remove", tone: "danger", action: () => remove(i.id) })} className="rounded p-1 text-slate-300 transition hover:text-rose-500">
+                            <Icon name="x" className="h-3.5 w-3.5" />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-800">₱{i.price.toFixed(2)}</span>
-                        <button type="button" aria-label={`Remove ${i.title}`} onClick={() => setConfirm({ title: "Remove this item?", message: `${i.title} will be removed from your order.`, confirmLabel: "Remove", tone: "danger", action: () => remove(i.id) })} className="rounded p-1 text-slate-300 transition hover:text-rose-500">
-                          <Icon name="x" className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
 
                 <div className="space-y-2 border-t border-slate-100 pt-3 text-xs">
-                  <div className="flex justify-between text-slate-500"><span>Items Total</span><span className="font-medium text-slate-700">₱{total.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-slate-500"><span>Items Total</span><span className="font-medium text-slate-700">₱{displayTotal.toFixed(2)}</span></div>
                   <div className="flex justify-between text-slate-500"><span>Campus delivery fee</span><span className="font-medium text-slate-700">Free</span></div>
                 </div>
               </>
@@ -253,7 +338,7 @@ export default function CheckoutPage() {
                 <span className="block text-xs font-bold text-slate-900">Total Amount</span>
                 <span className="text-[10px] text-slate-400">Includes all campus fees</span>
               </div>
-              <span className="text-xl font-extrabold tracking-tight text-slate-900">₱{total.toFixed(2)}</span>
+              <span className="text-xl font-extrabold tracking-tight text-slate-900">₱{displayTotal.toFixed(2)}</span>
             </div>
 
             <div className="mt-5">

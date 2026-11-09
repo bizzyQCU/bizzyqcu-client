@@ -118,9 +118,11 @@ export default function MB_StorePage() {
           {
             productId: selected.id,
             storeId: store.id,
+            storeName: store.name,
             name: selected.name,
             price: parseFloat(selected.price),
             quantity: 1,
+            stockQuantity: selected.stockQuantity,
           },
         ],
         storeId: store.id,
