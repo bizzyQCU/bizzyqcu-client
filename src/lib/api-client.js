@@ -55,10 +55,12 @@ apiClient.interceptors.response.use(
       data?.message ||
       (error.response ? 'Something went wrong. Please try again.' : 'Cannot reach the server. Please check your connection.');
 
-    // { fieldName: 'message' } - dotted paths from zod are kept as-is (e.g. "items.0.quantity")
+    // { fieldName: 'message' } - the server validates { body, query, params } so zod paths
+    // arrive as "body.qcuIdNumber"; strip that prefix and keep the rest (e.g. "items.0.quantity").
     error.fieldErrors = Array.isArray(data?.errors)
       ? data.errors.reduce((acc, { field, message }) => {
-          if (field && !acc[field]) acc[field] = message;
+          const key = typeof field === 'string' ? field.replace(/^(body|query|params)\./, '') : field;
+          if (key && !acc[key]) acc[key] = message;
           return acc;
         }, {})
       : {};

@@ -5,6 +5,8 @@ import {
   LandingPage,
   Login,
   Signup,
+  AccountSecurity,
+  RequireAuth,
   SellerLoginForm,
   SellerSignup,
   EnterpriseSeller,
@@ -24,6 +26,14 @@ export default function AppRoutes() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/account"
+          element={
+            <RequireAuth>
+              <AccountSecurity />
+            </RequireAuth>
+          }
+        />
 
         {/* Seller Login Form */}
         <Route path="/seller-login-form" element={<SellerLoginForm />} />

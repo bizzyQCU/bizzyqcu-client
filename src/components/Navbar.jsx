@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import Logo from './Logo.jsx'
+import { useAuth } from '../hooks/useAuth'
 
 const CART_COUNT = 2
 
@@ -11,6 +12,7 @@ const hashLinks = [
 
 export default function Navbar() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
   return (
     <header className="w-full pt-4 md:pt-6 px-4 sm:px-6 lg:px-10 z-50">
@@ -57,8 +59,8 @@ export default function Navbar() {
 
           <button
             type="button"
-            aria-label="Profile"
-            onClick={() => navigate('/login')}
+            aria-label={isAuthenticated ? 'Account & Security' : 'Log in'}
+            onClick={() => navigate(isAuthenticated ? '/account' : '/login')}
             className="text-[#103D84] hover:opacity-85 transition-opacity"
           >
             <svg className="w-8 h-8 fill-[#103D84]" viewBox="0 0 24 24">
