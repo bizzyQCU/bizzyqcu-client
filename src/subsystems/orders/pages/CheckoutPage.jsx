@@ -1,12 +1,18 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
 import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";
+import { createMultiStoreOrders } from "../api.js";
 
 const options = [
   { id: "room", title: "Room-to-room delivery", note: "Direct handoff right to your campus classroom or lab. Dispatched by Verified QCU Courier.", tag: "Instant", eta: "Estimated arrival: ~15-25 mins" },
   { id: "pickup", title: "Pickup at seller", note: "Meetup at University Library Gate / Gazebo Area. Standard campus daylight hours.", tag: "FREE", place: "Main Library Entrance Desk" },
+];
+
+const paymentOptions = [
+  { id: "CASH", label: "Cash" },
+  { id: "GCASH_PAYMONGO", label: "GCash" },
 ];
 
 // Formats digits as 9XX XXX XXXX while typing (10 digits max).
@@ -53,24 +59,37 @@ export default function CheckoutPage() {
   );
   
   const [delivery, setDelivery] = useState("room");
+  const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [collapsed, setCollapsed] = useState(false);
   const [building, setBuilding] = useState("Tech Building / San Bartolome Campus");
   const [room, setRoom] = useState("Room 402, 4th Floor");
   const [phone, setPhone] = useState("917 123 4567");
   const [sms, setSms] = useState("");
   const [notes, setNotes] = useState("");
-  const [attempted, setAttempted] = useState(false);
   const [confirm, setConfirm] = useState(null);
+  const [placing, setPlacing] = useState(false);
+  const [placeError, setPlaceError] = useState(null);
 
   const smsDigits = sms.replace(/\D/g, "").length;
   const smsIncomplete = smsDigits < 10;
 
-  function continueToPayment() {
-    setAttempted(true);
-    if (smsIncomplete || items.length === 0) return;
-    navigate("/payment");
-  }
+  // Check if any Buy Now item is out of stock or has 0 quantity
+  const hasOutOfStockItem = isBuyNow && items.some((item) => item.stockQuantity === 0);
+  const hasZeroQuantity = isBuyNow && items.some((item) => (buyNowQuantities[item.productId] || item.quantity) === 0);
   
+  // Map delivery radio to API enum
+  const deliveryMethodMap = {
+    room: "ROOM_TO_ROOM",
+    pickup: "PICKUP",
+  };
+  const apiDeliveryMethod = deliveryMethodMap[delivery];
+  
+  // For ROOM_TO_ROOM, require building and room
+  const buildingEmpty = apiDeliveryMethod === "ROOM_TO_ROOM" && !building.trim();
+  const roomEmpty = apiDeliveryMethod === "ROOM_TO_ROOM" && !room.trim();
+  
+  const canPlaceOrder = isBuyNow && !smsIncomplete && !hasOutOfStockItem && !hasZeroQuantity && !buildingEmpty && !roomEmpty && items.length > 0;
+
   function updateBuyNowQuantity(productId, newQty) {
     setBuyNowQuantities((prev) => ({
       ...prev,
@@ -88,6 +107,60 @@ export default function CheckoutPage() {
   // Display values depend on flow
   const displayCount = isBuyNow ? buyNowCount : selectedCount;
   const displayTotal = isBuyNow ? buyNowTotal : selectedTotal;
+
+  async function placeOrder() {
+    if (!canPlaceOrder) return;
+    
+    setPlacing(true);
+    setPlaceError(null);
+
+    try {
+      const item = items[0];
+      const qty = buyNowQuantities[item.productId] || item.quantity;
+      
+      const orderGroup = {
+        storeId: item.storeId,
+        deliveryMethod: apiDeliveryMethod,
+        paymentMethod,
+        items: [
+          {
+            productId: item.productId,
+            quantity: qty,
+          },
+        ],
+      };
+
+      // Add campus fields only for ROOM_TO_ROOM
+      if (apiDeliveryMethod === "ROOM_TO_ROOM") {
+        orderGroup.campusBuilding = building;
+        orderGroup.campusRoomNumber = room;
+      }
+
+      const results = await createMultiStoreOrders([orderGroup]);
+
+      // Handle errors first
+      if (Object.keys(results.errors).length > 0) {
+        const storeId = Object.keys(results.errors)[0];
+        setPlaceError(results.errors[storeId].message);
+        setPlacing(false);
+        return;
+      }
+
+      // Handle GCash redirect
+      if (results.gcashCheckoutUrls && results.gcashCheckoutUrls.length > 0) {
+        window.location.href = results.gcashCheckoutUrls[0].checkoutUrl;
+        return;
+      }
+
+      // Handle success - navigate to order detail
+      if (results.orders && results.orders.length > 0) {
+        navigate(`/orders/${results.orders[0].id}`);
+      }
+    } catch (err) {
+      setPlaceError(err.message || "Failed to place order. Please try again.");
+      setPlacing(false);
+    }
+  }
 
   return (
     <>
@@ -173,13 +246,39 @@ export default function CheckoutPage() {
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                <Icon name="wallet" className="h-4 w-4 text-[#0284C7]" />
+                <span>Payment Method</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
+              {paymentOptions.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setPaymentMethod(p.id)}
+                  className={`rounded-xl border-2 p-3 text-left text-xs font-semibold transition ${
+                    paymentMethod === p.id
+                      ? "border-[#0284C7] bg-sky-50 text-[#0284C7]"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
                 <Icon name="pin" className="h-4 w-4 text-[#0284C7]" />
                 <span>Delivery Location &amp; Contact</span>
               </div>
               <span className="text-[11px] font-medium text-slate-400">* Required Campus Fields</span>
             </div>
 
-            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); continueToPayment(); }}>
+            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label htmlFor="building" className="mb-1.5 block text-xs font-bold text-slate-700">Campus Building <span className="text-red-500">*</span></label>
@@ -208,9 +307,9 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label htmlFor="sms" className="mb-1.5 block text-xs font-bold text-slate-700">Backup SMS line for security <span className="text-red-500">*</span></label>
-                  <PhoneInput id="sms" value={sms} onChange={setSms} invalid={smsIncomplete && (attempted || sms.length > 0)} placeholder="9XX XXX XXXX" />
-                  {(attempted || sms.length > 0) && smsIncomplete && (
-                    <p className="mt-1 text-[11px] font-medium leading-tight text-red-500">Please confirm SMS-ready line for campus security gate clearance.</p>
+                  <PhoneInput id="sms" value={sms} onChange={setSms} invalid={isBuyNow && smsIncomplete} placeholder="9XX XXX XXXX" />
+                  {isBuyNow && smsIncomplete && (
+                    <p className="mt-1 text-[11px] font-medium leading-tight text-red-500">Add a complete backup SMS line to place the order.</p>
                   )}
                 </div>
               </div>
@@ -279,20 +378,20 @@ export default function CheckoutPage() {
                                     type="button"
                                     disabled={currentQty <= 1}
                                     onClick={() => updateBuyNowQuantity(item.productId, currentQty - 1)}
-                                    className="rounded p-0.5 text-slate-400 transition hover:text-slate-600 disabled:opacity-30"
+                                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-30"
                                     aria-label="Decrease quantity"
                                   >
-                                    <Icon name="minus" className="h-3 w-3" />
+                                    <span className="text-sm font-bold leading-none">−</span>
                                   </button>
                                   <span className="w-6 text-center text-xs font-bold text-slate-800">{currentQty}</span>
                                   <button
                                     type="button"
                                     disabled={currentQty >= maxQty}
                                     onClick={() => updateBuyNowQuantity(item.productId, currentQty + 1)}
-                                    className="rounded p-0.5 text-slate-400 transition hover:text-slate-600 disabled:opacity-30"
+                                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-30"
                                     aria-label="Increase quantity"
                                   >
-                                    <Icon name="plus" className="h-3 w-3" />
+                                    <span className="text-sm font-bold leading-none">+</span>
                                   </button>
                                 </div>
                                 <span className="text-xs font-bold text-slate-800">₱{lineTotal.toFixed(2)}</span>
@@ -341,16 +440,41 @@ export default function CheckoutPage() {
               <span className="text-xl font-extrabold tracking-tight text-slate-900">₱{displayTotal.toFixed(2)}</span>
             </div>
 
+            {placeError && isBuyNow && (
+              <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
+                <p className="font-semibold">Error placing order:</p>
+                <p>{placeError}</p>
+              </div>
+            )}
+
+            {isBuyNow && (buildingEmpty || roomEmpty) && (
+              <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-700">
+                <p>Enter your campus building and room to place the order.</p>
+              </div>
+            )}
+
             <div className="mt-5">
-              <button
-                type="button"
-                onClick={continueToPayment}
-                disabled={items.length === 0}
-                className="block w-full rounded-full bg-[#0284C7] px-4 py-3 text-center text-xs font-semibold tracking-wide text-white shadow-sm transition hover:bg-sky-700 hover:shadow active:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Continue to payment
-              </button>
-              {attempted && smsIncomplete && <p className="mt-2 text-center text-[11px] font-medium text-red-500">Add a complete backup SMS line to continue.</p>}
+              {isBuyNow ? (
+                <button
+                  type="button"
+                  onClick={placeOrder}
+                  disabled={!canPlaceOrder || placing}
+                  className="block w-full rounded-full bg-[#0284C7] px-4 py-3 text-center text-xs font-semibold tracking-wide text-white shadow-sm transition hover:bg-sky-700 hover:shadow active:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {placing ? "Placing order…" : "Place order"}
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    disabled={true}
+                    className="block w-full rounded-full bg-slate-300 px-4 py-3 text-center text-xs font-semibold tracking-wide text-slate-600 shadow-sm cursor-not-allowed"
+                  >
+                    Continue to payment
+                  </button>
+                  <p className="mt-2 text-center text-[11px] font-medium text-slate-500">Cart checkout is not connected yet.</p>
+                </>
+              )}
               {items.length === 0 && <Link to="/marketplace" className="mt-2 block text-center text-[11px] font-semibold text-sky-600">Browse the marketplace</Link>}
             </div>
           </div>
