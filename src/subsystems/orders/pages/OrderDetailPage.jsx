@@ -235,27 +235,32 @@ export default function OrderDetailPage() {
               <div className="flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
                 <div>
                   <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-400">Drop-off Location</span>
-                  <h4 className="text-sm font-bold text-slate-800">Tech Building, Room 402, 4th Floor</h4>
-                  <p className="mt-0.5 text-xs text-slate-500">QCU San Bartolome Main Campus</p>
+                  {order.deliveryMethod === "ROOM_TO_ROOM" ? (
+                    <>
+                      <h4 className="text-sm font-bold text-slate-800">{order.campusBuilding}, {order.campusRoomNumber}</h4>
+                      <p className="mt-0.5 text-xs text-slate-500">QCU Campus</p>
+                    </>
+                  ) : (
+                    <>
+                      <h4 className="text-sm font-bold text-slate-800">{order.store.pickupLocation}</h4>
+                      <p className="mt-0.5 text-xs text-slate-500">QCU Campus</p>
+                    </>
+                  )}
                 </div>
                 <div className="mt-4">
                   <span className="inline-flex items-center rounded-md bg-sky-100/70 px-2.5 py-1 text-[11px] font-semibold text-[#0369A1]">
                     <Icon name="building" className="mr-1 h-3.5 w-3.5" />
-                    Classroom Desk Handoff
+                    {order.deliveryMethod === "ROOM_TO_ROOM" ? "Classroom Desk Handoff" : "Pickup at Seller"}
                   </span>
                 </div>
               </div>
               <div className="flex flex-col justify-between rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
                 <div>
                   <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-400">Recipient Student</span>
-                  <h4 className="text-sm font-bold text-slate-800">Alex Valenzuela (BSIT 3-A)</h4>
-                  <p className="mt-0.5 text-xs text-slate-500">+63 917 123 4567</p>
-                </div>
-                <div className="mt-4">
-                  <span className="inline-flex items-center rounded-md bg-emerald-100/70 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
-                    <Icon name="shield" className="mr-1 h-3.5 w-3.5 text-emerald-600" />
-                    Student ID Verified - 2022-04812
-                  </span>
+                  <h4 className="text-sm font-bold text-slate-800">{order.buyer.fullName}</h4>
+                  {order.buyer.qcuIdNumber && (
+                    <p className="mt-0.5 text-xs text-slate-500">{order.buyer.qcuIdNumber}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -351,13 +356,17 @@ export default function OrderDetailPage() {
             {refundRequested && <p className="mt-2 text-center text-[11px] text-rose-600">Refund requested. Customer support will review it.</p>}
 
             <div className="mt-6 space-y-3.5 border-t border-slate-100 pt-5 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Payment Reference</span>
-                <span className="font-mono font-bold tracking-wider text-slate-800">BZ-891-9921</span>
-              </div>
+              {order.payment?.id && (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Payment Reference</span>
+                  <span className="font-mono font-bold tracking-wider text-slate-800">{order.payment.id}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Fulfillment Type</span>
-                <span className="font-medium text-slate-800">Room-to-room delivery</span>
+                <span className="font-medium text-slate-800">
+                  {order.deliveryMethod === "ROOM_TO_ROOM" ? "Room-to-room delivery" : "Pickup"}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Seller</span>

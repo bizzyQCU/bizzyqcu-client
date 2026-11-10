@@ -19,7 +19,7 @@ export default function OrderCard({ order, rated, onRate }) {
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-slate-900">#BZ-2024-{order.id}</span>
+          <span className="text-xs font-bold text-slate-900">#{order.orderNumber}</span>
           <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${toneClass[order.tone]}`}>{status}</span>
         </div>
         <p className="mt-1 text-[11px] text-slate-500">Seller: <span className="font-semibold text-slate-700">{order.seller}</span></p>

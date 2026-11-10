@@ -1,10 +1,21 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Icon from "../../../components/Icon.jsx";
 import RatingModal from "../../../components/RatingModal.jsx";
-import { orders } from "../../../lib/mockData.js";
 import { useRatings } from "../../../lib/RatingContext.jsx";
 import OrderCard from "./OrderCard.jsx";
 import { categories } from "./orderCategories.js";
+import { getMyOrders } from "../api.js";
+import { getErrorMessage } from "../../../lib/api-client.js";
+
+const STATUS_LABELS = {
+  PENDING_PAYMENT: "To pay",
+  PENDING_CONFIRMATION: "Waiting for approval",
+  PREPARING: "Preparing",
+  READY_FOR_PICKUP: "Ready for pickup",
+  OUT_FOR_DELIVERY: "Out for delivery",
+  COMPLETED: "Completed",
+  CANCELLED: "Cancelled",
+};
 
 const tiles = categories.filter((c) => c.id !== "all");
 
@@ -13,9 +24,70 @@ export default function MB_OrdersPage() {
   const [active, setActive] = useState("all");
   const [ratingFor, setRatingFor] = useState(null);
   const [rated, setRated] = useState({});
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    setError(null);
+    getMyOrders()
+      .then((res) => {
+        if (!ignore) {
+          const mapped = res.data.map((order) => ({
+            id: order.id,
+            orderNumber: order.orderNumber,
+            seller: order.store.name,
+            status: STATUS_LABELS[order.orderStatus] || order.orderStatus,
+            tone: getOrderTone(order.orderStatus),
+            total: Number(order.totalAmount),
+            fulfillment: order.deliveryMethod === "ROOM_TO_ROOM" ? "Room-to-room delivery" : "Pickup",
+            createdAt: order.createdAt,
+          }));
+          setOrders(mapped);
+        }
+      })
+      .catch((err) => {
+        if (!ignore) {
+          setError(getErrorMessage(err));
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const current = categories.find((c) => c.id === active);
-  const visible = useMemo(() => orders.filter(current.match), [current]);
+  const visible = useMemo(() => orders.filter(current.match), [current, orders]);
+
+  if (loading) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-sm text-slate-500">Loading orders…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-sm font-semibold text-rose-600">{error}</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="mt-2 text-xs font-semibold text-sky-600"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -79,10 +151,10 @@ export default function MB_OrdersPage() {
         <RatingModal
           seller={ratingFor.seller}
           initials={ratingFor.seller.split(" ").map((w) => w[0]).join("").slice(0, 2)}
-          orderRef={`#BZ-2024-${ratingFor.id}`}
+          orderRef={`#${ratingFor.orderNumber}`}
           onClose={() => setRatingFor(null)}
           onSubmit={({ rating, comment }) => {
-            addRating(ratingFor.storeName, rating, comment);
+            addRating(ratingFor.seller, rating, comment);
             setRated({ ...rated, [ratingFor.id]: true });
             setRatingFor(null);
           }}
@@ -90,4 +162,11 @@ export default function MB_OrdersPage() {
       )}
     </div>
   );
+}
+
+function getOrderTone(orderStatus) {
+  if (orderStatus === "COMPLETED") return "emerald";
+  if (orderStatus === "CANCELLED") return "rose";
+  if (orderStatus === "PENDING_PAYMENT" || orderStatus === "PENDING_CONFIRMATION") return "amber";
+  return "sky";
 }
