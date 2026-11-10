@@ -174,14 +174,16 @@ export default function MessageWidget() {
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-medium text-slate-500">{m.text}</span>
                 </div>
               ) : m.from === "me" ? (
-                <PopIn key={m.id} className="ml-auto max-w-[80%]">
-                  <div className="rounded-2xl rounded-br-sm bg-[#0284C7] px-3.5 py-2.5 leading-relaxed text-white shadow-sm">{m.text}</div>
-                  <span className="mt-1 block text-right text-[10px] text-slate-400">{m.time}</span>
+                <PopIn key={m.id} className="flex justify-end">
+                  <div className="inline-block max-w-[80%]">
+                    <div className="rounded-2xl rounded-br-sm bg-[#0284C7] px-3.5 py-2.5 leading-relaxed text-white shadow-sm">{m.text}</div>
+                    <span className="mt-1 block text-right text-[10px] text-slate-400">{m.time}</span>
+                  </div>
                 </PopIn>
               ) : (
-                <PopIn key={m.id} className="flex max-w-[85%] items-end gap-2">
+                <PopIn key={m.id} className="flex items-end gap-2">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-sky-600 text-[10px] font-bold text-white">{activeContact?.initials}</span>
-                  <div>
+                  <div className="inline-block max-w-[85%]">
                     <div className="rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-3.5 py-2.5 leading-relaxed text-slate-800 shadow-sm">{m.text}</div>
                     <span className="ml-1 mt-1 block text-[10px] text-slate-400">{m.time}</span>
                   </div>

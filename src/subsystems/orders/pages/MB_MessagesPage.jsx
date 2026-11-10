@@ -159,12 +159,14 @@ export default function MB_MessagesPage() {
                     <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-medium text-slate-500">{m.text}</span>
                   </div>
                 ) : m.from === "me" ? (
-                  <div key={m.id} className="ml-auto max-w-[78%]">
-                    <div className="rounded-2xl rounded-br-sm bg-[#0284C7] px-3.5 py-2.5 leading-relaxed text-white shadow-sm">{m.text}</div>
-                    <span className="mt-1 block text-right text-[10px] text-slate-400">{m.time}</span>
+                  <div key={m.id} className="flex justify-end">
+                    <div className="inline-block max-w-[78%]">
+                      <div className="rounded-2xl rounded-br-sm bg-[#0284C7] px-3.5 py-2.5 leading-relaxed text-white shadow-sm">{m.text}</div>
+                      <span className="mt-1 block text-right text-[10px] text-slate-400">{m.time}</span>
+                    </div>
                   </div>
                 ) : (
-                  <div key={m.id} className="max-w-[78%]">
+                  <div key={m.id} className="inline-block max-w-[78%]">
                     <div className="rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-3.5 py-2.5 leading-relaxed text-slate-800 shadow-sm">{m.text}</div>
                     <span className="mt-1 block text-[10px] text-slate-400">{m.time}</span>
                   </div>
