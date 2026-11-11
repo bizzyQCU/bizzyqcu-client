@@ -445,8 +445,8 @@ export default function AccountSecurity() {
 
   if (error && !profile) {
     return (
-      <main className="flex-grow flex items-center justify-center px-4 pt-20 pb-6">
-        <AuthCard className="w-full max-w-md space-y-4">
+      <main className="flex-1 min-h-0 flex items-center justify-center px-4 pt-20 pb-6">
+        <AuthCard fixedHeight={false} className="w-full max-w-md space-y-4">
           <Alert tone="error">{error}</Alert>
           <button
             type="button"
@@ -468,7 +468,7 @@ export default function AccountSecurity() {
   const sellerRejectionReason = seller?.rejectionReason
 
   return (
-    <main className="flex-grow w-full max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-8 space-y-5">
+    <main className="flex-1 min-h-0 overflow-y-auto auth-card-scroll w-full max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-8 space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <div>
@@ -490,7 +490,7 @@ export default function AccountSecurity() {
       {error && <Alert tone="error">{error}</Alert>}
 
       {/* 1. Profile & Verification Status */}
-      <AuthCard>
+      <AuthCard fixedHeight={false}>
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 flex items-center justify-center text-slate-950 text-xl font-black shrink-0">
             {initials(profile.fullName)}
@@ -572,7 +572,7 @@ export default function AccountSecurity() {
       </AuthCard>
 
       {/* 2. Seller Profile & Endorsement Status / Application */}
-      <AuthCard>
+      <AuthCard fixedHeight={false}>
         <SectionTitle icon="storefront" title="Campus Seller Status">
           {seller && <VerificationBadge status={seller.verificationStatus} />}
         </SectionTitle>
@@ -704,7 +704,7 @@ export default function AccountSecurity() {
       </AuthCard>
 
       {/* 3. Registered Devices & Passkey Management (GET/PATCH/DELETE /auth/devices/:id) */}
-      <AuthCard>
+      <AuthCard fixedHeight={false}>
         <SectionTitle icon="key" title="Registered Devices &amp; Passkeys">
           <span className="text-xs font-semibold text-slate-400">{devices.length} registered</span>
         </SectionTitle>
@@ -749,7 +749,7 @@ export default function AccountSecurity() {
       </AuthCard>
 
       {/* 4. Email & Password Settings (PATCH /auth/email & PATCH /auth/password) */}
-      <AuthCard>
+      <AuthCard fixedHeight={false}>
         <SectionTitle icon="lock_reset" title="Email &amp; Password" />
 
         <div className="space-y-6">

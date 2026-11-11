@@ -5,6 +5,7 @@ import { registerUser } from '../api'
 import { uploadVerificationImage } from '../upload'
 import {
   Alert,
+  AuthCard,
   Field,
   fieldBorder,
   Icon,
@@ -169,74 +170,77 @@ export function SellerRegistrationForm({
     const sellerStatus = registered.sellerProfile?.verificationStatus || 'PENDING'
 
     return (
-      <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-4 lg:py-4 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-2 lg:py-4 grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] gap-8 lg:gap-16 items-center">
         <SellerShowcase badge={badge} />
         <section className="w-full max-w-[490px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="seller-done-title">
-          <div className="relative overflow-hidden rounded-3xl bg-slate-900/70 backdrop-blur-xl border border-amber-400/20 shadow-modal ring-1 ring-inset ring-white/5 p-6 sm:p-7 space-y-4">
-            <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-amber-500/15 blur-3xl" />
-            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
-
-            <div className="relative text-center space-y-2.5">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
-                <Icon name="storefront" className="text-3xl" />
-              </div>
-              <h1 id="seller-done-title" className="text-2xl font-extrabold text-white">
-                Seller Application Submitted
-              </h1>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                An administrator will verify your QCU ID, live selfie, and seller endorsement document. Once approved, you can create and manage your campus store.
-              </p>
-            </div>
-
-            <dl className="relative rounded-2xl bg-white/[0.03] border border-white/10 divide-y divide-white/5 text-sm">
-              {[
-                ['Full Name', registered.fullName],
-                ['QCU ID', registered.qcuIdNumber],
-                ['Email', registered.email],
-                ['Seller Type', SELLER_TYPE_LABELS[sellerType] || sellerType],
-              ].map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between gap-3 px-4 py-2.5">
-                  <dt className="text-slate-400">{k}</dt>
-                  <dd className="text-white font-medium truncate">{v}</dd>
+          <AuthCard className="border-amber-400/20">
+            <div className="space-y-4">
+              <div className="text-center space-y-2.5">
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+                  <Icon name="storefront" className="text-3xl" />
                 </div>
-              ))}
-              <div className="flex items-center justify-between gap-3 px-4 py-2.5">
-                <dt className="text-slate-400">QCU Identity Status</dt>
-                <dd>
-                  <VerificationBadge status={registered.verificationStatus} />
-                </dd>
+                <h1 id="seller-done-title" className="text-2xl font-extrabold text-white">
+                  Seller Application Submitted
+                </h1>
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  An administrator will verify your QCU ID, live selfie, and seller endorsement document. Once approved, you can create and manage your campus store.
+                </p>
               </div>
-              <div className="flex items-center justify-between gap-3 px-4 py-2.5">
-                <dt className="text-slate-400">Seller Profile Status</dt>
-                <dd>
-                  <VerificationBadge status={sellerStatus} />
-                </dd>
-              </div>
-            </dl>
 
-            <div className="relative pt-3 border-t border-white/10 space-y-3">
-              {needsPasskey && passkeyCapable && (
-                <Alert tone="warning">
-                  You didn&apos;t set a password, so a passkey is required to sign in. Register one on this device now.
-                </Alert>
-              )}
-              <PasskeySetup userId={registered.id} onRegistered={() => setPasskeyAdded(true)} />
+              <dl className="rounded-2xl bg-white/[0.03] border border-white/10 divide-y divide-white/5 text-sm">
+                {[
+                  ['Full Name', registered.fullName],
+                  ['QCU ID', registered.qcuIdNumber],
+                  ['Email', registered.email],
+                  ['Seller Type', SELLER_TYPE_LABELS[sellerType] || sellerType],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between gap-3 px-4 py-2.5">
+                    <dt className="text-slate-400">{k}</dt>
+                    <dd className="text-white font-medium truncate">{v}</dd>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+                  <dt className="text-slate-400">QCU Identity Status</dt>
+                  <dd>
+                    <VerificationBadge status={registered.verificationStatus} />
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+                  <dt className="text-slate-400">Seller Profile Status</dt>
+                  <dd>
+                    <VerificationBadge status={sellerStatus} />
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="pt-3 border-t border-white/10 space-y-3">
+                {needsPasskey && passkeyCapable && (
+                  <Alert tone="warning">
+                    You didn&apos;t set a password, so a passkey is required to sign in. Register one on this device now.
+                  </Alert>
+                )}
+                <PasskeySetup userId={registered.id} onRegistered={() => setPasskeyAdded(true)} />
+              </div>
             </div>
 
-            <button
-              type="button"
-              disabled={needsPasskey && passkeyCapable}
-              onClick={() =>
-                navigate(`/seller-login-form?type=${portalKey}`, {
-                  state: { qcuIdNumber: registered.qcuIdNumber },
-                })
-              }
-              className={`${primaryButton} relative`}
-            >
-              <span>{needsPasskey && passkeyCapable ? 'Create a passkey to continue' : 'Proceed to Seller Log In'}</span>
-              <Icon name="arrow_forward" className="text-[20px]" />
-            </button>
-          </div>
+            <div className="mt-auto pt-4">
+              <button
+                type="button"
+                disabled={needsPasskey && passkeyCapable}
+                onClick={() =>
+                  navigate(`/seller-login-form?type=${portalKey}`, {
+                    state: { qcuIdNumber: registered.qcuIdNumber },
+                  })
+                }
+                className={primaryButton}
+              >
+                <span>{needsPasskey && passkeyCapable ? 'Create a passkey to continue' : 'Proceed to Seller Log In'}</span>
+                <Icon name="arrow_forward" className="text-[20px]" />
+              </button>
+            </div>
+          </AuthCard>
+
+          <TrustBadges items={['Official QCU Seller Portal', 'WebAuthn FIDO2 Protected']} />
         </section>
       </main>
     )
@@ -246,25 +250,15 @@ export function SellerRegistrationForm({
   // Seller Registration Form
   // --------------------------------------------------------------------------
   return (
-    <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-4 lg:py-4 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+    <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-2 lg:py-4 grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] gap-8 lg:gap-16 items-center">
       <SellerShowcase badge={badge} />
 
       <section className="w-full max-w-[550px] mx-auto lg:mx-0 lg:justify-self-end">
-        <div className="relative overflow-hidden rounded-3xl bg-slate-900/70 backdrop-blur-xl border border-amber-400/20 shadow-modal ring-1 ring-inset ring-white/5 p-6 sm:p-7">
-          <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-amber-500/15 blur-3xl" />
-          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
-
-          {/* Back / Close button */}
-          <button
-            type="button"
-            onClick={() => navigate('/seller-signup')}
-            aria-label="Back to seller portals"
-            className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
-          >
-            <Icon name="close" className="text-[18px]" />
-          </button>
-
-          <div className="relative">
+        <AuthCard
+          className="border-amber-400/20"
+          onClose={() => navigate('/seller-signup')}
+          closeLabel="Back to seller portals"
+        >
             {/* Header */}
             <div className="text-center mb-4 px-5">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-[10px] font-extrabold tracking-wider uppercase text-amber-300 mb-2">
@@ -469,22 +463,23 @@ export function SellerRegistrationForm({
             </form>
 
             {/* Footer link */}
-            <div className="mt-3.5 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-slate-400">
-              <span>
-                Already registered?{' '}
-                <Link
-                  className="text-amber-300 font-bold hover:text-amber-200 hover:underline"
-                  to={`/seller-login-form?type=${portalKey}`}
-                >
-                  Seller Log In
+            <div className="mt-auto pt-3.5">
+              <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-slate-400">
+                <span>
+                  Already registered?{' '}
+                  <Link
+                    className="text-amber-300 font-bold hover:text-amber-200 hover:underline"
+                    to={`/seller-login-form?type=${portalKey}`}
+                  >
+                    Seller Log In
+                  </Link>
+                </span>
+                <Link className="text-slate-400 hover:text-white text-xs" to="/seller-signup">
+                  ← Switch seller type
                 </Link>
-              </span>
-              <Link className="text-slate-400 hover:text-white text-xs" to="/seller-signup">
-                ← Switch seller type
-              </Link>
+              </div>
             </div>
-          </div>
-        </div>
+        </AuthCard>
 
         <TrustBadges items={['Official QCU Seller Portal', 'WebAuthn FIDO2 Protected']} />
       </section>

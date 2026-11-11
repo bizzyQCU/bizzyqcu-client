@@ -24,10 +24,14 @@ export function Spinner({ className = 'text-[20px]' }) {
 }
 
 /** Glass card with the amber glow + hairline used across auth pages. */
-export function AuthCard({ children, className = '', onClose, closeLabel = 'Close' }) {
+export function AuthCard({ children, className = '', onClose, closeLabel = 'Close', fixedHeight = true }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl bg-slate-900/70 backdrop-blur-xl border border-white/10 shadow-modal ring-1 ring-inset ring-white/5 p-6 sm:p-7 ${className}`}
+      className={`relative overflow-hidden rounded-3xl bg-slate-900/70 backdrop-blur-xl border border-white/10 shadow-modal ring-1 ring-inset ring-white/5 ${
+        fixedHeight
+          ? 'flex flex-col h-[min(590px,calc(100vh-180px))] lg:h-[min(590px,calc(100vh-130px))]'
+          : 'p-6 sm:p-7'
+      } ${className}`}
     >
       <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-amber-500/15 blur-3xl" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
@@ -41,7 +45,13 @@ export function AuthCard({ children, className = '', onClose, closeLabel = 'Clos
           <Icon name="close" className="text-[18px]" />
         </button>
       )}
-      <div className="relative">{children}</div>
+      {fixedHeight ? (
+        <div className="relative flex-1 min-h-0 overflow-y-auto overscroll-contain p-6 sm:p-7 auth-card-scroll">
+          <div className="min-h-full flex flex-col">{children}</div>
+        </div>
+      ) : (
+        <div className="relative">{children}</div>
+      )}
     </div>
   )
 }

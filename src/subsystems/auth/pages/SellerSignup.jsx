@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { Icon, TrustBadges } from '../components/AuthUI.jsx'
+import { AuthCard, Icon, TrustBadges } from '../components/AuthUI.jsx'
 
 const sellerTypes = [
   {
@@ -70,32 +70,9 @@ export default function SellerSignup() {
   }
 
   return (
-    <main className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 pt-20 pb-6">
+    <main className="flex-1 min-h-0 flex flex-col items-center justify-center px-4 sm:px-6 pt-20 pb-2 lg:py-4">
       <section className="w-full max-w-[840px]" aria-labelledby="seller-signup-title">
-        <div className="relative overflow-hidden rounded-3xl bg-slate-900/70 backdrop-blur-xl border border-white/10 shadow-modal ring-1 ring-inset ring-white/5 p-6 sm:p-8 md:p-9">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-28 -right-24 w-72 h-72 rounded-full bg-amber-500/15 blur-3xl"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-28 -left-24 w-72 h-72 rounded-full bg-sky-500/10 blur-3xl"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"
-          />
-
-          {/* Close button */}
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={closeModal}
-            className="absolute top-5 right-5 z-10 w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
-          >
-            <Icon name="close" className="text-[18px]" />
-          </button>
-
+        <AuthCard onClose={closeModal} closeLabel="Close">
           {/* Header */}
           <div className="relative text-center max-w-xl mx-auto mb-6">
             <div className="flex items-center justify-center gap-2">
@@ -186,12 +163,14 @@ export default function SellerSignup() {
           </div>
 
           {/* Footer info */}
-          <div className="relative text-center border-t border-white/10 pt-4">
-            <p className="text-[11px] text-slate-400 max-w-xl mx-auto leading-relaxed">
-              Both your QCU ID and your seller supporting document must be verified by an administrator before your store can open on the marketplace.
-            </p>
+          <div className="mt-auto pt-4">
+            <div className="text-center border-t border-white/10 pt-4">
+              <p className="text-[11px] text-slate-400 max-w-xl mx-auto leading-relaxed">
+                Both your QCU ID and your seller supporting document must be verified by an administrator before your store can open on the marketplace.
+              </p>
+            </div>
           </div>
-        </div>
+        </AuthCard>
 
         <TrustBadges items={['Official QCU Seller Portal', 'RA 10173 Data Privacy Protected']} />
       </section>

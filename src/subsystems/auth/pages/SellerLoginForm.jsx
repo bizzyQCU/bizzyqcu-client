@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import SellerShowcase from '../components/SellerShowcase.jsx'
-import { Alert, Icon, inputBase, PasswordToggle, Spinner, TrustBadges } from '../components/AuthUI.jsx'
+import { Alert, AuthCard, Icon, inputBase, PasswordToggle, Spinner, TrustBadges } from '../components/AuthUI.jsx'
 import StatusLookup from '../components/StatusLookup.jsx'
 import { requestPasswordOtp, verifyPasswordOtp, loginWithPasskey } from '../api'
 import { getWebAuthnErrorMessage, isWebAuthnSupported } from '../../../lib/webauthn'
@@ -164,21 +164,11 @@ export default function SellerLoginForm() {
   }
 
   return (
-    <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-4 lg:py-4 grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+    <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-2 lg:py-4 grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] gap-8 lg:gap-16 items-center">
       <SellerShowcase badge={portal.badge} />
 
       <section className="w-full max-w-[440px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="seller-form-title">
-        <div className="relative overflow-hidden rounded-3xl bg-slate-900/70 backdrop-blur-xl border border-amber-400/20 shadow-modal ring-1 ring-inset ring-white/5 p-6 sm:p-7">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-amber-500/15 blur-3xl"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/70 to-transparent"
-          />
-
-          <div className="relative">
+        <AuthCard className="border-amber-400/20">
             {/* Seller Portal Selector Bar */}
             <div className="flex items-center justify-between gap-2 pb-3.5 mb-4 border-b border-white/10">
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-extrabold uppercase tracking-wide ${portal.pillCls}`}>
@@ -492,23 +482,24 @@ export default function SellerLoginForm() {
             )}
 
             {/* Footer links */}
-            <div className="mt-4 pt-3.5 border-t border-white/10 text-center space-y-2.5">
-              <p className="text-xs sm:text-sm text-slate-400">
-                Don&apos;t have a seller account yet?{' '}
-                <Link className="text-amber-300 font-bold hover:text-amber-200 hover:underline" to="/seller-signup">
-                  Register as Seller
+            <div className="mt-auto pt-4">
+              <div className="pt-3.5 border-t border-white/10 text-center space-y-2.5">
+                <p className="text-xs sm:text-sm text-slate-400">
+                  Don&apos;t have a seller account yet?{' '}
+                  <Link className="text-amber-300 font-bold hover:text-amber-200 hover:underline" to="/seller-signup">
+                    Register as Seller
+                  </Link>
+                </p>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide px-3.5 py-1.5 rounded-full bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/10 transition-colors"
+                >
+                  <Icon name="shopping_bag" className="text-[14px] text-amber-400" />
+                  <span>Shopping instead? Buyer Login</span>
                 </Link>
-              </p>
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide px-3.5 py-1.5 rounded-full bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/10 transition-colors"
-              >
-                <Icon name="shopping_bag" className="text-[14px] text-amber-400" />
-                <span>Shopping instead? Buyer Login</span>
-              </Link>
+              </div>
             </div>
-          </div>
-        </div>
+        </AuthCard>
 
         <TrustBadges items={['Official QCU Seller Portal', 'WebAuthn FIDO2 Protected']} />
       </section>

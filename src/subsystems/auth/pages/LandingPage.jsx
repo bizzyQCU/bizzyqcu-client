@@ -15,7 +15,7 @@ const badges = [
 export default function LandingPage() {
   return (
     <>
-      <main className="relative flex-grow flex items-center justify-center px-4 sm:px-6 py-12 md:py-20">
+      <main className="relative flex-1 min-h-0 flex items-center justify-center px-4 sm:px-6 py-6">
         {/* Subtle centered ambient spotlight behind hero text */}
         <div
           aria-hidden="true"
