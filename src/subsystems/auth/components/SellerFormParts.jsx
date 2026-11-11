@@ -19,7 +19,7 @@ import {
 import ImageDropzone from './ImageDropzone.jsx'
 import CameraCapture from './CameraCapture.jsx'
 import PasskeySetup from './PasskeySetup.jsx'
-import { getErrorMessage, getFieldErrors } from '../../../lib/api-client'
+import { RegistrationOtpStep, useRegistrationOtp } from './RegistrationOtpStep.jsx'
 import { MEMBER_TYPES, MIN_PASSWORD_LENGTH, QCU_ID_PATTERN } from '../../../lib/constants'
 import { isWebAuthnSupported } from '../../../lib/webauthn'
 
@@ -39,18 +39,21 @@ const SERVER_FIELD_MAP = {
 }
 
 const SUBMIT_TEXT = {
-  idle: 'Submit Seller Application',
+  idle: 'Continue & Verify Email',
+  requesting_otp: 'Sending verification code…',
+  verifying_otp: 'Verifying email…',
   uploading: 'Uploading verification documents…',
   submitting: 'Submitting seller application…',
 }
 
 /**
  * Shared Seller Registration Form connected to bizzyqcu-server:
- *   1. Uploads QCU_ID, LIVE_SELFIE, and SELLER_ENDORSEMENT via POST /auth/uploads/verification
- *   2. Submits { qcuIdNumber, email, fullName, memberType: 'STUDENT', role: 'SELLER',
+ *   1. Requests and verifies a 6-digit Email OTP challenge via POST /auth/register/otp/{request,verify}
+ *   2. Uploads QCU_ID, LIVE_SELFIE, and SELLER_ENDORSEMENT via POST /auth/uploads/verification
+ *   3. Submits { qcuIdNumber, email, emailVerificationToken, fullName, memberType: 'STUDENT', role: 'SELLER',
  *      sellerType, qcuIdPhotoUrl, liveSelfieUrl, supportingDocumentUrl, password? }
  *      to POST /auth/register
- *   3. Offers WebAuthn Passkey registration on the confirmation screen
+ *   4. Offers WebAuthn Passkey registration on the confirmation screen
  */
 export function SellerRegistrationForm({
   portalKey,
@@ -70,6 +73,7 @@ export function SellerRegistrationForm({
 }) {
   const navigate = useNavigate()
   const passkeyCapable = isWebAuthnSupported()
+  const otpFlow = useRegistrationOtp(SERVER_FIELD_MAP)
 
   const [form, setForm] = useState({
     fullName: '',
@@ -84,13 +88,13 @@ export function SellerRegistrationForm({
   const [selfie, setSelfie] = useState(null)
   const [showPass, setShowPass] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [status, setStatus] = useState('idle') // idle | uploading | submitting
-  const [formError, setFormError] = useState('')
+  const [status, setStatus] = useState('idle') // idle | requesting_otp | verifying_otp | uploading | submitting
   const [errors, setErrors] = useState({})
   const [registered, setRegistered] = useState(null)
   const [passkeyAdded, setPasskeyAdded] = useState(false)
 
   const busy = status !== 'idle'
+  const emailAlreadyVerified = Boolean(otpFlow.getVerifiedEmailToken(form.email))
 
   const clearError = (key) => setErrors((prev) => ({ ...prev, [key]: undefined }))
   const update = (key) => (e) => {
@@ -118,49 +122,60 @@ export function SellerRegistrationForm({
     return next
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setFormError('')
-    const clientErrors = validate()
-    if (Object.keys(clientErrors).length) {
-      setErrors(clientErrors)
-      return
-    }
-
+  const completeRegistration = async (emailVerificationToken) => {
     const qcuIdNumber = form.qcuIdNumber.trim()
-    try {
-      setStatus('uploading')
-      const [supportingDocumentUrl, qcuIdPhotoUrl, liveSelfieUrl] = await Promise.all([
-        uploadVerificationImage(endorsementDoc, { documentType: 'SELLER_ENDORSEMENT', qcuIdNumber }),
-        uploadVerificationImage(idPhoto, { documentType: 'QCU_ID', qcuIdNumber }),
-        uploadVerificationImage(selfie, { documentType: 'LIVE_SELFIE', qcuIdNumber }),
-      ])
+    setStatus('uploading')
+    const [supportingDocumentUrl, qcuIdPhotoUrl, liveSelfieUrl] = await Promise.all([
+      uploadVerificationImage(endorsementDoc, { documentType: 'SELLER_ENDORSEMENT', qcuIdNumber }),
+      uploadVerificationImage(idPhoto, { documentType: 'QCU_ID', qcuIdNumber }),
+      uploadVerificationImage(selfie, { documentType: 'LIVE_SELFIE', qcuIdNumber }),
+    ])
 
-      setStatus('submitting')
-      const result = await registerUser({
-        qcuIdNumber,
-        email: form.email.trim(),
-        fullName: form.fullName.trim(),
-        memberType: MEMBER_TYPES.STUDENT,
-        role: 'SELLER',
-        sellerType,
-        supportingDocumentUrl,
-        qcuIdPhotoUrl,
-        liveSelfieUrl,
-        ...(usePassword ? { password: form.password } : {}),
-      })
-      setRegistered(result.data)
-    } catch (error) {
-      const serverErrors = getFieldErrors(error)
-      const mapped = Object.fromEntries(
-        Object.entries(serverErrors).map(([k, v]) => [SERVER_FIELD_MAP[k] || k, v])
-      )
-      setErrors(mapped)
-      setFormError(getErrorMessage(error))
-    } finally {
-      setStatus('idle')
-    }
+    setStatus('submitting')
+    const result = await registerUser({
+      qcuIdNumber,
+      email: form.email.trim(),
+      emailVerificationToken,
+      fullName: form.fullName.trim(),
+      memberType: MEMBER_TYPES.STUDENT,
+      role: 'SELLER',
+      sellerType,
+      supportingDocumentUrl,
+      qcuIdPhotoUrl,
+      liveSelfieUrl,
+      ...(usePassword ? { password: form.password } : {}),
+    })
+    setRegistered(result.data)
   }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    return otpFlow.handleFormSubmit({
+      email: form.email,
+      qcuIdNumber: form.qcuIdNumber,
+      validate,
+      completeRegistration,
+      setErrors,
+      setStatus,
+    })
+  }
+
+  const handleVerifyAndSubmit = (e) => {
+    e.preventDefault()
+    return otpFlow.handleOtpSubmit({
+      email: form.email,
+      completeRegistration,
+      setErrors,
+      setStatus,
+    })
+  }
+
+  const handleResendOtp = () =>
+    otpFlow.handleResendOtp({
+      email: form.email,
+      qcuIdNumber: form.qcuIdNumber,
+      setStatus,
+    })
 
   // --------------------------------------------------------------------------
   // Post-registration screen: shows User + SellerProfile status & Passkey setup
@@ -279,8 +294,26 @@ export function SellerRegistrationForm({
               </p>
             </div>
 
-            <form className="space-y-3.5" onSubmit={handleSubmit} noValidate>
-              {formError && <Alert tone="error">{formError}</Alert>}
+            {otpFlow.step === 'otp' ? (
+              <RegistrationOtpStep
+                id={`${portalKey}-otp`}
+                email={form.email}
+                otp={otpFlow.otp}
+                onOtpChange={otpFlow.setOtp}
+                notice={otpFlow.otpNotice}
+                secondsLeft={otpFlow.otpSecondsLeft}
+                resendSecondsLeft={otpFlow.resendSecondsLeft}
+                busy={busy}
+                error={otpFlow.formError}
+                submitLabel="Verify & Submit Application"
+                busyLabel={SUBMIT_TEXT[status]}
+                onSubmit={handleVerifyAndSubmit}
+                onResend={handleResendOtp}
+                onBack={otpFlow.backToForm}
+              />
+            ) : (
+              <form className="space-y-3.5" onSubmit={handleSubmit} noValidate>
+              {otpFlow.formError && <Alert tone="error">{otpFlow.formError}</Alert>}
 
               <Field id={`${portalKey}-full-name`} label={fullNameLabel} icon="person" error={errors.fullName}>
                 <input
@@ -457,10 +490,11 @@ export function SellerRegistrationForm({
               </p>
 
               <button type="submit" disabled={busy} className={primaryButton}>
-                <span>{SUBMIT_TEXT[status]}</span>
+                <span>{status === 'idle' && emailAlreadyVerified ? 'Submit Seller Application' : SUBMIT_TEXT[status]}</span>
                 {busy && <Spinner />}
               </button>
             </form>
+            )}
 
             {/* Footer link */}
             <div className="mt-auto pt-3.5">

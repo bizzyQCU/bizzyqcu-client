@@ -41,12 +41,37 @@ export const uploadVerificationDocument = async (file, documentType) => {
 // ============================================================================
 
 /**
+ * Step 1 (Registration Email OTP): POST /auth/register/otp/request
+ * Checks email/QCU ID availability and sends a 6-digit registration OTP to the user's email.
+ *
+ * @param {{email: string, qcuIdNumber?: string}} payload
+ * @returns {Promise<{success: boolean, message: string, data: { otpToken: string, expiresInSeconds: number }}>}
+ */
+export const requestRegistrationOtp = async (payload) => {
+  const response = await apiClient.post('/auth/register/otp/request', payload);
+  return response.data;
+};
+
+/**
+ * Step 2 (Registration Email OTP): POST /auth/register/otp/verify
+ * Verifies the 6-digit registration code and returns a short-lived emailVerificationToken.
+ *
+ * @param {{email: string, otp: string, otpToken: string}} payload
+ * @returns {Promise<{success: boolean, message: string, data: { emailVerificationToken: string, expiresInSeconds: number }}>}
+ */
+export const verifyRegistrationOtp = async (payload) => {
+  const response = await apiClient.post('/auth/register/otp/verify', payload);
+  return response.data;
+};
+
+/**
  * POST /auth/register
  * Registers a Buyer or Seller account (submitted as PENDING until admin review).
  *
  * @param {object} userData
  * @param {string} userData.qcuIdNumber            YY-NNNN (e.g. "24-0001")
  * @param {string} userData.email
+ * @param {string} userData.emailVerificationToken token returned by POST /auth/register/otp/verify
  * @param {string} userData.fullName               min 2 chars
  * @param {'STUDENT'|'FACULTY'|'STAFF'} userData.memberType
  * @param {string} userData.qcuIdPhotoUrl          valid URL

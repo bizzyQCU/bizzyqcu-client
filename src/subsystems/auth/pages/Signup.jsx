@@ -20,7 +20,7 @@ import {
 import ImageDropzone from '../components/ImageDropzone.jsx'
 import CameraCapture from '../components/CameraCapture.jsx'
 import PasskeySetup from '../components/PasskeySetup.jsx'
-import { getErrorMessage, getFieldErrors } from '../../../lib/api-client'
+import { RegistrationOtpStep, useRegistrationOtp } from '../components/RegistrationOtpStep.jsx'
 import { MEMBER_TYPES, QCU_ID_PATTERN, MIN_PASSWORD_LENGTH } from '../../../lib/constants'
 import { isWebAuthnSupported } from '../../../lib/webauthn'
 
@@ -38,13 +38,16 @@ const SERVER_FIELD_MAP = {
 }
 
 const SUBMIT_TEXT = {
-  idle: 'Submit for Verification',
+  idle: 'Continue & Verify Email',
+  requesting_otp: 'Sending verification code…',
+  verifying_otp: 'Verifying email…',
   uploading: 'Uploading photos…',
   submitting: 'Creating account…',
 }
 
 export default function Signup() {
   const navigate = useNavigate()
+  const otpFlow = useRegistrationOtp(SERVER_FIELD_MAP)
 
   const [form, setForm] = useState({
     memberType: MEMBER_TYPES.STUDENT,
@@ -59,14 +62,14 @@ export default function Signup() {
   const [selfie, setSelfie] = useState(null)
   const [showPass, setShowPass] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [status, setStatus] = useState('idle') // idle | uploading | submitting
-  const [formError, setFormError] = useState('')
+  const [status, setStatus] = useState('idle') // idle | requesting_otp | verifying_otp | uploading | submitting
   const [errors, setErrors] = useState({})
   const [registered, setRegistered] = useState(null) // server user object
   const [passkeyAdded, setPasskeyAdded] = useState(false)
 
   const busy = status !== 'idle'
   const passkeyCapable = isWebAuthnSupported()
+  const emailAlreadyVerified = Boolean(otpFlow.getVerifiedEmailToken(form.email))
 
   const clearError = (key) => setErrors((prev) => ({ ...prev, [key]: undefined }))
   const update = (key) => (e) => {
@@ -90,45 +93,56 @@ export default function Signup() {
     return next
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setFormError('')
-    const clientErrors = validate()
-    if (Object.keys(clientErrors).length) {
-      setErrors(clientErrors)
-      return
-    }
-
+  const completeRegistration = async (emailVerificationToken) => {
     const qcuIdNumber = form.qcuIdNumber.trim()
-    try {
-      setStatus('uploading')
-      const [qcuIdPhotoUrl, liveSelfieUrl] = await Promise.all([
-        uploadVerificationImage(idPhoto, { tag: 'qcu-id', qcuIdNumber }),
-        uploadVerificationImage(selfie, { tag: 'selfie', qcuIdNumber }),
-      ])
+    setStatus('uploading')
+    const [qcuIdPhotoUrl, liveSelfieUrl] = await Promise.all([
+      uploadVerificationImage(idPhoto, { tag: 'qcu-id', qcuIdNumber }),
+      uploadVerificationImage(selfie, { tag: 'selfie', qcuIdNumber }),
+    ])
 
-      setStatus('submitting')
-      const result = await registerUser({
-        qcuIdNumber,
-        email: form.email.trim(),
-        fullName: form.fullName.trim(),
-        memberType: form.memberType,
-        qcuIdPhotoUrl,
-        liveSelfieUrl,
-        ...(usePassword ? { password: form.password } : {}),
-      })
-      setRegistered(result.data)
-    } catch (error) {
-      const serverErrors = getFieldErrors(error)
-      const mapped = Object.fromEntries(
-        Object.entries(serverErrors).map(([k, v]) => [SERVER_FIELD_MAP[k] || k, v])
-      )
-      setErrors(mapped)
-      setFormError(getErrorMessage(error))
-    } finally {
-      setStatus('idle')
-    }
+    setStatus('submitting')
+    const result = await registerUser({
+      qcuIdNumber,
+      email: form.email.trim(),
+      emailVerificationToken,
+      fullName: form.fullName.trim(),
+      memberType: form.memberType,
+      qcuIdPhotoUrl,
+      liveSelfieUrl,
+      ...(usePassword ? { password: form.password } : {}),
+    })
+    setRegistered(result.data)
   }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    return otpFlow.handleFormSubmit({
+      email: form.email,
+      qcuIdNumber: form.qcuIdNumber,
+      validate,
+      completeRegistration,
+      setErrors,
+      setStatus,
+    })
+  }
+
+  const handleVerifyAndSubmit = (e) => {
+    e.preventDefault()
+    return otpFlow.handleOtpSubmit({
+      email: form.email,
+      completeRegistration,
+      setErrors,
+      setStatus,
+    })
+  }
+
+  const handleResendOtp = () =>
+    otpFlow.handleResendOtp({
+      email: form.email,
+      qcuIdNumber: form.qcuIdNumber,
+      setStatus,
+    })
 
   // --------------------------------------------------------------------------
   // Success: registration is PENDING admin verification; offer passkey setup.
@@ -229,8 +243,26 @@ export default function Signup() {
 
           <AuthModeTabs active="signup" loginTo="/login" signupTo="/signup" />
 
-          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-            {formError && <Alert tone="error">{formError}</Alert>}
+          {otpFlow.step === 'otp' ? (
+            <RegistrationOtpStep
+              id="signup-otp"
+              email={form.email}
+              otp={otpFlow.otp}
+              onOtpChange={otpFlow.setOtp}
+              notice={otpFlow.otpNotice}
+              secondsLeft={otpFlow.otpSecondsLeft}
+              resendSecondsLeft={otpFlow.resendSecondsLeft}
+              busy={busy}
+              error={otpFlow.formError}
+              submitLabel="Verify & Create Account"
+              busyLabel={SUBMIT_TEXT[status]}
+              onSubmit={handleVerifyAndSubmit}
+              onResend={handleResendOtp}
+              onBack={otpFlow.backToForm}
+            />
+          ) : (
+            <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+            {otpFlow.formError && <Alert tone="error">{otpFlow.formError}</Alert>}
 
             {/* QCU role */}
             <fieldset>
@@ -421,10 +453,11 @@ export default function Signup() {
             )}
 
             <button type="submit" disabled={busy} className={primaryButton}>
-              <span>{SUBMIT_TEXT[status]}</span>
+              <span>{status === 'idle' && emailAlreadyVerified ? 'Submit for Verification' : SUBMIT_TEXT[status]}</span>
               {busy && <Spinner />}
             </button>
           </form>
+          )}
 
           <div className="mt-auto pt-4">
             <div className="pt-3.5 border-t border-white/10 text-center">
