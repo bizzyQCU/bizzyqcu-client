@@ -186,7 +186,7 @@ export default function Login() {
   }[loginState]
 
   return (
-    <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-4 lg:py-4 grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+    <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-2 lg:py-4 grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] gap-8 lg:gap-16 items-center">
       <AuthShowcase />
 
       <section className="w-full max-w-[420px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="login-title">
@@ -324,14 +324,16 @@ export default function Login() {
           )}
 
           {/* Footer */}
-          <div className="mt-5 pt-4 border-t border-white/10 text-center">
-            <Link
-              to="/seller-login-form"
-              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full bg-amber-400/10 text-amber-300 hover:bg-amber-400/20 hover:text-amber-200 border border-amber-400/25 transition-colors"
-            >
-              <Icon name="storefront" className="text-[16px]" />
-              <span>Want to sell? Seller Portal</span>
-            </Link>
+          <div className="mt-auto pt-5">
+            <div className="pt-4 border-t border-white/10 text-center">
+              <Link
+                to="/seller-login-form"
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full bg-amber-400/10 text-amber-300 hover:bg-amber-400/20 hover:text-amber-200 border border-amber-400/25 transition-colors"
+              >
+                <Icon name="storefront" className="text-[16px]" />
+                <span>Want to sell? Seller Portal</span>
+              </Link>
+            </div>
           </div>
         </AuthCard>
 

@@ -136,7 +136,7 @@ export default function Signup() {
   if (registered) {
     const needsPasskey = !usePassword && !passkeyAdded
     return (
-      <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-4 lg:py-4 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-2 lg:py-4 grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] gap-8 lg:gap-16 items-center">
         <AuthShowcase />
         <section className="w-full max-w-[480px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="signup-done-title">
           <AuthCard>
@@ -186,16 +186,20 @@ export default function Signup() {
               <PasskeySetup userId={registered.id} onRegistered={() => setPasskeyAdded(true)} />
             </div>
 
-            <button
-              type="button"
-              onClick={() => navigate('/login', { state: { qcuIdNumber: registered.qcuIdNumber } })}
-              disabled={needsPasskey && passkeyCapable}
-              className={`${primaryButton} mt-5`}
-            >
-              <span>{needsPasskey && passkeyCapable ? 'Create a passkey to continue' : 'Proceed to Log In'}</span>
-              <Icon name="arrow_forward" className="text-[20px]" />
-            </button>
+            <div className="mt-auto pt-5">
+              <button
+                type="button"
+                onClick={() => navigate('/login', { state: { qcuIdNumber: registered.qcuIdNumber } })}
+                disabled={needsPasskey && passkeyCapable}
+                className={primaryButton}
+              >
+                <span>{needsPasskey && passkeyCapable ? 'Create a passkey to continue' : 'Proceed to Log In'}</span>
+                <Icon name="arrow_forward" className="text-[20px]" />
+              </button>
+            </div>
           </AuthCard>
+
+          <TrustBadges />
         </section>
       </main>
     )
@@ -205,7 +209,7 @@ export default function Signup() {
   // Registration form
   // --------------------------------------------------------------------------
   return (
-    <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-4 lg:py-4 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+    <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-2 lg:py-4 grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] gap-8 lg:gap-16 items-center">
       <AuthShowcase />
 
       <section className="w-full max-w-[540px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="signup-title">
@@ -422,13 +426,15 @@ export default function Signup() {
             </button>
           </form>
 
-          <div className="mt-4 pt-3.5 border-t border-white/10 text-center">
-            <p className="text-sm text-slate-400">
-              Already have an account?{' '}
-              <Link className="text-amber-300 font-bold hover:text-amber-200 hover:underline" to="/login">
-                Log in
-              </Link>
-            </p>
+          <div className="mt-auto pt-4">
+            <div className="pt-3.5 border-t border-white/10 text-center">
+              <p className="text-sm text-slate-400">
+                Already have an account?{' '}
+                <Link className="text-amber-300 font-bold hover:text-amber-200 hover:underline" to="/login">
+                  Log in
+                </Link>
+              </p>
+            </div>
           </div>
         </AuthCard>
 
