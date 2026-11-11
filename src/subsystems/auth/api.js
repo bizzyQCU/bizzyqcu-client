@@ -73,7 +73,7 @@ export const verifyRegistrationOtp = async (payload) => {
  * @param {string} userData.email
  * @param {string} userData.emailVerificationToken token returned by POST /auth/register/otp/verify
  * @param {string} userData.fullName               min 2 chars
- * @param {'STUDENT'|'FACULTY'|'STAFF'} userData.memberType
+ * @param {'STUDENT'} [userData.memberType]    defaults to 'STUDENT' (student-only registration)
  * @param {string} userData.qcuIdPhotoUrl          valid URL
  * @param {string} userData.liveSelfieUrl          valid URL
  * @param {string} [userData.password]             min 8 chars (optional for passkey-only)

@@ -24,13 +24,6 @@ import { RegistrationOtpStep, useRegistrationOtp } from '../components/Registrat
 import { MEMBER_TYPES, QCU_ID_PATTERN, MIN_PASSWORD_LENGTH } from '../../../lib/constants'
 import { isWebAuthnSupported } from '../../../lib/webauthn'
 
-// Mirrors bizzyqcu-server QcuMemberType. Faculty & Staff accounts can only buy.
-const MEMBER_OPTIONS = [
-  { value: MEMBER_TYPES.STUDENT, label: 'Student', icon: 'school' },
-  { value: MEMBER_TYPES.FACULTY, label: 'Faculty', icon: 'co_present' },
-  { value: MEMBER_TYPES.STAFF, label: 'Staff', icon: 'badge' },
-]
-
 // Server field name -> form field name
 const SERVER_FIELD_MAP = {
   qcuIdPhotoUrl: 'idPhoto',
@@ -50,7 +43,6 @@ export default function Signup() {
   const otpFlow = useRegistrationOtp(SERVER_FIELD_MAP)
 
   const [form, setForm] = useState({
-    memberType: MEMBER_TYPES.STUDENT,
     fullName: '',
     qcuIdNumber: '',
     email: '',
@@ -83,12 +75,11 @@ export default function Signup() {
     if (form.fullName.trim().length < 2) next.fullName = 'Full name must be at least 2 characters'
     if (!QCU_ID_PATTERN.test(form.qcuIdNumber.trim())) next.qcuIdNumber = 'Format must be YY-NNNN (e.g. 24-0001)'
     if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) next.email = 'Enter a valid email address'
-    if (!Object.values(MEMBER_TYPES).includes(form.memberType)) next.memberType = 'Select your QCU role'
     if (usePassword) {
       if (form.password.length < MIN_PASSWORD_LENGTH) next.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`
       if (form.confirmPassword !== form.password) next.confirmPassword = 'Passwords do not match'
     }
-    if (!idPhoto) next.idPhoto = 'Please upload a photo of your QCU ID'
+    if (!idPhoto) next.idPhoto = 'Please upload a photo of your QCU Student ID'
     if (!selfie) next.selfie = 'Please take a live selfie'
     return next
   }
@@ -107,7 +98,7 @@ export default function Signup() {
       email: form.email.trim(),
       emailVerificationToken,
       fullName: form.fullName.trim(),
-      memberType: form.memberType,
+      memberType: MEMBER_TYPES.STUDENT,
       qcuIdPhotoUrl,
       liveSelfieUrl,
       ...(usePassword ? { password: form.password } : {}),
@@ -237,7 +228,7 @@ export default function Signup() {
               <Icon name="auto_awesome" className="text-amber-400 text-[20px]" />
             </div>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Verified QCUians only — your ID and selfie are reviewed by an administrator.
+              Verified QCU students only — your ID and selfie are reviewed by an administrator.
             </p>
           </div>
 
@@ -263,45 +254,6 @@ export default function Signup() {
           ) : (
             <form className="space-y-4" onSubmit={handleSubmit} noValidate>
             {otpFlow.formError && <Alert tone="error">{otpFlow.formError}</Alert>}
-
-            {/* QCU role */}
-            <fieldset>
-              <legend className="flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-slate-300">
-                <span>I am a QCU</span>
-                <span className="text-amber-400" aria-hidden="true">*</span>
-              </legend>
-              <div role="radiogroup" className="mt-1.5 grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-white/[0.04] border border-white/10">
-                {MEMBER_OPTIONS.map((opt) => {
-                  const active = form.memberType === opt.value
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      role="radio"
-                      aria-checked={active}
-                      disabled={busy}
-                      onClick={() => {
-                        setForm((f) => ({ ...f, memberType: opt.value }))
-                        clearError('memberType')
-                      }}
-                      className={`py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                        active
-                          ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <Icon name={opt.icon} className="text-[18px]" />
-                      <span>{opt.label}</span>
-                    </button>
-                  )
-                })}
-              </div>
-              {errors.memberType ? (
-                <p className="mt-1 text-[11px] text-red-400">{errors.memberType}</p>
-              ) : form.memberType !== MEMBER_TYPES.STUDENT ? (
-                <p className="mt-1 text-[11px] text-slate-500">Faculty and staff accounts can shop but cannot open a store.</p>
-              ) : null}
-            </fieldset>
 
             <Field id="signup-full-name" label="Full Name" icon="person" error={errors.fullName}>
               <input
@@ -417,7 +369,7 @@ export default function Signup() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <ImageDropzone
                 id="signup-qcu-id-photo"
-                label="QCU ID Photo"
+                label="QCU Student ID Photo"
                 file={idPhoto}
                 error={errors.idPhoto}
                 disabled={busy}
