@@ -101,7 +101,7 @@ export default function SellerLoginForm() {
     later(() => navigate(destinationFor(user), { replace: true }), 600)
   }
 
-  // 1. POST /auth/login/password — verify credentials & send 6-digit OTP email
+  // 1. POST /auth/login/password — verify credentials; issues session directly for dev test accounts or sends OTP.
   const handleRequestOtp = async (e) => {
     e?.preventDefault()
     setLoginError(null)
@@ -111,6 +111,11 @@ export default function SellerLoginForm() {
         qcuIdNumber: identifier.trim(),
         password,
       })
+      if (result?.data?.accessToken || result?.data?.token) {
+        setLoginState('done')
+        finishLogin(result.data)
+        return
+      }
       const sentAt = Date.now()
       setOtpNotice(result.message || 'Verification code sent to your registered email.')
       setOtpExpiresAt(sentAt + OTP_TTL_SECONDS * 1000)
@@ -118,9 +123,9 @@ export default function SellerLoginForm() {
       setNow(sentAt)
       setOtp('')
       setStep('otp')
+      setLoginState('idle')
     } catch (err) {
       setLoginError(getErrorMessage(err))
-    } finally {
       setLoginState('idle')
     }
   }
@@ -286,8 +291,18 @@ export default function SellerLoginForm() {
                   disabled={busy}
                   className="w-full py-3 rounded-xl font-extrabold text-base bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:via-amber-400 hover:to-amber-500 text-slate-950 ring-1 ring-inset ring-amber-200/50 shadow-lg shadow-amber-500/25 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <span>{loginState === 'loading' ? 'Verifying credentials…' : 'Send Login Code'}</span>
-                  {loginState === 'loading' ? <Spinner /> : <Icon name="send" className="text-[18px]" />}
+                  <span>
+                    {loginState === 'done'
+                      ? 'Signed in!'
+                      : loginState === 'loading'
+                        ? 'Verifying credentials…'
+                        : 'Continue / Send Code'}
+                  </span>
+                  {loginState === 'loading' ? (
+                    <Spinner />
+                  ) : (
+                    <Icon name={loginState === 'done' ? 'check_circle' : 'login'} className="text-[18px]" />
+                  )}
                 </button>
 
                 <PasskeyOption

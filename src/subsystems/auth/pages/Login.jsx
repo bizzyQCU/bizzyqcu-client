@@ -109,13 +109,18 @@ export default function Login() {
     later(() => navigate(destinationFor(user, location.state?.from), { replace: true }), 600)
   }
 
-  // 1. POST /auth/login/password — verify credentials, server emails a 6-digit code.
+  // 1. POST /auth/login/password — verify credentials; issues session directly for dev test accounts or sends OTP.
   const handleRequestOtp = async (e) => {
     e?.preventDefault()
     setLoginError(null)
     setLoginState('loading')
     try {
       const result = await requestPasswordOtp({ qcuIdNumber: identifier.trim(), password })
+      if (result?.data?.accessToken || result?.data?.token) {
+        setLoginState('done')
+        finishLogin(result.data)
+        return
+      }
       const sentAt = Date.now()
       setOtpNotice(result.message || 'Verification code sent to your registered email.')
       setOtpExpiresAt(sentAt + OTP_TTL_SECONDS * 1000)
@@ -123,9 +128,9 @@ export default function Login() {
       setNow(sentAt)
       setOtp('')
       setStep('otp')
+      setLoginState('idle')
     } catch (err) {
       setLoginError(getErrorMessage(err))
-    } finally {
       setLoginState('idle')
     }
   }
@@ -175,9 +180,10 @@ export default function Login() {
   const busy = loginState !== 'idle' || bioState !== 'idle'
 
   const passwordBtn = {
-    idle: { text: 'Send Login Code', icon: 'send' },
+    idle: { text: 'Continue / Send Code', icon: 'login' },
     loading: { text: 'Checking credentials…', icon: null },
-  }[loginState] || { text: 'Send Login Code', icon: 'send' }
+    done: { text: 'Signed in!', icon: 'check_circle' },
+  }[loginState] || { text: 'Continue / Send Code', icon: 'login' }
 
   const otpBtn = {
     idle: { text: 'Verify & Sign In', icon: 'login' },
@@ -246,7 +252,7 @@ export default function Login() {
                 <span>We&apos;ll email a 6-digit code to confirm it&apos;s you.</span>
               </p>
 
-              <button type="submit" disabled={busy} className={submitBtn(false)}>
+              <button type="submit" disabled={busy} className={submitBtn(loginState === 'done')}>
                 <span>{passwordBtn.text}</span>
                 {loginState === 'loading' ? <Spinner /> : passwordBtn.icon && <Icon name={passwordBtn.icon} className="text-[20px]" />}
               </button>
