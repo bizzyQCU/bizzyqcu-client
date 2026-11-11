@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import SellerShowcase from '../components/SellerShowcase.jsx'
-import { Alert, Icon, inputBase, PasswordToggle, Spinner, TrustBadges } from '../components/AuthUI.jsx'
-import StatusLookup from '../components/StatusLookup.jsx'
+import { Alert, AuthModeTabs, Icon, inputBase, PasskeyOption, PasswordToggle, Spinner, TrustBadges } from '../components/AuthUI.jsx'
 import { requestPasswordOtp, verifyPasswordOtp, loginWithPasskey } from '../api'
 import { getWebAuthnErrorMessage, isWebAuthnSupported } from '../../../lib/webauthn'
 import { useAuth } from '../../../hooks/useAuth'
@@ -38,11 +37,6 @@ const PORTALS = {
 const OTP_TTL_SECONDS = 5 * 60
 const RESEND_COOLDOWN_SECONDS = 60
 
-const tabBase =
-  'flex-1 py-2 px-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70'
-const tabActive = `${tabBase} bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-md shadow-amber-500/20`
-const tabIdle = `${tabBase} text-slate-400 hover:text-white hover:bg-white/5`
-
 const formatClock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
 function destinationFor(user) {
@@ -61,7 +55,6 @@ export default function SellerLoginForm() {
   const { login: authLogin } = useAuth()
   const passkeyCapable = isWebAuthnSupported()
 
-  const [tab, setTab] = useState('credentials') // 'credentials' | 'passkey' | 'status'
   const [step, setStep] = useState('password') // 'password' | 'otp'
   const [identifier, setIdentifier] = useState(location.state?.qcuIdNumber || '')
   const [password, setPassword] = useState('')
@@ -74,6 +67,7 @@ export default function SellerLoginForm() {
   const [otpExpiresAt, setOtpExpiresAt] = useState(null)
   const [resendAt, setResendAt] = useState(null)
   const [now, setNow] = useState(() => Date.now())
+  const idInputRef = useRef(null)
   const timers = useRef([])
 
   const later = (fn, ms) => {
@@ -140,11 +134,11 @@ export default function SellerLoginForm() {
   }
 
   // 3. WebAuthn Passkey Login
-  const handlePasskeyLogin = async (e) => {
-    e?.preventDefault()
+  const handlePasskeyLogin = async () => {
     setLoginError(null)
     if (!identifier.trim()) {
-      setLoginError('Please enter your QCU ID Number to sign in with a passkey.')
+      setLoginError('Please enter your QCU ID Number first to sign in with a passkey.')
+      idInputRef.current?.focus()
       return
     }
     setBioState('scanning')
@@ -158,10 +152,7 @@ export default function SellerLoginForm() {
     }
   }
 
-  const switchTab = (next) => {
-    setTab(next)
-    setLoginError(null)
-  }
+  const busy = loginState !== 'idle' || bioState !== 'idle'
 
   return (
     <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-4 lg:py-4 grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
@@ -180,18 +171,11 @@ export default function SellerLoginForm() {
 
           <div className="relative">
             {/* Seller Portal Selector Bar */}
-            <div className="flex items-center justify-between gap-2 pb-3.5 mb-4 border-b border-white/10">
+            <div className="flex items-center justify-center pb-3.5 mb-4 border-b border-white/10">
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-extrabold uppercase tracking-wide ${portal.pillCls}`}>
                 <Icon name={portal.icon} className="text-[14px]" />
                 <span>{portal.label}</span>
               </span>
-              <Link
-                to="/seller-signup"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-amber-300 transition-colors"
-              >
-                <Icon name="storefront" className="text-[15px]" />
-                <span>Register as Seller</span>
-              </Link>
             </div>
 
             {/* Quick 3-portal pills */}
@@ -230,39 +214,12 @@ export default function SellerLoginForm() {
               </p>
             </div>
 
-            {/* Auth Method Tabs */}
-            <div role="tablist" aria-label="Seller sign-in method" className="bg-white/[0.04] p-1 rounded-2xl flex gap-1 mb-4 border border-white/10">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'credentials'}
-                className={tab === 'credentials' ? tabActive : tabIdle}
-                onClick={() => switchTab('credentials')}
-              >
-                <Icon name="key" className="text-[17px]" />
-                <span>Password + OTP</span>
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'passkey'}
-                className={tab === 'passkey' ? tabActive : tabIdle}
-                onClick={() => switchTab('passkey')}
-              >
-                <Icon name="fingerprint" className="text-[17px]" />
-                <span>Passkey</span>
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'status'}
-                className={tab === 'status' ? tabActive : tabIdle}
-                onClick={() => switchTab('status')}
-              >
-                <Icon name="fact_check" className="text-[17px]" />
-                <span>Status</span>
-              </button>
-            </div>
+            <AuthModeTabs
+              active="login"
+              loginTo={`/seller-login-form?type=${portal.key}`}
+              signupTo="/seller-signup"
+              className="mb-4"
+            />
 
             {loginError && (
               <Alert tone="error" className="mb-4">
@@ -270,157 +227,10 @@ export default function SellerLoginForm() {
               </Alert>
             )}
 
-            {tab === 'status' ? (
-              <StatusLookup initialIdentifier={identifier} />
-            ) : tab === 'credentials' ? (
-              step === 'password' ? (
-                <form className="space-y-3.5" onSubmit={handleRequestOtp}>
-                  <div>
-                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-login-id">
-                      <Icon name="badge" className="text-[15px] text-amber-400" />
-                      <span>QCU ID Number</span>
-                      <span className="text-amber-400" aria-hidden="true">*</span>
-                    </label>
-                    <div className="relative mt-1.5">
-                      <Icon name="account_circle" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-[20px] pointer-events-none" />
-                      <input
-                        id="seller-login-id"
-                        type="text"
-                        required
-                        autoComplete="username"
-                        disabled={loginState !== 'idle'}
-                        value={identifier}
-                        onChange={(e) => setIdentifier(e.target.value)}
-                        placeholder="e.g. 24-0001"
-                        className={`${inputBase} border-white/10 pl-11 pr-4`}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-login-password">
-                      <Icon name="lock" className="text-[15px] text-amber-400" />
-                      <span>Password</span>
-                      <span className="text-amber-400" aria-hidden="true">*</span>
-                    </label>
-                    <div className="relative mt-1.5">
-                      <Icon name="lock" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-[20px] pointer-events-none" />
-                      <input
-                        id="seller-login-password"
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        minLength={8}
-                        autoComplete="current-password"
-                        disabled={loginState !== 'idle'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter your password"
-                        className={`${inputBase} border-white/10 pl-11 pr-11`}
-                      />
-                      <PasswordToggle visible={showPassword} onToggle={() => setShowPassword((s) => !s)} />
-                    </div>
-                  </div>
-
-                  <p className="flex items-center gap-1.5 text-xs text-slate-400">
-                    <Icon name="verified_user" className="text-[15px] text-emerald-400" />
-                    <span>A 6-digit verification code will be sent to your registered QCU email.</span>
-                  </p>
-
-                  <button
-                    type="submit"
-                    disabled={loginState !== 'idle'}
-                    className="w-full py-3 rounded-xl font-extrabold text-base bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:via-amber-400 hover:to-amber-500 text-slate-950 ring-1 ring-inset ring-amber-200/50 shadow-lg shadow-amber-500/25 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    <span>{loginState === 'loading' ? 'Verifying credentials…' : 'Send Login Code'}</span>
-                    {loginState === 'loading' ? <Spinner /> : <Icon name="send" className="text-[18px]" />}
-                  </button>
-                </form>
-              ) : (
-                <form className="space-y-4" onSubmit={handleVerifyOtp}>
-                  {otpNotice && (
-                    <Alert tone="info" icon="mark_email_read">
-                      {otpNotice}
-                      <span className="block text-xs text-amber-200/70 mt-0.5">Signing in as {identifier.trim()}</span>
-                    </Alert>
-                  )}
-
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-login-otp">
-                        <Icon name="pin" className="text-[16px] text-amber-400" />
-                        <span>6-Digit Verification Code</span>
-                      </label>
-                      <span
-                        className={`text-xs font-semibold tabular-nums ${
-                          otpExpired ? 'text-red-400' : otpSecondsLeft <= 60 ? 'text-orange-300' : 'text-slate-400'
-                        }`}
-                        aria-live="polite"
-                      >
-                        {otpExpired ? 'Code expired' : `Expires in ${formatClock(otpSecondsLeft)}`}
-                      </span>
-                    </div>
-                    <input
-                      id="seller-login-otp"
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      pattern="\d{6}"
-                      maxLength={6}
-                      required
-                      autoFocus
-                      disabled={loginState !== 'idle'}
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="••••••"
-                      className={`${inputBase} border-white/10 mt-1.5 px-4 text-center tracking-[0.6em] text-xl font-mono`}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loginState !== 'idle' || otp.length !== 6 || otpExpired}
-                    className={`w-full py-3 rounded-xl font-extrabold text-base transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:cursor-not-allowed ${
-                      loginState === 'done'
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 disabled:opacity-60'
-                    }`}
-                  >
-                    <span>
-                      {loginState === 'done' ? 'Authenticated!' : loginState === 'loading' ? 'Signing in…' : 'Verify & Sign In'}
-                    </span>
-                    {loginState === 'loading' && <Spinner />}
-                  </button>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStep('password')
-                        setOtp('')
-                        setOtpNotice(null)
-                        setOtpExpiresAt(null)
-                        setLoginError(null)
-                      }}
-                      className="text-xs text-slate-400 hover:text-white"
-                    >
-                      ← Back to password
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleRequestOtp}
-                      disabled={loginState !== 'idle' || resendSecondsLeft > 0}
-                      className="text-xs font-semibold text-amber-300 hover:underline disabled:text-slate-500 disabled:no-underline"
-                    >
-                      {resendSecondsLeft > 0 ? `Resend code in ${resendSecondsLeft}s` : 'Resend code'}
-                    </button>
-                  </div>
-                </form>
-              )
-            ) : (
-              /* WebAuthn Passkey Tab */
-              <form className="space-y-4" onSubmit={handlePasskeyLogin}>
+            {step === 'password' ? (
+              <form className="space-y-3.5" onSubmit={handleRequestOtp}>
                 <div>
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-passkey-id">
+                  <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-login-id">
                     <Icon name="badge" className="text-[15px] text-amber-400" />
                     <span>QCU ID Number</span>
                     <span className="text-amber-400" aria-hidden="true">*</span>
@@ -428,10 +238,12 @@ export default function SellerLoginForm() {
                   <div className="relative mt-1.5">
                     <Icon name="account_circle" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-[20px] pointer-events-none" />
                     <input
-                      id="seller-passkey-id"
+                      ref={idInputRef}
+                      id="seller-login-id"
                       type="text"
                       required
-                      disabled={bioState !== 'idle'}
+                      autoComplete="username webauthn"
+                      disabled={busy}
                       value={identifier}
                       onChange={(e) => setIdentifier(e.target.value)}
                       placeholder="e.g. 24-0001"
@@ -440,65 +252,135 @@ export default function SellerLoginForm() {
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col items-center text-center space-y-3">
-                  <div className="relative w-16 h-16">
-                    <span
-                      aria-hidden="true"
-                      className={`absolute inset-0 rounded-full border-2 border-amber-400/40 ${bioState === 'scanning' ? 'animate-ping' : ''}`}
+                <div>
+                  <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-login-password">
+                    <Icon name="lock" className="text-[15px] text-amber-400" />
+                    <span>Password</span>
+                    <span className="text-amber-400" aria-hidden="true">*</span>
+                  </label>
+                  <div className="relative mt-1.5">
+                    <Icon name="lock" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-[20px] pointer-events-none" />
+                    <input
+                      id="seller-login-password"
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      minLength={8}
+                      autoComplete="current-password"
+                      disabled={busy}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className={`${inputBase} border-white/10 pl-11 pr-11`}
                     />
-                    <div className="relative w-16 h-16 rounded-full bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-300">
-                      <Icon name="fingerprint" className="text-3xl" />
-                    </div>
-                    <div className="absolute -top-1 -right-1 px-1.5 h-6 rounded-full bg-amber-400 flex items-center justify-center text-slate-950 text-[10px] font-black">
-                      FIDO2
-                    </div>
+                    <PasswordToggle visible={showPassword} onToggle={() => setShowPassword((s) => !s)} />
                   </div>
-                  <div>
-                    <h3 className="text-base font-bold text-white">Seller WebAuthn Passkey</h3>
-                    <p className="text-xs text-slate-400 max-w-xs mt-1">
-                      Unlock with Touch ID, Face ID, Windows Hello, or your device PIN registered to your seller account.
-                    </p>
-                  </div>
-                  {passkeyCapable ? (
-                    <button
-                      type="submit"
-                      disabled={bioState !== 'idle'}
-                      className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:cursor-not-allowed ${
-                        bioState === 'done'
-                          ? 'bg-emerald-500 text-white'
-                          : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-lg shadow-amber-500/25'
+                </div>
+
+                <p className="flex items-center gap-1.5 text-xs text-slate-400">
+                  <Icon name="verified_user" className="text-[15px] text-emerald-400" />
+                  <span>A 6-digit verification code will be sent to your registered QCU email.</span>
+                </p>
+
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full py-3 rounded-xl font-extrabold text-base bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:via-amber-400 hover:to-amber-500 text-slate-950 ring-1 ring-inset ring-amber-200/50 shadow-lg shadow-amber-500/25 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <span>{loginState === 'loading' ? 'Verifying credentials…' : 'Send Login Code'}</span>
+                  {loginState === 'loading' ? <Spinner /> : <Icon name="send" className="text-[18px]" />}
+                </button>
+
+                <PasskeyOption
+                  supported={passkeyCapable}
+                  state={bioState}
+                  disabled={busy}
+                  onTrigger={handlePasskeyLogin}
+                />
+              </form>
+            ) : (
+              <form className="space-y-4" onSubmit={handleVerifyOtp}>
+                {otpNotice && (
+                  <Alert tone="info" icon="mark_email_read">
+                    {otpNotice}
+                    <span className="block text-xs text-amber-200/70 mt-0.5">Signing in as {identifier.trim()}</span>
+                  </Alert>
+                )}
+
+                <div>
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-login-otp">
+                      <Icon name="pin" className="text-[16px] text-amber-400" />
+                      <span>6-Digit Verification Code</span>
+                    </label>
+                    <span
+                      className={`text-xs font-semibold tabular-nums ${
+                        otpExpired ? 'text-red-400' : otpSecondsLeft <= 60 ? 'text-orange-300' : 'text-slate-400'
                       }`}
+                      aria-live="polite"
                     >
-                      {bioState === 'scanning' ? (
-                        <Spinner />
-                      ) : (
-                        <Icon name={bioState === 'done' ? 'verified' : 'fingerprint'} className="text-[20px]" />
-                      )}
-                      <span>
-                        {bioState === 'done'
-                          ? 'Passkey Verified!'
-                          : bioState === 'scanning'
-                            ? 'Authenticating passkey…'
-                            : 'Sign In with Passkey'}
-                      </span>
-                    </button>
-                  ) : (
-                    <Alert tone="warning" icon="no_encryption" className="w-full text-left">
-                      WebAuthn Passkeys are not supported on this browser. Please use Password + OTP.
-                    </Alert>
-                  )}
+                      {otpExpired ? 'Code expired' : `Expires in ${formatClock(otpSecondsLeft)}`}
+                    </span>
+                  </div>
+                  <input
+                    id="seller-login-otp"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    pattern="\d{6}"
+                    maxLength={6}
+                    required
+                    autoFocus
+                    disabled={loginState !== 'idle'}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="••••••"
+                    className={`${inputBase} border-white/10 mt-1.5 px-4 text-center tracking-[0.6em] text-xl font-mono`}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loginState !== 'idle' || otp.length !== 6 || otpExpired}
+                  className={`w-full py-3 rounded-xl font-extrabold text-base transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:cursor-not-allowed ${
+                    loginState === 'done'
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 disabled:opacity-60'
+                  }`}
+                >
+                  <span>
+                    {loginState === 'done' ? 'Authenticated!' : loginState === 'loading' ? 'Signing in…' : 'Verify & Sign In'}
+                  </span>
+                  {loginState === 'loading' && <Spinner />}
+                </button>
+
+                <div className="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('password')
+                      setOtp('')
+                      setOtpNotice(null)
+                      setOtpExpiresAt(null)
+                      setLoginError(null)
+                    }}
+                    className="text-xs text-slate-400 hover:text-white"
+                  >
+                    ← Back to password
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRequestOtp}
+                    disabled={loginState !== 'idle' || resendSecondsLeft > 0}
+                    className="text-xs font-semibold text-amber-300 hover:underline disabled:text-slate-500 disabled:no-underline"
+                  >
+                    {resendSecondsLeft > 0 ? `Resend code in ${resendSecondsLeft}s` : 'Resend code'}
+                  </button>
                 </div>
               </form>
             )}
 
             {/* Footer links */}
-            <div className="mt-4 pt-3.5 border-t border-white/10 text-center space-y-2.5">
-              <p className="text-xs sm:text-sm text-slate-400">
-                Don&apos;t have a seller account yet?{' '}
-                <Link className="text-amber-300 font-bold hover:text-amber-200 hover:underline" to="/seller-signup">
-                  Register as Seller
-                </Link>
-              </p>
+            <div className="mt-4 pt-3.5 border-t border-white/10 text-center">
               <Link
                 to="/login"
                 className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide px-3.5 py-1.5 rounded-full bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/10 transition-colors"

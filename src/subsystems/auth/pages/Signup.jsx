@@ -6,6 +6,7 @@ import { AuthShowcase } from '../components'
 import {
   Alert,
   AuthCard,
+  AuthModeTabs,
   Field,
   fieldBorder,
   Icon,
@@ -221,6 +222,8 @@ export default function Signup() {
               Verified QCUians only — your ID and selfie are reviewed by an administrator.
             </p>
           </div>
+
+          <AuthModeTabs active="signup" loginTo="/login" signupTo="/signup" />
 
           <form className="space-y-4" onSubmit={handleSubmit} noValidate>
             {formError && <Alert tone="error">{formError}</Alert>}

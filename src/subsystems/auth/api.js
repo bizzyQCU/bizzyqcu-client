@@ -88,18 +88,6 @@ export const getAccountStatus = async () => {
 };
 
 /**
- * POST /auth/check-status
- * Public pre-login check of registration and seller verification status by QCU ID or email.
- *
- * @param {string} identifier  QCU ID (e.g. "24-0001") or email address
- * @returns {Promise<{success: boolean, data: object}>}
- */
-export const checkPublicAccountStatus = async (identifier) => {
-  const response = await apiClient.post('/auth/check-status', { identifier: identifier.trim() });
-  return response.data;
-};
-
-/**
  * POST /auth/resubmit-verification
  * Resubmits QCU ID photo and/or live selfie after rejection.
  *
