@@ -1,14 +1,14 @@
 import { MessageSquare, Bell, User } from 'lucide-react'
 
-export default function SellerTopBar({ onMessagesClick }) {
+export default function SellerTopBar({ storeName, storeLocation, onMessagesClick }) {
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-20">
       <div>
         <h2 className="font-bold text-slate-900 text-base">
-          QCU Computer Society (QCS)
+          {storeName || 'QCU Computer Society (QCS)'}
         </h2>
         <p className="text-xs text-slate-500">
-          AWS IK Building, Basement, Booth No. 3
+          {storeLocation || 'AWS IK Building, Basement, Booth No. 3'}
         </p>
       </div>
       <div className="flex items-center space-x-4">

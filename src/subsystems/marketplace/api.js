@@ -166,7 +166,7 @@ export const updateOrderStatus = async (orderId, status) => {
  *
  * @param {string} orderId  UUID
  * @returns {Promise<{ success: boolean, count: number, data: object[] }>}
- */
+ */ 
 export const getOrderMessages = async (orderId) => {
   const response = await apiClient.get(`/orders/${orderId}/messages`);
   return response.data;
@@ -215,6 +215,37 @@ export const getPickupLocations = async () => {
  */
 export const checkoutCart = async (checkoutData) => {
   const response = await apiClient.post("/orders", checkoutData);
+  return response.data;
+};
+
+// ============================================================================
+// SELLER INVENTORY
+// ============================================================================
+
+/**
+ * GET /marketplace/seller/products (seller only)
+ * Returns the authenticated seller's own products including PENDING/REJECTED.
+ *
+ * @param {object} [query]
+ * @param {number} [query.page]    default 1
+ * @param {number} [query.limit]   default 20
+ * @param {'PENDING'|'VERIFIED'|'REJECTED'} [query.approvalStatus]
+ * @returns {Promise<{ success: boolean, items: object[], pagination: object }>}
+ */
+export const getSellerProducts = async (query = {}) => {
+  const params = Object.fromEntries(
+    Object.entries(query).filter(([, v]) => v !== '' && v !== null && v !== undefined),
+  );
+  const response = await apiClient.get('/marketplace/seller/products', { params });
+  return response.data;
+};
+
+/**
+ * GET /marketplace/categories (public)
+ * @returns {Promise<{ success: boolean, data: { id: string, name: string, slug: string }[] }>}
+ */
+export const getCategories = async () => {
+  const response = await apiClient.get('/marketplace/categories');
   return response.data;
 };
 
