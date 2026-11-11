@@ -6,6 +6,7 @@ import { AuthShowcase } from '../components'
 import {
   Alert,
   AuthCard,
+  AuthModeTabs,
   Field,
   fieldBorder,
   Icon,
@@ -19,16 +20,9 @@ import {
 import ImageDropzone from '../components/ImageDropzone.jsx'
 import CameraCapture from '../components/CameraCapture.jsx'
 import PasskeySetup from '../components/PasskeySetup.jsx'
-import { getErrorMessage, getFieldErrors } from '../../../lib/api-client'
+import { RegistrationOtpStep, useRegistrationOtp } from '../components/RegistrationOtpStep.jsx'
 import { MEMBER_TYPES, QCU_ID_PATTERN, MIN_PASSWORD_LENGTH } from '../../../lib/constants'
 import { isWebAuthnSupported } from '../../../lib/webauthn'
-
-// Mirrors bizzyqcu-server QcuMemberType. Faculty & Staff accounts can only buy.
-const MEMBER_OPTIONS = [
-  { value: MEMBER_TYPES.STUDENT, label: 'Student', icon: 'school' },
-  { value: MEMBER_TYPES.FACULTY, label: 'Faculty', icon: 'co_present' },
-  { value: MEMBER_TYPES.STAFF, label: 'Staff', icon: 'badge' },
-]
 
 // Server field name -> form field name
 const SERVER_FIELD_MAP = {
@@ -37,16 +31,18 @@ const SERVER_FIELD_MAP = {
 }
 
 const SUBMIT_TEXT = {
-  idle: 'Submit for Verification',
+  idle: 'Continue & Verify Email',
+  requesting_otp: 'Sending verification code…',
+  verifying_otp: 'Verifying email…',
   uploading: 'Uploading photos…',
   submitting: 'Creating account…',
 }
 
 export default function Signup() {
   const navigate = useNavigate()
+  const otpFlow = useRegistrationOtp(SERVER_FIELD_MAP)
 
   const [form, setForm] = useState({
-    memberType: MEMBER_TYPES.STUDENT,
     fullName: '',
     qcuIdNumber: '',
     email: '',
@@ -58,14 +54,14 @@ export default function Signup() {
   const [selfie, setSelfie] = useState(null)
   const [showPass, setShowPass] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [status, setStatus] = useState('idle') // idle | uploading | submitting
-  const [formError, setFormError] = useState('')
+  const [status, setStatus] = useState('idle') // idle | requesting_otp | verifying_otp | uploading | submitting
   const [errors, setErrors] = useState({})
   const [registered, setRegistered] = useState(null) // server user object
   const [passkeyAdded, setPasskeyAdded] = useState(false)
 
   const busy = status !== 'idle'
   const passkeyCapable = isWebAuthnSupported()
+  const emailAlreadyVerified = Boolean(otpFlow.getVerifiedEmailToken(form.email))
 
   const clearError = (key) => setErrors((prev) => ({ ...prev, [key]: undefined }))
   const update = (key) => (e) => {
@@ -79,55 +75,65 @@ export default function Signup() {
     if (form.fullName.trim().length < 2) next.fullName = 'Full name must be at least 2 characters'
     if (!QCU_ID_PATTERN.test(form.qcuIdNumber.trim())) next.qcuIdNumber = 'Format must be YY-NNNN (e.g. 24-0001)'
     if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) next.email = 'Enter a valid email address'
-    if (!Object.values(MEMBER_TYPES).includes(form.memberType)) next.memberType = 'Select your QCU role'
     if (usePassword) {
       if (form.password.length < MIN_PASSWORD_LENGTH) next.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`
       if (form.confirmPassword !== form.password) next.confirmPassword = 'Passwords do not match'
     }
-    if (!idPhoto) next.idPhoto = 'Please upload a photo of your QCU ID'
+    if (!idPhoto) next.idPhoto = 'Please upload a photo of your QCU Student ID'
     if (!selfie) next.selfie = 'Please take a live selfie'
     return next
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setFormError('')
-    const clientErrors = validate()
-    if (Object.keys(clientErrors).length) {
-      setErrors(clientErrors)
-      return
-    }
-
+  const completeRegistration = async (emailVerificationToken) => {
     const qcuIdNumber = form.qcuIdNumber.trim()
-    try {
-      setStatus('uploading')
-      const [qcuIdPhotoUrl, liveSelfieUrl] = await Promise.all([
-        uploadVerificationImage(idPhoto, { tag: 'qcu-id', qcuIdNumber }),
-        uploadVerificationImage(selfie, { tag: 'selfie', qcuIdNumber }),
-      ])
+    setStatus('uploading')
+    const [qcuIdPhotoUrl, liveSelfieUrl] = await Promise.all([
+      uploadVerificationImage(idPhoto, { tag: 'qcu-id', qcuIdNumber }),
+      uploadVerificationImage(selfie, { tag: 'selfie', qcuIdNumber }),
+    ])
 
-      setStatus('submitting')
-      const result = await registerUser({
-        qcuIdNumber,
-        email: form.email.trim(),
-        fullName: form.fullName.trim(),
-        memberType: form.memberType,
-        qcuIdPhotoUrl,
-        liveSelfieUrl,
-        ...(usePassword ? { password: form.password } : {}),
-      })
-      setRegistered(result.data)
-    } catch (error) {
-      const serverErrors = getFieldErrors(error)
-      const mapped = Object.fromEntries(
-        Object.entries(serverErrors).map(([k, v]) => [SERVER_FIELD_MAP[k] || k, v])
-      )
-      setErrors(mapped)
-      setFormError(getErrorMessage(error))
-    } finally {
-      setStatus('idle')
-    }
+    setStatus('submitting')
+    const result = await registerUser({
+      qcuIdNumber,
+      email: form.email.trim(),
+      emailVerificationToken,
+      fullName: form.fullName.trim(),
+      memberType: MEMBER_TYPES.STUDENT,
+      qcuIdPhotoUrl,
+      liveSelfieUrl,
+      ...(usePassword ? { password: form.password } : {}),
+    })
+    setRegistered(result.data)
   }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    return otpFlow.handleFormSubmit({
+      email: form.email,
+      qcuIdNumber: form.qcuIdNumber,
+      validate,
+      completeRegistration,
+      setErrors,
+      setStatus,
+    })
+  }
+
+  const handleVerifyAndSubmit = (e) => {
+    e.preventDefault()
+    return otpFlow.handleOtpSubmit({
+      email: form.email,
+      completeRegistration,
+      setErrors,
+      setStatus,
+    })
+  }
+
+  const handleResendOtp = () =>
+    otpFlow.handleResendOtp({
+      email: form.email,
+      qcuIdNumber: form.qcuIdNumber,
+      setStatus,
+    })
 
   // --------------------------------------------------------------------------
   // Success: registration is PENDING admin verification; offer passkey setup.
@@ -222,51 +228,32 @@ export default function Signup() {
               <Icon name="auto_awesome" className="text-amber-400 text-[20px]" />
             </div>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Verified QCUians only — your ID and selfie are reviewed by an administrator.
+              Verified QCU students only — your ID and selfie are reviewed by an administrator.
             </p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-            {formError && <Alert tone="error">{formError}</Alert>}
+          <AuthModeTabs active="signup" loginTo="/login" signupTo="/signup" />
 
-            {/* QCU role */}
-            <fieldset>
-              <legend className="flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-slate-300">
-                <span>I am a QCU</span>
-                <span className="text-amber-400" aria-hidden="true">*</span>
-              </legend>
-              <div role="radiogroup" className="mt-1.5 grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-white/[0.04] border border-white/10">
-                {MEMBER_OPTIONS.map((opt) => {
-                  const active = form.memberType === opt.value
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      role="radio"
-                      aria-checked={active}
-                      disabled={busy}
-                      onClick={() => {
-                        setForm((f) => ({ ...f, memberType: opt.value }))
-                        clearError('memberType')
-                      }}
-                      className={`py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                        active
-                          ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <Icon name={opt.icon} className="text-[18px]" />
-                      <span>{opt.label}</span>
-                    </button>
-                  )
-                })}
-              </div>
-              {errors.memberType ? (
-                <p className="mt-1 text-[11px] text-red-400">{errors.memberType}</p>
-              ) : form.memberType !== MEMBER_TYPES.STUDENT ? (
-                <p className="mt-1 text-[11px] text-slate-500">Faculty and staff accounts can shop but cannot open a store.</p>
-              ) : null}
-            </fieldset>
+          {otpFlow.step === 'otp' ? (
+            <RegistrationOtpStep
+              id="signup-otp"
+              email={form.email}
+              otp={otpFlow.otp}
+              onOtpChange={otpFlow.setOtp}
+              notice={otpFlow.otpNotice}
+              secondsLeft={otpFlow.otpSecondsLeft}
+              resendSecondsLeft={otpFlow.resendSecondsLeft}
+              busy={busy}
+              error={otpFlow.formError}
+              submitLabel="Verify & Create Account"
+              busyLabel={SUBMIT_TEXT[status]}
+              onSubmit={handleVerifyAndSubmit}
+              onResend={handleResendOtp}
+              onBack={otpFlow.backToForm}
+            />
+          ) : (
+            <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+            {otpFlow.formError && <Alert tone="error">{otpFlow.formError}</Alert>}
 
             <Field id="signup-full-name" label="Full Name" icon="person" error={errors.fullName}>
               <input
@@ -382,7 +369,7 @@ export default function Signup() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <ImageDropzone
                 id="signup-qcu-id-photo"
-                label="QCU ID Photo"
+                label="QCU Student ID Photo"
                 file={idPhoto}
                 error={errors.idPhoto}
                 disabled={busy}
@@ -418,10 +405,11 @@ export default function Signup() {
             )}
 
             <button type="submit" disabled={busy} className={primaryButton}>
-              <span>{SUBMIT_TEXT[status]}</span>
+              <span>{status === 'idle' && emailAlreadyVerified ? 'Submit for Verification' : SUBMIT_TEXT[status]}</span>
               {busy && <Spinner />}
             </button>
           </form>
+          )}
 
           <div className="mt-auto pt-4">
             <div className="pt-3.5 border-t border-white/10 text-center">
