@@ -32,3 +32,32 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   }
 }
+
+/* ===== Subsystem 3: transition and modal styles (from the frontend prototype) ===== */
+/* Soft cascade for the photo viewer: rises and settles, no hard pop */
+@keyframes cascade-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+.cascade {
+  animation: cascade-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* Shared modal shell: springs in over a dimmed page; clicking outside shakes the card */
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes modal-shk {
+  0%, 100% { transform: translateX(0); }
+  14%  { transform: translateX(-7px); }
+  30%  { transform: translateX(6px); }
+  46%  { transform: translateX(-4px); }
+  62%  { transform: translateX(3px); }
+  78%  { transform: translateX(-1.5px); }
+}
+.modal-overlay { animation: modal-fade 0.3s ease both; }
+.modal-spring { animation: modal-in 0.59s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.modal-shake { animation: modal-shk 0.52s ease-in-out; }

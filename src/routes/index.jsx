@@ -15,6 +15,22 @@ import {
 } from '../subsystems/auth';
 import Placeholder from '../components/Placeholder.jsx';
 
+// Subsystem 3: Orders, cart, checkout, payment, messages
+import CartPage from '../subsystems/orders/pages/CartPage.jsx';
+import CheckoutPage from '../subsystems/orders/pages/CheckoutPage.jsx';
+import PaymentPage from '../subsystems/orders/pages/PaymentPage.jsx';
+import PaymentPendingPage from '../subsystems/orders/pages/PaymentPendingPage.jsx';
+import PaymentConfirmedPage from '../subsystems/orders/pages/PaymentConfirmedPage.jsx';
+import PaymentFailedPage from '../subsystems/orders/pages/PaymentFailedPage.jsx';
+import OrdersPage from '../subsystems/orders/pages/OrdersPage.jsx';
+import OrderDetailPage from '../subsystems/orders/pages/OrderDetailPage.jsx';
+import MessagesPage from '../subsystems/orders/pages/MessagesPage.jsx';
+import OrdersLayout from '../subsystems/orders/OrdersLayout.jsx';
+import MarketPage from '../subsystems/orders/pages/MarketPage.jsx';
+import StorePage from '../subsystems/orders/pages/StorePage.jsx';
+import ProfilePage from '../subsystems/auth/pages/ProfilePage.jsx';
+import NotificationsPage from '../subsystems/orders/pages/NotificationsPage.jsx';
+
 // Import your new Admin Dashboard
 import AdminDashboard from '../subsystems/admin/pages/AdminDashboard.jsx';
 
@@ -48,36 +64,30 @@ export default function AppRoutes() {
         <Route path="/seller-signup/organization" element={<OrganizationSeller />} />
       </Route>
 
+    {/* Subsystem 3: Orders, cart, checkout, payment, messages (prototype shell) */}
+    <Route element={<OrdersLayout />}>
+      <Route path="/marketplace" element={<MarketPage />} />
+          <Route path="/stores/:id" element={<StorePage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/cart" element={<CartPage />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/payment" element={<PaymentPage />} />
+      <Route path="/payment/pending" element={<PaymentPendingPage />} />
+      <Route path="/payment/confirmed" element={<PaymentConfirmedPage />} />
+      <Route path="/payment/failed" element={<PaymentFailedPage />} />
+      <Route path="/orders" element={<OrdersPage />} />
+      <Route path="/orders/:id" element={<OrderDetailPage />} />
+      <Route path="/messages" element={<MessagesPage />} />
+    </Route>
+
       {/* Main App Routes - With Navbar */}
       <Route element={<Layout />}>
-
-        {/* Marketplace Routes (Subsystem 2) - Coming Soon */}
-        <Route
-          path="/marketplace"
-          element={<Placeholder title="Marketplace" text="Browse products and stores." />}
-        />
-        <Route
-          path="/stores/:storeId"
-          element={<Placeholder title="Store" text="Store details page." />}
-        />
         <Route
           path="/products/:productId"
           element={<Placeholder title="Product" text="Product details page." />}
         />
 
-        {/* Orders Routes (Subsystem 3) - Coming Soon */}
-        <Route
-          path="/cart"
-          element={<Placeholder title="Shopping Cart" text="Your cart items." />}
-        />
-        <Route
-          path="/orders"
-          element={<Placeholder title="Orders" text="Your order history." />}
-        />
-        <Route
-          path="/orders/:orderId"
-          element={<Placeholder title="Order Details" text="Detailed order view." />}
-        />
 
         {/* Admin Routes (Subsystem 4) - YOUR DASHBOARD */}
         <Route path="/admin" element={<AdminDashboard />} />
