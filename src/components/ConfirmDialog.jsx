@@ -19,11 +19,11 @@ export default function ConfirmDialog({ open, title, message, confirmLabel = "Co
       <h2 className="text-[17px] font-semibold tracking-tight text-slate-900">{title}</h2>
       {message && <p className="mx-auto mt-2 max-w-[280px] text-[13px] leading-relaxed text-slate-500">{message}</p>}
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="mt-6 grid grid-cols-2 gap-4 pt-2">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-xl bg-slate-100 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 active:scale-[0.98]"
+          className="rounded-xl bg-slate-100 py-3.5 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 active:scale-[0.98]"
         >
           {cancelLabel}
         </button>
@@ -31,7 +31,7 @@ export default function ConfirmDialog({ open, title, message, confirmLabel = "Co
           type="button"
           autoFocus
           onClick={onConfirm}
-          className={`rounded-xl py-3 text-sm font-semibold text-white transition active:scale-[0.98] ${
+          className={`rounded-xl py-3.5 px-4 text-sm font-semibold text-white transition active:scale-[0.98] ${
             danger
               ? "bg-[#D92D20] shadow-[0_8px_20px_-6px_rgba(217,45,32,0.5)] hover:bg-[#B42318]"
               : "bg-[#0284C7] shadow-[0_8px_20px_-6px_rgba(2,132,199,0.5)] hover:bg-[#0369A1]"

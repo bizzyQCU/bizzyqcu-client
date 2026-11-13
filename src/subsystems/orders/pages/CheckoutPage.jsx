@@ -69,6 +69,7 @@ export default function CheckoutPage() {
   const [confirm, setConfirm] = useState(null);
   const [placing, setPlacing] = useState(false);
   const [placeError, setPlaceError] = useState(null);
+  const [orderConfirm, setOrderConfirm] = useState(false);
 
   const smsDigits = sms.replace(/\D/g, "").length;
   const smsIncomplete = smsDigits < 10;
@@ -111,6 +112,12 @@ export default function CheckoutPage() {
   async function placeOrder() {
     if (!canPlaceOrder) return;
     
+    // Show confirmation modal first
+    setOrderConfirm(true);
+  }
+
+  async function confirmPlaceOrder() {
+    setOrderConfirm(false);
     setPlacing(true);
     setPlaceError(null);
 
@@ -165,6 +172,15 @@ export default function CheckoutPage() {
   return (
     <>
       <ConfirmDialog open={!!confirm} title={confirm?.title} message={confirm?.message} confirmLabel={confirm?.confirmLabel} tone={confirm?.tone} onCancel={() => setConfirm(null)} onConfirm={() => { confirm?.action(); setConfirm(null); }} />
+      <ConfirmDialog 
+        open={orderConfirm} 
+        title="Confirm your order?" 
+        message={`You're about to place an order for ₱${displayTotal.toFixed(2)}. Please review your delivery details before confirming.`}
+        confirmLabel="Confirm & Place Order"
+        tone="primary"
+        onCancel={() => setOrderConfirm(false)}
+        onConfirm={confirmPlaceOrder}
+      />
       <div className="mb-4">
         <Link to="/marketplace" className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0284C7] transition hover:text-sky-700">
           <Icon name="arrowLeft" className="h-4 w-4" />

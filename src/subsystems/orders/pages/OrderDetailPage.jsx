@@ -195,35 +195,73 @@ export default function OrderDetailPage() {
                 Live Sync
               </div>
             </div>
-            <ol className="relative pl-1">
-              {getTimelineSteps(order.orderStatus, order.deliveryMethod).map((step, idx, arr) => {
-                const last = idx === arr.length - 1;
-                const isDone = step.state === "done";
-                const isCurrent = step.state === "current";
-                return (
-                  <li key={step.label} className={`relative flex items-start space-x-4 ${last ? "" : "pb-7"}`}>
-                    {!last && <span className="absolute left-3 top-6 h-full w-px bg-slate-200" aria-hidden="true" />}
-                    <div
-                      className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ring-4 ring-white ${
-                        isDone ? "bg-[#0284C7] text-white shadow-sm" : isCurrent ? "bg-sky-500 text-white ring-sky-100 shadow-sm" : "border-2 border-slate-300 bg-slate-100 text-slate-400"
-                      }`}
-                    >
-                      {isDone && <Icon name="check" className="h-3.5 w-3.5" strokeWidth={3} />}
-                      {isCurrent && <span className="h-2.5 w-2.5 rounded-full bg-white" />}
-                      {!isDone && !isCurrent && <Icon name="clock" className="h-3 w-3 text-slate-400" />}
-                    </div>
-                    <div className="min-w-0 flex-1 pt-0.5">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <h3 className={`text-sm ${isCurrent ? "font-extrabold text-[#0284C7]" : isDone ? "font-bold text-slate-800" : "font-semibold text-slate-600"}`}>{step.label}</h3>
-                          {isCurrent && <span className="rounded-full bg-[#FFD444] px-2 py-0.5 text-[10px] font-extrabold tracking-wide text-slate-900">NOW</span>}
-                        </div>
+            {/* Stepper - Clean horizontal line with steps */}
+            <div className="space-y-8">
+              {/* Line with circles */}
+              <div className="flex items-center gap-0 relative">
+                {getTimelineSteps(order.orderStatus, order.deliveryMethod).map((step, idx, arr) => {
+                  const isDone = step.state === "done";
+                  const isCurrent = step.state === "current";
+                  const isLast = idx === arr.length - 1;
+                  const currentIdx = getTimelineSteps(order.orderStatus, order.deliveryMethod).findIndex(s => s.state === "current");
+                  
+                  return (
+                    <div key={step.label} className="flex-1 flex items-center justify-center relative">
+                      {/* Connector Line - Behind circles */}
+                      {!isLast && (
+                        <div
+                          className="absolute left-1/2 top-1/2 h-0.5 w-full ml-4 -translate-y-1/2 z-0"
+                          style={{
+                            backgroundColor: idx < currentIdx + 1 ? "#10b981" : "#d1d5db"
+                          }}
+                        />
+                      )}
+                      
+                      {/* Step Circle - On top of line */}
+                      <div
+                        className={`relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-all ${
+                          isDone 
+                            ? "bg-emerald-500 text-white shadow-sm ring-4 ring-white" 
+                            : isCurrent 
+                            ? "bg-sky-500 text-white shadow-sm ring-4 ring-sky-100" 
+                            : "border-2 border-slate-300 bg-white"
+                        }`}
+                      >
+                        {isDone && <Icon name="check" className="h-4 w-4" strokeWidth={3} />}
+                        {isCurrent && <span className="h-2 w-2 rounded-full bg-white" />}
                       </div>
                     </div>
-                  </li>
-                );
-              })}
-            </ol>
+                  );
+                })}
+              </div>
+              
+              {/* Labels Row - Centered below each dot */}
+              <div className="flex items-start justify-between">
+                {getTimelineSteps(order.orderStatus, order.deliveryMethod).map((step, idx) => {
+                  const isDone = step.state === "done";
+                  const isCurrent = step.state === "current";
+                  
+                  return (
+                    <div key={step.label} className="flex-1 flex flex-col items-center">
+                      <p
+                        className={`text-xs font-semibold text-center ${
+                          isCurrent
+                            ? "text-sky-600 font-bold"
+                            : isDone
+                            ? "text-slate-700"
+                            : "text-slate-500"
+                        }`}
+                      >
+                        {step.label}
+                      </p>
+                      {isCurrent && (
+                        <span className="mt-1 text-[9px] font-bold text-amber-600">● NOW</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </section>
 
           <section className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
@@ -278,7 +316,7 @@ export default function OrderDetailPage() {
               {items.map((i) => (
                 <li key={i.id} className="flex items-center justify-between py-4">
                   <div className="flex items-center space-x-4">
-                    <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-slate-200">
+                    <div onClick={() => setZoomImage(galleryFor(i.productId)[0])} className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 cursor-pointer hover:opacity-80 transition-opacity">
                       <ProductArt art={galleryFor(i.productId)[0]} />
                     </div>
                     <div>
