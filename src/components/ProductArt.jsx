@@ -10,8 +10,10 @@ const palettes = [
 // Three angles per product (front, side, detail). Swap these for real photos later.
 export function galleryFor(seed) {
   const labels = ["Front", "Side", "Detail"];
+  // Product IDs are UUID strings; reduce any non-number seed to a number so the palette lookup works.
+  const base = typeof seed === "number" ? seed : [...String(seed)].reduce((a, ch) => a + ch.charCodeAt(0), 0);
   return labels.map((label, i) => {
-    const p = palettes[(seed + i) % palettes.length];
+    const p = palettes[(base + i) % palettes.length];
     return { label, ...p, sx: 30 + i * 30, sy: 24 + i * 6 };
   });
 }
