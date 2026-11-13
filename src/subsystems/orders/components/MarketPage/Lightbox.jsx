@@ -1,5 +1,5 @@
-import Icon from "./Icon.jsx";
-import ModalShell from "./ModalShell.jsx";
+import Icon from "../../../../components/Icon.jsx";
+import ModalShell from "../Dialogs/ModalShell.jsx";
 import ProductGallery from "./ProductGallery.jsx";
 
 // Photo viewer: same modal behaviour as every other dialog, with a frosted backdrop.

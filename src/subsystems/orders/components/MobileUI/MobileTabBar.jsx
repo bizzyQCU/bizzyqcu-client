@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import Icon from './Icon.jsx'
+import Icon from '../../../../components/Icon.jsx'
 
 // Bottom tab bar for phones. A yellow line stretches from the old tab to the new one.
 const tabs = [

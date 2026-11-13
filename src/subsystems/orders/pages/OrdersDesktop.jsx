@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Icon from "../../../components/Icon.jsx";
-import RatingModal from "../../../components/RatingModal.jsx";
+import RatingModal from "../components/OrderPage/RatingModal.jsx";
 import { useRatings } from "../../../lib/RatingContext.jsx";
 import OrderCard from "./OrderCard.jsx";
 import { categories } from "./orderCategories.js";

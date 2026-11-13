@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
-import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
+import ConfirmDialog from "../components/Dialogs/ConfirmDialog.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";
 
 const methods = [

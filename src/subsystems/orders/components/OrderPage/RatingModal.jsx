@@ -1,8 +1,8 @@
 import { useState } from "react";
-import Button from "./Button.jsx";
-import Icon from "./Icon.jsx";
-import ModalShell from "./ModalShell.jsx";
-import VerifiedSeal from "./VerifiedSeal.jsx";
+import Button from "../Dialogs/Button.jsx";
+import Icon from "../../../../components/Icon.jsx";
+import ModalShell from "../Dialogs/ModalShell.jsx";
+import VerifiedSeal from "../../../../components/VerifiedSeal.jsx";
 
 const labels = ["", "Poor", "Fair", "Good", "Very good", "Great"];
 

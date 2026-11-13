@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
-import RatingModal from "../../../components/RatingModal.jsx";
-import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
-import Lightbox from "../../../components/Lightbox.jsx";
+import RatingModal from "../components/OrderPage/RatingModal.jsx";
+import ConfirmDialog from "../components/Dialogs/ConfirmDialog.jsx";
+import Lightbox from "../components/MarketPage/Lightbox.jsx";
 import { useMessages } from "../../../lib/MessageContext.jsx";
 import { useRatings } from "../../../lib/RatingContext.jsx";
-import ProductArt, { galleryFor } from "../../../components/ProductArt.jsx";
+import ProductArt, { galleryFor } from "../components/MarketPage/ProductArt.jsx";
 import { canRequestRefund } from "../../../lib/orderRules.js";
 import { getOrderById, cancelOrder } from "../api.js";
 import { getErrorMessage } from "../../../lib/api-client.js";

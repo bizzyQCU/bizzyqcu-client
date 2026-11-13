@@ -1,10 +1,10 @@
-import SelectCircle from "../../../components/SelectCircle.jsx";
+import SelectCircle from "../components/Cart/SelectCircle.jsx";
 import useIsMobile from "../../../hooks/useIsMobile.js";
 import MB_CartPage from "./MB_CartPage.jsx";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
-import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
+import ConfirmDialog from "../components/Dialogs/ConfirmDialog.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";
 
 function CartDesktop() {

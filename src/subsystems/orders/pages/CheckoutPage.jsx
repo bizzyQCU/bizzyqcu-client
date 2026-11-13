@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
-import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
+import ConfirmDialog from "../components/Dialogs/ConfirmDialog.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";
 import { useAuth } from "../../../hooks/useAuth";
 import { createMultiStoreOrders } from "../api.js";

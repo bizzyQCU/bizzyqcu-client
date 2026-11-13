@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { flyToCart } from "../../../lib/flyToCart.js";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
-import FullScreenPage from "../../../components/FullScreenPage.jsx";
+import ConfirmDialog from "../components/Dialogs/ConfirmDialog.jsx";
+import FullScreenPage from "../components/MobileUI/FullScreenPage.jsx";
 import Icon from "../../../components/Icon.jsx";
 import VerifiedSeal from "../../../components/VerifiedSeal.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";

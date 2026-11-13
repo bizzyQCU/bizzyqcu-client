@@ -1,4 +1,4 @@
-import Icon from "./Icon.jsx";
+import Icon from "../../../../components/Icon.jsx";
 
 // Round selector: fills blue with a check when selected.
 export default function SelectCircle({ checked, onToggle, label }) {

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
-import FullScreenPage from "../../../components/FullScreenPage.jsx";
+import ConfirmDialog from "../components/Dialogs/ConfirmDialog.jsx";
+import FullScreenPage from "../components/MobileUI/FullScreenPage.jsx";
 import Icon from "../../../components/Icon.jsx";
-import SelectCircle from "../../../components/SelectCircle.jsx";
+import SelectCircle from "../components/Cart/SelectCircle.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";
 
 export default function MB_CartPage() {

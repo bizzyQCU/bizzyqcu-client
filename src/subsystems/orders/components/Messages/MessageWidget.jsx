@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import Icon from "./Icon.jsx";
-import { SUPPORT, useMessages } from "../lib/MessageContext.jsx";
+import Icon from "../../../../components/Icon.jsx";
+import { SUPPORT, useMessages } from "../../../../lib/MessageContext.jsx";
 
 const quickReplies = ["Track my order", "Payment problem", "Delivery question"];
 

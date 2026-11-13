@@ -1,4 +1,4 @@
-import Icon from "./Icon.jsx";
+import Icon from "../../../../components/Icon.jsx";
 import ModalShell from "./ModalShell.jsx";
 
 // Confirmation dialog: centred icon, bold title, muted message, two equal buttons.
