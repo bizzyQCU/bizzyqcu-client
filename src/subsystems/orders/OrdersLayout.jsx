@@ -7,6 +7,8 @@ import Popover from '../../components/Popover.jsx'
 import MobileTabBar from '../../components/MobileTabBar.jsx'
 import { useCart } from '../../lib/CartContext.jsx'
 import { useMessages } from '../../lib/MessageContext.jsx'
+import { getInitials, getVerificationLabel } from '../../lib/userDisplay.js'
+import { useAuth } from '../../hooks/useAuth'
 import useIsMobile from '../../hooks/useIsMobile.js'
 const logo = '/logo-clear.png'
 
@@ -17,10 +19,11 @@ const navClass = ({ isActive }) =>
       : 'text-slate-600'
   }`
 
-// Buyer-side shell, following the prototype: floating header, profile menu, and cart on phones.
+// Buyer-side shell: floating header, authenticated profile menu, and cart on phones.
 export default function OrdersLayout() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { user, isAuthenticated, loading: authLoading, logout } = useAuth()
   const { count } = useCart()
   const mobile = useIsMobile()
   const { open: chatOpen } = useMessages()
@@ -29,12 +32,25 @@ export default function OrdersLayout() {
 
   const [menuOpen, setMenuOpen] = useState(false)
   const [confirmSignOut, setConfirmSignOut] = useState(false)
-  const [signedOut, setSignedOut] = useState(false)
 
   // On phones, "Message seller" opens the full-screen messages page instead of the chat window.
   useEffect(() => {
     if (mobile && chatOpen && pathname !== '/messages') navigate('/messages')
   }, [mobile, chatOpen, pathname, navigate])
+
+  const initials = isAuthenticated ? getInitials(user?.fullName, 'Q') : '?'
+  const displayName = isAuthenticated ? user?.fullName || 'QCU User' : 'Guest'
+  const subtitle = isAuthenticated
+    ? [user?.qcuIdNumber, getVerificationLabel(user?.verificationStatus)].filter(Boolean).join(' · ')
+    : authLoading
+      ? 'Checking session…'
+      : 'Not signed in'
+
+  const handleSignOut = async () => {
+    setConfirmSignOut(false)
+    await logout()
+    navigate('/login', { replace: true })
+  }
 
   const profileMenu = (
     <div className="relative">
@@ -46,34 +62,73 @@ export default function OrdersLayout() {
         onClick={() => setMenuOpen((o) => !o)}
         className="flex items-center gap-1.5 pl-2"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700 ring-2 ring-white">JB</span>
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700 ring-2 ring-white">
+          {initials}
+        </span>
         <Icon name={menuOpen ? 'chevronUp' : 'chevronDown'} className="h-3.5 w-3.5 text-slate-400" />
       </button>
-      <Popover open={menuOpen} onClose={() => setMenuOpen(false)} className="right-0 z-50 mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg">
+      <Popover open={menuOpen} onClose={() => setMenuOpen(false)} className="right-0 z-50 mt-2 w-60 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg">
         <div className="px-3 py-2">
-          <p className="text-xs font-bold text-slate-900">Juan Bautista</p>
-          <p className="text-[11px] text-slate-500">BSIT 3rd Year · Verified QCU</p>
+          <p className="truncate text-xs font-bold text-slate-900">{displayName}</p>
+          <p className="truncate text-[11px] text-slate-500">{subtitle}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setMenuOpen(false)
-            navigate('/profile')
-          }}
-          className="w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 transition hover:bg-slate-50"
-        >
-          Profile
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setMenuOpen(false)
-            setConfirmSignOut(true)
-          }}
-          className="w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-rose-600 transition hover:bg-rose-50"
-        >
-          Sign out
-        </button>
+        {isAuthenticated ? (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                navigate('/profile')
+              }}
+              className="w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+            >
+              Profile
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                navigate('/account')
+              }}
+              className="w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+            >
+              Account &amp; Security
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                setConfirmSignOut(true)
+              }}
+              className="w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-rose-600 transition hover:bg-rose-50"
+            >
+              Sign out
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                navigate('/login')
+              }}
+              className="w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-[#0284C7] transition hover:bg-sky-50"
+            >
+              Sign in
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                navigate('/signup')
+              }}
+              className="w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+            >
+              Create account
+            </button>
+          </>
+        )}
       </Popover>
     </div>
   )
@@ -87,10 +142,7 @@ export default function OrdersLayout() {
         confirmLabel="Sign out"
         tone="danger"
         onCancel={() => setConfirmSignOut(false)}
-        onConfirm={() => {
-          setConfirmSignOut(false)
-          setSignedOut(true)
-        }}
+        onConfirm={handleSignOut}
       />
 
       {mobile && !covered && (
@@ -127,15 +179,6 @@ export default function OrdersLayout() {
             </div>
           </div>
         </header>
-      )}
-
-      {signedOut && (
-        <div role="status" className="mx-auto mt-3 flex w-full max-w-7xl shrink-0 items-center justify-between rounded-full bg-slate-900 px-6 py-2.5 text-xs text-white">
-          <span>You've signed out. Sign-in isn't connected in this prototype yet.</span>
-          <button type="button" onClick={() => setSignedOut(false)} aria-label="Dismiss" className="rounded p-1 text-white/80 hover:text-white">
-            <Icon name="x" className="h-3.5 w-3.5" />
-          </button>
-        </div>
       )}
 
       <main className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto">

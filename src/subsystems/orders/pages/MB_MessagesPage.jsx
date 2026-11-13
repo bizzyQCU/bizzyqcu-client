@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
-import { conversations } from "../../../lib/mockData.js";
 import { SUPPORT, useMessages } from "../../../lib/MessageContext.jsx";
 
 const filters = ["All", "Unread"];
@@ -62,7 +61,7 @@ export default function MB_MessagesPage() {
 
   const list = contacts
     .filter((c) => c.name.toLowerCase().includes(query.toLowerCase()))
-    .filter((c) => filter === "All" || conversations.find((x) => x.id === c.id)?.unread);
+    .filter((c) => filter === "All" || Boolean(c.unread));
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex flex-col bg-white" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
@@ -120,7 +119,7 @@ export default function MB_MessagesPage() {
             {list.length === 0 && <li className="p-6 text-center text-xs text-slate-500">No chats match.</li>}
             {list.map((c) => {
               const last = (threads[c.id] ?? []).filter((m) => m.type !== "system").at(-1);
-              const unread = conversations.find((x) => x.id === c.id)?.unread;
+              const unread = Boolean(c.unread);
               return (
                 <li key={c.id}>
                   <button

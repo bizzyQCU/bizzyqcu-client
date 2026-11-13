@@ -9,6 +9,7 @@ export default function AuthLogo() {
     <header className="absolute top-5 left-5 sm:top-6 sm:left-8 z-30">
       <Link
         to="/"
+        state={{ blinds: true }}
         aria-label="BizzyQCU Home"
         className="inline-flex items-center px-3 py-1.5 rounded-2xl bg-slate-900/50 hover:bg-slate-900/80 border border-white/10 hover:border-amber-400/40 backdrop-blur-md shadow-md shadow-black/25 transition-all duration-200 group"
       >

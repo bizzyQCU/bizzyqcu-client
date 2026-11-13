@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{SUBJECT}}</title>
+  <!-- {{STYLES}} -->
+</head>
+<body>
+  <table role="presentation" class="email-canvas">
+    <tr>
+      <td class="email-canvas-cell">
+        <table role="presentation" class="email-card">
+
+          <!-- Top Royal Blue Accent Stripe -->
+          <tr>
+            <td class="email-top-stripe">&nbsp;</td>
+          </tr>
+
+          <!-- Brand Logo Header -->
+          <tr>
+            <td class="email-header">
+              <table role="presentation" class="email-brand-table">
+                <tr>
+                  <td class="email-logo-cell">
+                    <img src="{{LOGO_SRC}}" alt="BizzyQCU" width="54" height="46" class="email-logo-img" />
+                  </td>
+                  <td class="email-wordmark">
+                    <span class="email-wordmark-bizzy">Bizzy</span>&nbsp;<span class="email-wordmark-qcu">QCU</span>
+                  </td>
+                </tr>
+              </table>
+              <p class="email-subtitle">
+                Quezon City University Community Portal
+              </p>
+            </td>
+          </tr>
+
+          <!-- Golden Amber Divider Bar -->
+          <tr>
+            <td class="email-divider">&nbsp;</td>
+          </tr>
+
+          <!-- Main Body Content -->
+          <tr>
+            <td class="email-body">
+
+              <!-- Purpose Pill Badge -->
+              <table role="presentation" class="email-badge-wrap">
+                <tr>
+                  <td class="email-purpose-badge">{{BADGE}}</td>
+                </tr>
+              </table>
+
+              <!-- Main Heading -->
+              <h1 class="email-heading">{{HEADING}}</h1>
+
+              <!-- Intro Paragraph -->
+              <p class="email-intro">{{INTRO}}</p>
+
+              <!-- High-Contrast OTP Code Container -->
+              <table role="presentation" class="email-otp-box">
+                <tr>
+                  <td class="email-otp-cell">
+                    <span class="email-otp-label">ONE-TIME PASSCODE</span>
+                    <div class="email-otp-code">{{OTP}}</div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- 5-Minute Expiration Callout Pill -->
+              <table role="presentation" class="email-expiry-wrap">
+                <tr>
+                  <td class="email-expiry-cell">
+                    <table role="presentation" class="email-expiry-pill-table">
+                      <tr>
+                        <td class="email-expiry-pill">
+                          &#9201; This code expires in <strong class="email-expiry-strong">5 minutes</strong>.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Security Warning Box -->
+              <table role="presentation" class="email-warning-box">
+                <tr>
+                  <td class="email-warning-cell">
+                    <strong class="email-warning-strong">Security Reminder:</strong> Do not share this code with anyone. BizzyQCU staff or student admins will never ask for your verification code.
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="email-footer">
+              <p class="email-footer-note">{{ACTION_NOTE}}</p>
+              <p class="email-footer-copy">
+                &copy; {{YEAR}} <strong class="email-wordmark-bizzy">Bizzy</strong><strong class="email-wordmark-qcu">QCU</strong> &bull; Automated Security Notification
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

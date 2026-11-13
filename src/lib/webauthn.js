@@ -34,6 +34,95 @@ export function isWebAuthnSupported() {
 }
 
 /**
+ * Turns a DOMException thrown by navigator.credentials.* into a user-facing message.
+ * Returns null when the error is not a WebAuthn ceremony error.
+ */
+export function getWebAuthnErrorMessage(error) {
+  switch (error?.name) {
+    case 'NotAllowedError':
+      return 'The passkey prompt was cancelled or timed out. Please try again.';
+    case 'InvalidStateError':
+      return 'This device already has a passkey registered for your account.';
+    case 'SecurityError':
+      return 'Passkeys are blocked on this origin. Make sure you are using the official BizzyQCU address.';
+    case 'NotSupportedError':
+      return 'This device does not support the required passkey type.';
+    case 'AbortError':
+      return 'The passkey request was aborted.';
+    default:
+      return null;
+  }
+}
+
+/** Best-effort friendly label for the current device, e.g. "Chrome on Windows". */
+export function guessDeviceName() {
+  if (typeof navigator === 'undefined') return '';
+  const ua = navigator.userAgent;
+  const browser =
+    /Edg\//.test(ua) ? 'Edge'
+      : /OPR\//.test(ua) ? 'Opera'
+        : /Firefox\//.test(ua) ? 'Firefox'
+          : /Chrome\//.test(ua) ? 'Chrome'
+            : /Safari\//.test(ua) ? 'Safari'
+              : 'Browser';
+  const os =
+    /Android/.test(ua) ? 'Android'
+      : /iPhone|iPad|iPod/.test(ua) ? 'iOS'
+        : /Windows/.test(ua) ? 'Windows'
+          : /Mac OS X/.test(ua) ? 'macOS'
+            : /Linux/.test(ua) ? 'Linux'
+              : 'this device';
+  return `${browser} on ${os}`;
+}
+
+/**
+ * Executes passkey registration in browser.
+ * `options` is the PublicKeyCredentialCreationOptionsJSON returned by
+ * POST /auth/webauthn/register/options (@simplewebauthn/server).
+ * Returns a RegistrationResponseJSON for POST /auth/webauthn/register/verify.
+ */
+export async function startPasskeyRegistration(options) {
+  if (!isWebAuthnSupported()) {
+    throw new Error('WebAuthn / Passkeys are not supported on this browser or device.');
+  }
+
+  const publicKey = {
+    ...options,
+    challenge: base64URLToBuffer(options.challenge),
+    user: {
+      ...options.user,
+      id: base64URLToBuffer(options.user.id),
+    },
+    excludeCredentials: options.excludeCredentials?.map((cred) => ({
+      ...cred,
+      id: base64URLToBuffer(cred.id),
+    })),
+  };
+
+  const credential = await navigator.credentials.create({ publicKey });
+
+  if (!credential) {
+    throw new Error('Passkey registration cancelled or failed.');
+  }
+
+  const { response } = credential;
+  const transports = typeof response.getTransports === 'function' ? response.getTransports() : [];
+
+  return {
+    id: credential.id,
+    rawId: bufferToBase64URL(credential.rawId),
+    type: credential.type,
+    authenticatorAttachment: credential.authenticatorAttachment ?? undefined,
+    response: {
+      clientDataJSON: bufferToBase64URL(response.clientDataJSON),
+      attestationObject: bufferToBase64URL(response.attestationObject),
+      transports,
+    },
+    clientExtensionResults: credential.getClientExtensionResults(),
+  };
+}
+
+/**
  * Executes passkey authentication in browser
  */
 export async function startPasskeyLogin(options) {

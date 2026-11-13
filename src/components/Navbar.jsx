@@ -1,7 +1,7 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import Logo from './Logo.jsx'
-
-const CART_COUNT = 2
+import { useAuth } from '../hooks/useAuth'
+import { useCart } from '../lib/CartContext.jsx'
 
 const hashLinks = [
   { label: 'PRODUCTS', to: '/#products' },
@@ -11,6 +11,8 @@ const hashLinks = [
 
 export default function Navbar() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
+  const { count } = useCart()
 
   return (
     <header className="w-full pt-4 md:pt-6 px-4 sm:px-6 lg:px-10 z-50">
@@ -42,7 +44,7 @@ export default function Navbar() {
           <button
             type="button"
             aria-label="Cart"
-            onClick={() => navigate('/#cart')}
+            onClick={() => navigate('/cart')}
             className="relative p-2 text-[#103D84] hover:text-amber-500 transition-colors"
           >
             <svg className="w-6 h-6 stroke-current" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -50,15 +52,17 @@ export default function Navbar() {
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
-            <span className="absolute top-1 right-0.5 bg-[#E88E0E] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white">
-              {CART_COUNT}
-            </span>
+            {count > 0 && (
+              <span className="absolute top-1 right-0.5 bg-[#E88E0E] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white">
+                {count}
+              </span>
+            )}
           </button>
 
           <button
             type="button"
-            aria-label="Profile"
-            onClick={() => navigate('/login')}
+            aria-label={isAuthenticated ? 'Account & Security' : 'Log in'}
+            onClick={() => navigate(isAuthenticated ? '/account' : '/login')}
             className="text-[#103D84] hover:opacity-85 transition-opacity"
           >
             <svg className="w-8 h-8 fill-[#103D84]" viewBox="0 0 24 24">
