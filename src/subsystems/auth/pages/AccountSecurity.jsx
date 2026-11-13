@@ -847,7 +847,7 @@ export default function AccountSecurity() {
       </AuthCard>
 
       <p className="text-center text-xs text-slate-500">
-        <Link to="/dashboard" className="text-amber-300 font-semibold hover:underline">
+        <Link to="/marketplace" className="text-amber-300 font-semibold hover:underline">
           Continue to marketplace →
         </Link>
       </p>

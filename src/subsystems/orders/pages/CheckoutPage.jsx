@@ -1,8 +1,9 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
 import ConfirmDialog from "../../../components/ConfirmDialog.jsx";
 import { useCart } from "../../../lib/CartContext.jsx";
+import { useAuth } from "../../../hooks/useAuth";
 import { createMultiStoreOrders } from "../api.js";
 
 const options = [
@@ -46,6 +47,7 @@ function PhoneInput({ id, value, onChange, invalid, placeholder }) {
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const { selected: cartItems, selectedCount, remove, selectedTotal } = useCart();
   
   // Use Buy Now items if they exist, otherwise use cart items
@@ -62,8 +64,8 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [collapsed, setCollapsed] = useState(false);
   const [building, setBuilding] = useState("Tech Building / San Bartolome Campus");
-  const [room, setRoom] = useState("Room 402, 4th Floor");
-  const [phone, setPhone] = useState("917 123 4567");
+  const [room, setRoom] = useState("");
+  const [phone, setPhone] = useState("");
   const [sms, setSms] = useState("");
   const [notes, setNotes] = useState("");
   const [confirm, setConfirm] = useState(null);
@@ -294,7 +296,7 @@ export default function CheckoutPage() {
                 <div>
                   <label htmlFor="room" className="mb-1.5 block text-xs font-bold text-slate-700">Room number / Floor <span className="text-red-500">*</span></label>
                   <div className="relative">
-                    <input id="room" type="text" value={room} onChange={(e) => setRoom(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 pr-8 text-xs font-medium text-slate-800 focus:border-sky-500 focus:ring-sky-500" />
+                    <input id="room" type="text" value={room} onChange={(e) => setRoom(e.target.value)} placeholder="e.g. Room 402, 4th Floor" className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 pr-8 text-xs font-medium text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:ring-sky-500" />
                     <Icon name="building" className="pointer-events-none absolute inset-y-0 right-3 my-auto h-4 w-4 text-slate-400" />
                   </div>
                 </div>
@@ -325,7 +327,11 @@ export default function CheckoutPage() {
               <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-sky-100 bg-sky-50/60 p-3 text-sky-800">
                 <Icon name="shield" className="h-4 w-4 flex-shrink-0 text-sky-600" />
                 <p className="text-[11px] leading-tight">
-                  Couriers will match your Student ID tag <strong className="font-bold text-slate-900">#21-08492</strong> upon room entry to ensure secure handover.
+                  {user?.qcuIdNumber ? (
+                    <>Couriers will match your Student ID tag <strong className="font-bold text-slate-900">#{user.qcuIdNumber}</strong> upon room entry to ensure secure handover.</>
+                  ) : (
+                    <>Couriers will match your QCU Student ID upon room entry to ensure secure handover.</>
+                  )}
                 </p>
               </div>
 

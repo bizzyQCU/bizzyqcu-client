@@ -1,20 +1,22 @@
 import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
-import { orderReference } from "../../../lib/mockData.js";
 import { useCart } from "../../../lib/CartContext.jsx";
 
 export default function PaymentPendingPage() {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const order = state?.order;
+  const orderNumber = order?.orderNumber ? `#${order.orderNumber}` : "—";
   const method = state?.method ?? "gcash";
-  const { selected: items, selectedTotal: total } = useCart();
+  const { selectedTotal: total } = useCart();
+  const displayTotal = order?.totalAmount != null ? Number(order.totalAmount) : total;
 
   // Simulates the PayMongo webhook confirming the payment.
   useEffect(() => {
-    const t = setTimeout(() => navigate("/payment/confirmed", { state: { method } }), 4000);
+    const t = setTimeout(() => navigate("/payment/confirmed", { state: { method, order } }), 4000);
     return () => clearTimeout(t);
-  }, [navigate, method]);
+  }, [navigate, method, order]);
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center py-8">
@@ -43,11 +45,11 @@ export default function PaymentPendingPage() {
           <div className="flex items-start justify-between border-b border-slate-200/60 pb-3.5">
             <div>
               <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-slate-400">Order Reference</span>
-              <span className="text-xs font-bold text-slate-800 sm:text-sm">Order {orderReference}</span>
+              <span className="text-xs font-bold text-slate-800 sm:text-sm">Order {orderNumber}</span>
             </div>
             <div className="text-right">
               <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-slate-400">Amount Due</span>
-              <span className="text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">₱{total.toFixed(2)}</span>
+              <span className="text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">₱{displayTotal.toFixed(2)}</span>
             </div>
           </div>
           <div className="flex items-center justify-between pt-3 text-xs">

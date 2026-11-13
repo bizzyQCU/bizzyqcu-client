@@ -1,11 +1,15 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Icon from "../../../components/Icon.jsx";
-import { orderReference } from "../../../lib/mockData.js";
 import { useCart } from "../../../lib/CartContext.jsx";
 
 export default function PaymentFailedPage() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const order = state?.order;
+  const orderNumber = order?.orderNumber ? `#${order.orderNumber}` : "—";
   const { selected: items, selectedTotal: total } = useCart();
+  const displayTotal = order?.totalAmount != null ? Number(order.totalAmount) : total;
+  const itemCount = order?.items?.length ?? items.length;
 
   return (
     <div className="flex justify-center py-8">
@@ -47,7 +51,7 @@ export default function PaymentFailedPage() {
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
             <div className="flex items-center gap-1 text-xs font-medium text-[#64748B]">
               <span>Order Reference:</span>
-              <span className="font-bold text-[#0F172A]">{orderReference}</span>
+              <span className="font-bold text-[#0F172A]">{orderNumber}</span>
             </div>
             <div className="inline-flex items-center gap-1 rounded border border-sky-100 bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700">
               <Icon name="pin" className="h-3 w-3 text-sky-500" />
@@ -56,8 +60,8 @@ export default function PaymentFailedPage() {
           </div>
           <div className="mb-3 space-y-2 text-xs">
             <div className="flex items-center justify-between text-[#64748B]">
-              <span>Items summary ({items.length} items)</span>
-              <span className="font-semibold text-[#0F172A]">₱{total.toFixed(2)}</span>
+              <span>Items summary ({itemCount} {itemCount === 1 ? "item" : "items"})</span>
+              <span className="font-semibold text-[#0F172A]">₱{displayTotal.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between text-[#64748B]">
               <span>Campus Delivery</span>
@@ -66,7 +70,7 @@ export default function PaymentFailedPage() {
           </div>
           <div className="mb-2.5 flex items-center justify-between border-t border-slate-200/60 pt-2.5">
             <span className="text-xs font-bold text-[#0F172A]">Total Due</span>
-            <span className="text-base font-extrabold text-[#0F172A]">₱{total.toFixed(2)}</span>
+            <span className="text-base font-extrabold text-[#0F172A]">₱{displayTotal.toFixed(2)}</span>
           </div>
         </section>
       </div>

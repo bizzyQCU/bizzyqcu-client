@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../layouts/Layout.jsx';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import {
@@ -81,6 +81,9 @@ export default function AppRoutes() {
       <Route path="/messages" element={<MessagesPage />} />
     </Route>
 
+      {/* Redirect legacy /dashboard route to buyer Marketplace (OrdersLayout) */}
+      <Route path="/dashboard" element={<Navigate to="/marketplace" replace />} />
+
       {/* Main App Routes - With Navbar */}
       <Route element={<Layout />}>
         <Route
@@ -93,10 +96,6 @@ export default function AppRoutes() {
         <Route path="/admin" element={<AdminDashboard />} />
 
         {/* Fallback */}
-        <Route
-          path="/dashboard"
-          element={<Placeholder title="Marketplace Dashboard" text="You're signed in. The marketplace will live here." />}
-        />
         <Route
           path="*"
           element={<Placeholder title="Page not found" text="The page you're looking for doesn't exist." />}

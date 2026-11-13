@@ -1,10 +1,14 @@
 import { createContext, useContext, useMemo, useState } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { formatAuthorShort } from "./userDisplay.js";
 
 const RatingContext = createContext(null);
 
 // Ratings and reviews come only from customers who completed an order and rated it.
 export function RatingProvider({ children }) {
+  const { user } = useAuth();
   const [data, setData] = useState({ totals: {}, reviews: {} });
+  const authorName = formatAuthorShort(user?.fullName);
 
   const value = useMemo(() => {
     const getRating = (name) => {
@@ -18,7 +22,7 @@ export function RatingProvider({ children }) {
         const t = prev.totals[name] ?? { sum: 0, count: 0 };
         const review = {
           id: Date.now(),
-          author: "Juan B.",
+          author: authorName,
           rating,
           comment: comment.trim(),
           date: new Date().toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }),
@@ -29,7 +33,7 @@ export function RatingProvider({ children }) {
         };
       });
     return { getRating, getReviews, addRating };
-  }, [data]);
+  }, [data, authorName]);
 
   return <RatingContext.Provider value={value}>{children}</RatingContext.Provider>;
 }
