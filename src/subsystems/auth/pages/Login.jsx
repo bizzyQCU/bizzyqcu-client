@@ -36,7 +36,7 @@ function destinationFor(user, from) {
   if (from && from !== '/login') return from
   if (user?.verificationStatus !== 'VERIFIED') return '/account'
   if (user?.role === 'ADMIN') return '/admin'
-  return '/dashboard'
+  return '/marketplace'
 }
 
 function QcuIdInput({ id, value, onChange, disabled, inputRef }) {

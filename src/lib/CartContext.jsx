@@ -1,13 +1,36 @@
-import { createContext, useContext, useMemo, useState } from "react";
-import { checkoutItems } from "./mockData.js";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 
 const CartContext = createContext(null);
 
-// An item is selected unless it has been explicitly unchecked.
 const isChecked = (i) => i.checked !== false;
 
+function readStoredCart(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(checkoutItems);
+  const { user } = useAuth();
+  const storageKey = user?.id ? `bizzyqcu_cart_${user.id}` : "bizzyqcu_cart_guest";
+  const [items, setItems] = useState(() => readStoredCart(storageKey));
+
+  useEffect(() => {
+    setItems(readStoredCart(storageKey));
+  }, [storageKey]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(items));
+    } catch {
+      // ignore storage quota errors
+    }
+  }, [storageKey, items]);
 
   const value = useMemo(() => {
     const selected = items.filter(isChecked);
