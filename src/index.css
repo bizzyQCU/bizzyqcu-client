@@ -61,3 +61,12 @@
 .modal-overlay { animation: modal-fade 0.3s ease both; }
 .modal-spring { animation: modal-in 0.59s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .modal-shake { animation: modal-shk 0.52s ease-in-out; }
+
+/* Buyer dark mode: form controls and dropdown options (active only when html has .dark) */
+html.dark input, html.dark select, html.dark textarea {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+html.dark input::placeholder, html.dark textarea::placeholder { color: #64748b !important; }
+html.dark select option { background-color: #0f172a; color: #f1f5f9; }
