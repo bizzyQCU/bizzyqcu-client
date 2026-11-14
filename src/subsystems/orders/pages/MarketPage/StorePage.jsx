@@ -1,19 +1,19 @@
-import useIsMobile from "../../../hooks/useIsMobile.js";
-import MB_StorePage from "./MB_StorePage.jsx";
+import useIsMobile from "../../../../hooks/useIsMobile.js";
+import MB_StorePage from "../MobileUI/MB_StorePage.jsx";
 import { useEffect, useState } from "react";
-import { flyToCart } from "../../../lib/flyToCart.js";
+import { flyToCart } from "../../../../lib/flyToCart.js";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Icon from "../../../components/Icon.jsx";
-import Lightbox from "../components/MarketPage/Lightbox.jsx";
-import ConfirmDialog from "../components/Dialogs/ConfirmDialog.jsx";
-import ReviewsSection from "../components/ReviewsSection.jsx";
-import VerifiedSeal from "../../../components/VerifiedSeal.jsx";
-import { galleryFor } from "../components/MarketPage/ProductArt.jsx";
-import { useCart } from "../../../lib/CartContext.jsx";
-import { useMessages } from "../../../lib/MessageContext.jsx";
-import { useRatings } from "../../../lib/RatingContext.jsx";
-import { getStore } from "../../marketplace/api.js";
-import { getErrorMessage } from "../../../lib/api-client.js";
+import Icon from "../../../../components/Icon.jsx";
+import Lightbox from "../../components/MarketPage/Lightbox.jsx";
+import ConfirmDialog from "../../components/Dialogs/ConfirmDialog.jsx";
+import ReviewsSection from "../../components/MarketPage/ReviewsSection.jsx";
+import VerifiedSeal from "../../../../components/VerifiedSeal.jsx";
+import { galleryFor } from "../../components/MarketPage/ProductArt.jsx";
+import { useCart } from "../../../../lib/CartContext.jsx";
+import { useMessages } from "../../../../lib/MessageContext.jsx";
+import { useRatings } from "../../../../lib/RatingContext.jsx";
+import { getStore } from "../../../marketplace/api.js";
+import { getErrorMessage } from "../../../../lib/api-client.js";
 
 const SELLER_TYPE_LABELS = {
   STUDENT_ENTERPRISE: "Enterprise",
@@ -54,13 +54,13 @@ function StoreDesktop() {
   }, [id]);
 
   if (loading) {
-    return <p className="py-20 text-center text-sm text-slate-500">Loading store…</p>;
+    return <p className="py-20 text-center text-sm text-slate-500 dark:text-slate-400">Loading store…</p>;
   }
 
   if (error) {
     return (
       <div className="py-20 text-center">
-        <p className="text-sm text-rose-600">{error}</p>
+        <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>
         <Link to="/marketplace" className="mt-3 inline-block text-sm font-semibold text-sky-600">Back to marketplace</Link>
       </div>
     );
@@ -69,7 +69,7 @@ function StoreDesktop() {
   if (!store) {
     return (
       <div className="py-20 text-center">
-        <p className="text-sm text-slate-600">This store doesn't exist.</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300">This store doesn't exist.</p>
         <Link to="/marketplace" className="mt-3 inline-block text-sm font-semibold text-sky-600">Back to marketplace</Link>
       </div>
     );
@@ -123,7 +123,7 @@ function StoreDesktop() {
         Back to marketplace
       </Link>
 
-      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
         <div className="h-48 rounded-t-2xl bg-sky-400 sm:h-56" />
         <div className="flex flex-wrap items-start justify-between gap-4 px-6 pb-6">
           <div className="flex items-start gap-5">
@@ -132,11 +132,11 @@ function StoreDesktop() {
             </div>
             <div className="pt-3">
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-extrabold leading-tight tracking-tight text-slate-900">{store.name}</h1>
+                <h1 className="text-xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-slate-100">{store.name}</h1>
                 <VerifiedSeal className="h-5 w-5" />
               </div>
-              <p className="mt-1 text-xs leading-relaxed text-slate-500">{store.description}</p>
-              <span className="mt-2 inline-block rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-[11px] font-semibold text-sky-700">
+              <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{store.description}</p>
+              <span className="mt-2 inline-block rounded-full border border-sky-200 dark:border-sky-900 bg-sky-50 dark:bg-sky-950/40 px-2.5 py-0.5 text-[11px] font-semibold text-sky-700">
                 {SELLER_TYPE_LABELS[store.sellerProfile?.sellerType] ?? store.sellerProfile?.sellerType}
               </span>
             </div>
@@ -145,13 +145,13 @@ function StoreDesktop() {
           <div className="flex flex-col items-end gap-2 pt-4">
             <div className="flex items-center gap-2">
               <Stars value={rating.avg ?? 0} />
-              <span className="text-sm font-extrabold text-slate-900">{rating.avg ? rating.avg.toFixed(1) : "New"}</span>
-              <span className="text-[11px] text-slate-500">({rating.count} {rating.count === 1 ? "rating" : "ratings"})</span>
+              <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{rating.avg ? rating.avg.toFixed(1) : "New"}</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">({rating.count} {rating.count === 1 ? "rating" : "ratings"})</span>
             </div>
             <button
               type="button"
               onClick={() => openSeller({ key: `store-${store.id}`, name: store.name, initials })}
-              className="mt-1 rounded-full border-[1.5px] border-[#8ACFF8] bg-white px-4 py-2 text-xs font-semibold text-[#0369A1] transition hover:bg-sky-50 active:scale-95"
+              className="mt-1 rounded-full border-[1.5px] border-[#8ACFF8] bg-white dark:bg-slate-900 px-4 py-2 text-xs font-semibold text-[#0369A1] transition hover:bg-sky-50 dark:hover:bg-sky-950/40 active:scale-95"
             >
               Message seller
             </button>
@@ -160,21 +160,21 @@ function StoreDesktop() {
       </section>
 
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-slate-900">Products</h2>
-        <span className="text-xs text-slate-500">
+        <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Products</h2>
+        <span className="text-xs text-slate-500 dark:text-slate-400">
           {store.products.length} {store.products.length === 1 ? "item" : "items"}
         </span>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {store.products.map((p) => (
-          <div key={p.id} className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div key={p.id} className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
                 aria-label={`View photos of ${p.name}`}
                 onClick={() => setZoomProduct(p)}
-                className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-sky-100 bg-sky-50 transition hover:scale-105 hover:shadow-md active:scale-95"
+                className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-sky-100 bg-sky-50 dark:bg-sky-950/40 transition hover:scale-105 hover:shadow-md active:scale-95"
               >
                 <svg viewBox="0 0 120 90" preserveAspectRatio="xMidYMid slice" className="h-full w-full" aria-hidden="true">
                   <rect width="120" height="90" fill="#BFD9FF" />
@@ -184,9 +184,9 @@ function StoreDesktop() {
                 </svg>
               </button>
               <div className="min-w-0">
-                <h3 className="text-sm font-bold leading-snug text-slate-900">{p.name}</h3>
-                <p className="mt-0.5 text-[11px] text-slate-500">{p.category?.name ?? ""}</p>
-                <p className="mt-1 text-sm font-extrabold text-slate-900">₱{Number(p.price).toLocaleString("en-PH")}</p>
+                <h3 className="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">{p.name}</h3>
+                <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{p.category?.name ?? ""}</p>
+                <p className="mt-1 text-sm font-extrabold text-slate-900 dark:text-slate-100">₱{Number(p.price).toLocaleString("en-PH")}</p>
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -196,7 +196,7 @@ function StoreDesktop() {
                   add(toCartItem(p));
                   flyToCart(e.currentTarget);
                 }}
-                className="rounded-full border-[1.5px] border-[#8ACFF8] bg-white px-3.5 py-2 text-xs font-semibold text-[#0369A1] transition hover:bg-sky-50 active:scale-95"
+                className="rounded-full border-[1.5px] border-[#8ACFF8] bg-white dark:bg-slate-900 px-3.5 py-2 text-xs font-semibold text-[#0369A1] transition hover:bg-sky-50 dark:hover:bg-sky-950/40 active:scale-95"
               >
                 Add to cart
               </button>

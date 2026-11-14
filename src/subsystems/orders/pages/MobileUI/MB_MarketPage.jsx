@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Icon from "../../../components/Icon.jsx";
-import VerifiedSeal from "../../../components/VerifiedSeal.jsx";
-import { getProducts } from "../../marketplace/api.js";
-import { getErrorMessage } from "../../../lib/api-client.js";
+import Icon from "../../../../components/Icon.jsx";
+import VerifiedSeal from "../../../../components/VerifiedSeal.jsx";
+import { getProducts } from "../../../marketplace/api.js";
+import { getErrorMessage } from "../../../../lib/api-client.js";
 
 // ─── Seller-type enum → display label ───────────────────────────────────────
 const SELLER_TYPE_LABELS = {
@@ -81,16 +81,16 @@ export default function MB_MarketPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Marketplace</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Marketplace</h1>
 
       <div className="relative">
-        <Icon name="search" className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <Icon name="search" className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search sellers and products"
-          className="w-full rounded-full border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-xs placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+          className="w-full rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-2.5 pl-10 pr-4 text-xs placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
         />
       </div>
 
@@ -103,7 +103,7 @@ export default function MB_MarketPage() {
               type="button"
               aria-pressed={selected}
               onClick={() => setSellerType(selected ? null : enumVal)}
-              className={`flex-1 rounded-full px-2 py-1.5 text-[11px] font-bold transition ${selected ? "bg-white text-[#B45309] shadow-sm" : "text-white"}`}
+              className={`flex-1 rounded-full px-2 py-1.5 text-[11px] font-bold transition ${selected ? "bg-white dark:bg-slate-900 text-[#B45309] shadow-sm" : "text-white"}`}
             >
               {SELLER_TYPE_LABELS[enumVal]}
             </button>
@@ -124,13 +124,13 @@ export default function MB_MarketPage() {
 
       {/* Loading / error / empty states */}
       {loading && (
-        <p className="py-10 text-center text-sm text-slate-500">Loading sellers…</p>
+        <p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">Loading sellers…</p>
       )}
       {!loading && error && (
-        <p className="py-10 text-center text-sm text-rose-600">{error}</p>
+        <p className="py-10 text-center text-sm text-rose-600 dark:text-rose-400">{error}</p>
       )}
       {!loading && !error && list.length === 0 && (
-        <p className="py-10 text-center text-sm text-slate-500">No sellers match these filters.</p>
+        <p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">No sellers match these filters.</p>
       )}
 
       {!loading && !error && (
@@ -140,7 +140,7 @@ export default function MB_MarketPage() {
               key={s.id}
               type="button"
               onClick={() => navigate(`/stores/${s.id}`)}
-              className="overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition active:scale-[0.98]"
+              className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-left shadow-sm transition active:scale-[0.98]"
             >
               <div className="relative h-20 bg-gradient-to-br from-sky-200 to-sky-100">
                 <span className="absolute right-2 top-2 rounded-full bg-slate-800 px-2 py-0.5 text-[9px] font-bold text-white">Active</span>
@@ -150,10 +150,10 @@ export default function MB_MarketPage() {
               </div>
               <div className="px-3 pb-3 pt-7">
                 <div className="flex items-start gap-1">
-                  <h2 className="text-xs font-bold leading-snug text-slate-900">{s.name}</h2>
+                  <h2 className="text-xs font-bold leading-snug text-slate-900 dark:text-slate-100">{s.name}</h2>
                   <VerifiedSeal className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 </div>
-                <p className="mt-2 border-t border-slate-100 pt-2 text-[9px] font-semibold uppercase tracking-wider text-slate-500">
+                <p className="mt-2 border-t border-slate-100 dark:border-slate-800 pt-2 text-[9px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {SELLER_TYPE_LABELS[s.sellerType] ?? s.category}
                 </p>
               </div>

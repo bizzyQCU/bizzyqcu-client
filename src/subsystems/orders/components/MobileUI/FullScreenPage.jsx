@@ -5,11 +5,11 @@ import { createPortal } from "react-dom";
 // It covers the app frame and the tab bar.
 export default function FullScreenPage({ header, footer, children }) {
   return createPortal(
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-50">
-      {header && <div className="shrink-0 border-b border-slate-200 bg-white pt-[max(env(safe-area-inset-top),0px)]">{header}</div>}
+    <div className="fixed inset-0 z-50 flex flex-col bg-slate-50 dark:bg-slate-950">
+      {header && <div className="shrink-0 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 pt-[max(env(safe-area-inset-top),0px)]">{header}</div>}
       <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
       {footer && (
-        <div className="shrink-0 border-t border-slate-200 bg-white px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-3">{footer}</div>
+        <div className="shrink-0 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-3">{footer}</div>
       )}
     </div>,
     document.body

@@ -1,6 +1,6 @@
 const variants = {
   primary: "bg-primary text-white hover:bg-primary-deep",
-  secondary: "bg-white text-primary-deep border-[1.5px] border-tint hover:bg-tint/10",
+  secondary: "bg-white dark:bg-slate-900 text-primary-deep border-[1.5px] border-tint hover:bg-tint/10",
   ghost: "bg-transparent text-ink hover:bg-line/60",
 };
 

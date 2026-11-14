@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { flyToCart } from "../../../lib/flyToCart.js";
+import { flyToCart } from "../../../../lib/flyToCart.js";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import ConfirmDialog from "../components/Dialogs/ConfirmDialog.jsx";
-import FullScreenPage from "../components/MobileUI/FullScreenPage.jsx";
-import Icon from "../../../components/Icon.jsx";
-import VerifiedSeal from "../../../components/VerifiedSeal.jsx";
-import { useCart } from "../../../lib/CartContext.jsx";
-import { useMessages } from "../../../lib/MessageContext.jsx";
-import { useRatings } from "../../../lib/RatingContext.jsx";
-import ReviewsSection from "../components/ReviewsSection.jsx";
-import { getStore } from "../../marketplace/api.js";
-import { getErrorMessage } from "../../../lib/api-client.js";
+import ConfirmDialog from "../../components/Dialogs/ConfirmDialog.jsx";
+import FullScreenPage from "../../components/MobileUI/FullScreenPage.jsx";
+import Icon from "../../../../components/Icon.jsx";
+import VerifiedSeal from "../../../../components/VerifiedSeal.jsx";
+import { useCart } from "../../../../lib/CartContext.jsx";
+import { useMessages } from "../../../../lib/MessageContext.jsx";
+import { useRatings } from "../../../../lib/RatingContext.jsx";
+import ReviewsSection from "../../components/MarketPage/ReviewsSection.jsx";
+import { getStore } from "../../../marketplace/api.js";
+import { getErrorMessage } from "../../../../lib/api-client.js";
 
 const SELLER_TYPE_LABELS = {
   STUDENT_ENTERPRISE: "Enterprise",
@@ -21,8 +21,8 @@ const SELLER_TYPE_LABELS = {
 function Stat({ value, label }) {
   return (
     <div>
-      <p className="text-sm font-extrabold text-slate-900">{value}</p>
-      <p className="text-[10px] text-slate-500">{label}</p>
+      <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{value}</p>
+      <p className="text-[10px] text-slate-500 dark:text-slate-400">{label}</p>
     </div>
   );
 }
@@ -61,13 +61,13 @@ export default function MB_StorePage() {
       <FullScreenPage
         header={
           <div className="flex items-center px-4 py-3">
-            <button type="button" aria-label="Back" onClick={goBack} className="rounded-full p-1.5 text-slate-700">
+            <button type="button" aria-label="Back" onClick={goBack} className="rounded-full p-1.5 text-slate-700 dark:text-slate-200">
               <Icon name="arrowLeft" className="h-5 w-5" />
             </button>
           </div>
         }
       >
-        <p className="py-20 text-center text-sm text-slate-500">Loading store…</p>
+        <p className="py-20 text-center text-sm text-slate-500 dark:text-slate-400">Loading store…</p>
       </FullScreenPage>
     );
   }
@@ -75,7 +75,7 @@ export default function MB_StorePage() {
   if (error || !store) {
     return (
       <div className="py-20 text-center">
-        <p className="text-sm text-rose-600">{error ?? "This store doesn't exist."}</p>
+        <p className="text-sm text-rose-600 dark:text-rose-400">{error ?? "This store doesn't exist."}</p>
         <button type="button" onClick={() => navigate("/marketplace")} className="mt-3 text-sm font-semibold text-sky-600">
           Back to marketplace
         </button>
@@ -134,14 +134,14 @@ export default function MB_StorePage() {
     <FullScreenPage
       header={
         <div className="flex items-center justify-between px-4 py-3">
-          <button type="button" aria-label="Back" onClick={goBack} className="rounded-full p-1.5 text-slate-700">
+          <button type="button" aria-label="Back" onClick={goBack} className="rounded-full p-1.5 text-slate-700 dark:text-slate-200">
             <Icon name="arrowLeft" className="h-5 w-5" />
           </button>
-          <span className="truncate px-2 text-sm font-bold text-slate-900">{store.name}</span>
-          <button type="button" id="cart-button-store" aria-label="Cart" onClick={() => navigate("/cart")} className="relative rounded-full p-1.5 text-slate-700">
+          <span className="truncate px-2 text-sm font-bold text-slate-900 dark:text-slate-100">{store.name}</span>
+          <button type="button" id="cart-button-store" aria-label="Cart" onClick={() => navigate("/cart")} className="relative rounded-full p-1.5 text-slate-700 dark:text-slate-200">
             <Icon name="cart" className="h-5 w-5" />
             {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0284C7] px-1 text-[9px] font-bold text-white ring-2 ring-white">{count}</span>
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0284C7] px-1 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-900">{count}</span>
             )}
           </button>
         </div>
@@ -152,7 +152,7 @@ export default function MB_StorePage() {
             <button
               type="button"
               onClick={() => openSeller({ key: `store-${store.id}`, name: store.name, initials })}
-              className="flex flex-col items-center gap-0.5 px-2 text-[10px] font-semibold text-slate-600"
+              className="flex flex-col items-center gap-0.5 px-2 text-[10px] font-semibold text-slate-600 dark:text-slate-300"
             >
               <Icon name="chat" className="h-5 w-5" />
               Message
@@ -160,7 +160,7 @@ export default function MB_StorePage() {
             <button
               type="button"
               onClick={(e) => addSelected(e.currentTarget)}
-              className="flex-1 rounded-full border-[1.5px] border-[#8ACFF8] bg-white py-2.5 text-xs font-bold text-[#0369A1] transition active:scale-95"
+              className="flex-1 rounded-full border-[1.5px] border-[#8ACFF8] bg-white dark:bg-slate-900 py-2.5 text-xs font-bold text-[#0369A1] transition active:scale-95"
             >
               Add to Cart
             </button>
@@ -182,23 +182,23 @@ export default function MB_StorePage() {
           {initials}
         </div>
         <div className="mt-3 flex items-center gap-1.5">
-          <h1 className="text-lg font-extrabold leading-tight text-slate-900">{store.name}</h1>
+          <h1 className="text-lg font-extrabold leading-tight text-slate-900 dark:text-slate-100">{store.name}</h1>
           <VerifiedSeal className="h-4 w-4" />
         </div>
-        <p className="mt-0.5 text-xs font-semibold text-slate-500">
+        <p className="mt-0.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
           {SELLER_TYPE_LABELS[store.sellerProfile?.sellerType] ?? store.sellerProfile?.sellerType}
         </p>
-        <p className="mt-2 text-xs leading-relaxed text-slate-600">{store.description}</p>
+        <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">{store.description}</p>
 
-        <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 bg-white p-3 text-center">
+        <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-center">
           <Stat value={store.products.length} label="Items" />
           <Stat value={rating.avg ? rating.avg.toFixed(1) : "New"} label={`${rating.count} ${rating.count === 1 ? "rating" : "ratings"}`} />
           <Stat value={SELLER_TYPE_LABELS[store.sellerProfile?.sellerType] ?? "—"} label="Seller type" />
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-900">Products</h2>
-          <span className="text-xs text-slate-500">{store.products.length} {store.products.length === 1 ? "item" : "items"}</span>
+          <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Products</h2>
+          <span className="text-xs text-slate-500 dark:text-slate-400">{store.products.length} {store.products.length === 1 ? "item" : "items"}</span>
         </div>
 
         <ul className="mt-3 space-y-3">
@@ -210,18 +210,18 @@ export default function MB_StorePage() {
                   type="button"
                   aria-pressed={active}
                   onClick={() => setSelectedId(p.id)}
-                  className={`flex w-full items-center gap-3 rounded-2xl border bg-white p-3 text-left transition ${
-                    active ? "border-[#0284C7] ring-1 ring-[#0284C7]" : "border-slate-200"
+                  className={`flex w-full items-center gap-3 rounded-2xl border bg-white dark:bg-slate-900 p-3 text-left transition ${
+                    active ? "border-[#0284C7] ring-1 ring-[#0284C7]" : "border-slate-200 dark:border-slate-800"
                   }`}
                 >
                   <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
                     <Icon name="book" className="h-6 w-6" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-bold text-slate-900">{p.name}</span>
-                    <span className="block truncate text-[11px] text-slate-500">{p.category?.name ?? ""}</span>
+                    <span className="block truncate text-sm font-bold text-slate-900 dark:text-slate-100">{p.name}</span>
+                    <span className="block truncate text-[11px] text-slate-500 dark:text-slate-400">{p.category?.name ?? ""}</span>
                   </span>
-                  <span className="text-sm font-extrabold text-slate-900">₱{Number(p.price).toLocaleString("en-PH")}</span>
+                  <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100">₱{Number(p.price).toLocaleString("en-PH")}</span>
                 </button>
               </li>
             );

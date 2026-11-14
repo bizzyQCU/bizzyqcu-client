@@ -8,7 +8,7 @@ export default function ModalShell({
   onClose,
   label,
   overlayClassName = "bg-slate-900/40 backdrop-blur-sm",
-  panelClassName = "w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl",
+  panelClassName = "w-full max-w-sm rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl",
   children,
 }) {
   const overlayRef = useRef(null);

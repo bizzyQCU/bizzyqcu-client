@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import Icon from "../../../components/Icon.jsx";
-import RatingModal from "../components/OrderPage/RatingModal.jsx";
-import { useRatings } from "../../../lib/RatingContext.jsx";
-import OrderCard from "./OrderCard.jsx";
-import { categories } from "./orderCategories.js";
-import { getMyOrders } from "../api.js";
-import { getErrorMessage } from "../../../lib/api-client.js";
+import Icon from "../../../../components/Icon.jsx";
+import RatingModal from "../../components/OrderPage/RatingModal.jsx";
+import { useRatings } from "../../../../lib/RatingContext.jsx";
+import OrderCard from "../OrderPage/OrderCard.jsx";
+import { categories } from "../OrderPage/orderCategories.js";
+import { getMyOrders } from "../../api.js";
+import { getErrorMessage } from "../../../../lib/api-client.js";
 
 const STATUS_LABELS = {
   PENDING_PAYMENT: "To pay",
@@ -69,7 +69,7 @@ export default function MB_OrdersPage() {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <p className="text-sm text-slate-500">Loading orders…</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Loading orders…</p>
       </div>
     );
   }
@@ -77,7 +77,7 @@ export default function MB_OrdersPage() {
   if (error) {
     return (
       <div className="py-20 text-center">
-        <p className="text-sm font-semibold text-rose-600">{error}</p>
+        <p className="text-sm font-semibold text-rose-600 dark:text-rose-400">{error}</p>
         <button
           type="button"
           onClick={() => window.location.reload()}
@@ -91,11 +91,11 @@ export default function MB_OrdersPage() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">My Orders</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">My Orders</h1>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm font-bold text-slate-900">My Purchases</p>
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-100">My Purchases</p>
           <button type="button" onClick={() => setActive("all")} className="flex items-center gap-1 text-[11px] font-semibold text-sky-600">
             View order history
             <Icon name="chevronDown" className="h-3 w-3 -rotate-90" />
@@ -114,16 +114,16 @@ export default function MB_OrdersPage() {
                 className="flex flex-col items-center gap-2 text-center transition active:scale-95"
               >
                 <span className={`relative flex h-12 w-12 items-center justify-center rounded-xl border transition ${
-                  selected ? "border-[#0284C7] bg-sky-100 text-[#0284C7]" : "border-slate-200 bg-slate-50 text-slate-600"
+                  selected ? "border-[#0284C7] bg-sky-100 text-[#0284C7]" : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-300"
                 }`}>
                   <Icon name={t.icon} className="h-5 w-5" />
                   {count > 0 && (
-                    <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white ring-2 ring-white">
+                    <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
                       {count}
                     </span>
                   )}
                 </span>
-                <span className={`text-[10px] font-semibold leading-tight ${selected ? "text-[#0284C7]" : "text-slate-600"}`}>{t.label}</span>
+                <span className={`text-[10px] font-semibold leading-tight ${selected ? "text-[#0284C7]" : "text-slate-600 dark:text-slate-300"}`}>{t.label}</span>
               </button>
             );
           })}
@@ -131,12 +131,12 @@ export default function MB_OrdersPage() {
       </section>
 
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-slate-900">{current.label}</h2>
-        <span className="text-xs text-slate-500">{visible.length} {visible.length === 1 ? "order" : "orders"}</span>
+        <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">{current.label}</h2>
+        <span className="text-xs text-slate-500 dark:text-slate-400">{visible.length} {visible.length === 1 ? "order" : "orders"}</span>
       </div>
 
       {visible.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-xs text-slate-500">
+        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-8 text-center text-xs text-slate-500 dark:text-slate-400">
           No orders in this category yet.
         </div>
       )}

@@ -10,7 +10,7 @@ export default function SelectCircle({ checked, onToggle, label }) {
       aria-label={label}
       onClick={onToggle}
       className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 active:scale-90 ${
-        checked ? "border-[#0284C7] bg-[#0284C7] shadow-sm" : "border-slate-300 bg-white hover:border-sky-400"
+        checked ? "border-[#0284C7] bg-[#0284C7] shadow-sm" : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 hover:border-sky-400"
       }`}
     >
       <Icon

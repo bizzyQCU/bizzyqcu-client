@@ -1,5 +1,5 @@
-import Icon from "../../../components/Icon.jsx";
-import { useRatings } from "../../../lib/RatingContext.jsx";
+import Icon from "../../../../components/Icon.jsx";
+import { useRatings } from "../../../../lib/RatingContext.jsx";
 
 function Stars({ value }) {
   return (
@@ -17,23 +17,23 @@ export default function ReviewsSection({ storeName }) {
   const reviews = getReviews(storeName);
 
   return (
-    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="space-y-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-slate-900">Reviews</h2>
-          <p className="mt-0.5 text-xs text-slate-500">From customers who completed an order</p>
+          <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Reviews</h2>
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">From customers who completed an order</p>
         </div>
         {count > 0 && (
           <div className="flex items-center gap-2">
             <Stars value={Math.round(avg)} />
-            <span className="text-sm font-extrabold text-slate-900">{avg.toFixed(1)}</span>
-            <span className="text-[11px] text-slate-500">({count} {count === 1 ? "review" : "reviews"})</span>
+            <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{avg.toFixed(1)}</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">({count} {count === 1 ? "review" : "reviews"})</span>
           </div>
         )}
       </div>
 
       {reviews.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-xs text-slate-500">
+        <p className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-6 text-center text-xs text-slate-500 dark:text-slate-400">
           No reviews yet. Reviews appear here after a customer rates a completed order.
         </p>
       ) : (
@@ -46,11 +46,11 @@ export default function ReviewsSection({ storeName }) {
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-bold text-slate-900">{r.author}</span>
-                    <span className="text-[10px] text-slate-400">{r.date}</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{r.author}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500">{r.date}</span>
                   </div>
                   <div className="mt-0.5"><Stars value={r.rating} /></div>
-                  <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+                  <p className="mt-1.5 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
                     {r.comment || "Rated without a comment."}
                   </p>
                 </div>

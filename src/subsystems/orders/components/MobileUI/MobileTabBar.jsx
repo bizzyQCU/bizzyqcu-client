@@ -36,7 +36,7 @@ export default function MobileTabBar({ unread = 0 }) {
   return (
     <nav
       aria-label="Main"
-      className="fixed bottom-0 left-0 right-0 z-40 h-[76px] border-t border-slate-200 bg-white shadow-[0_-6px_18px_rgba(15,23,42,0.08)] md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-40 h-[76px] border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-[0_-6px_18px_rgba(15,23,42,0.08)] md:hidden"
     >
       <div
         aria-hidden="true"
@@ -55,13 +55,13 @@ export default function MobileTabBar({ unread = 0 }) {
               to={t.to}
               aria-current={on ? 'page' : undefined}
               className={`flex flex-1 flex-col items-center justify-center gap-1 pt-1 transition-colors duration-200 ${
-                on ? 'text-[#0369A1]' : 'text-slate-500'
+                on ? 'text-[#0369A1]' : 'text-slate-500 dark:text-slate-400'
               }`}
             >
               <span className="relative flex h-[22px] w-[22px] items-center justify-center">
                 <Icon name={t.icon} strokeWidth={on ? 2 : 1.8} className="h-[22px] w-[22px]" />
                 {t.icon === 'bell' && unread > 0 && (
-                  <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white ring-2 ring-white">
+                  <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
                     {unread}
                   </span>
                 )}

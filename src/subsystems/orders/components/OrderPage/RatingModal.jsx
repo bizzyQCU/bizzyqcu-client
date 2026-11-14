@@ -15,11 +15,11 @@ export default function RatingModal({ seller, initials, orderRef, subtitle, onSu
       open
       onClose={onClose}
       label="Rate your seller"
-      panelClassName="w-full max-w-[500px] rounded-2xl border border-[#E2E8F0] bg-white p-6 text-slate-800 shadow-lg"
+      panelClassName="w-full max-w-[500px] rounded-2xl border border-[#E2E8F0] bg-white dark:bg-slate-900 p-6 text-slate-800 dark:text-slate-100 shadow-lg"
     >
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-base font-bold tracking-tight text-[#0F172A]">Rate your seller</h2>
-        <button type="button" aria-label="Close" onClick={onClose} className="-mr-1 p-1 text-slate-400 transition-colors hover:text-slate-600">
+        <button type="button" aria-label="Close" onClick={onClose} className="-mr-1 p-1 text-slate-400 dark:text-slate-500 transition-colors hover:text-slate-600">
           <Icon name="x" className="h-4 w-4" />
         </button>
       </div>
@@ -29,7 +29,7 @@ export default function RatingModal({ seller, initials, orderRef, subtitle, onSu
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold leading-tight text-[#0F172A]">{seller}</span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-sky-100 bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700">
+            <span className="inline-flex items-center gap-1 rounded-full border border-sky-100 bg-sky-50 dark:bg-sky-950/40 px-2 py-0.5 text-[10px] font-semibold text-sky-700">
               <VerifiedSeal className="h-3.5 w-3.5" />
               Verified QCU
             </span>
@@ -74,7 +74,7 @@ export default function RatingModal({ seller, initials, orderRef, subtitle, onSu
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           placeholder="Tell other students about your experience"
-          className="w-full resize-none rounded-xl border border-[#E2E8F0] p-3 text-xs text-slate-800 placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          className="w-full resize-none rounded-xl border border-[#E2E8F0] p-3 text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
         />
         <div className="mt-1 flex justify-end">
           <span className="text-[11px] text-[#64748B]">{comment.length}/500</span>

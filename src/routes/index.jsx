@@ -16,20 +16,20 @@ import {
 import Placeholder from '../components/Placeholder.jsx';
 
 // Subsystem 3: Orders, cart, checkout, payment, messages
-import CartPage from '../subsystems/orders/pages/CartPage.jsx';
-import CheckoutPage from '../subsystems/orders/pages/CheckoutPage.jsx';
-import PaymentPage from '../subsystems/orders/pages/PaymentPage.jsx';
-import PaymentPendingPage from '../subsystems/orders/pages/PaymentPendingPage.jsx';
-import PaymentConfirmedPage from '../subsystems/orders/pages/PaymentConfirmedPage.jsx';
-import PaymentFailedPage from '../subsystems/orders/pages/PaymentFailedPage.jsx';
-import OrdersPage from '../subsystems/orders/pages/OrdersPage.jsx';
-import OrderDetailPage from '../subsystems/orders/pages/OrderDetailPage.jsx';
-import MessagesPage from '../subsystems/orders/pages/MessagesPage.jsx';
+import CartPage from '../subsystems/orders/pages/Cart/CartPage.jsx';
+import CheckoutPage from '../subsystems/orders/pages/Cart/CheckoutPage.jsx';
+import PaymentPage from '../subsystems/orders/pages/Cart/PaymentPage.jsx';
+import PaymentPendingPage from '../subsystems/orders/pages/Cart/PaymentPendingPage.jsx';
+import PaymentConfirmedPage from '../subsystems/orders/pages/Cart/PaymentConfirmedPage.jsx';
+import PaymentFailedPage from '../subsystems/orders/pages/Cart/PaymentFailedPage.jsx';
+import OrdersPage from '../subsystems/orders/pages/OrderPage/OrdersPage.jsx';
+import OrderDetailPage from '../subsystems/orders/pages/OrderPage/OrderDetailPage.jsx';
+import MessagesPage from '../subsystems/orders/pages/Messages/MessagesPage.jsx';
 import OrdersLayout from '../subsystems/orders/OrdersLayout.jsx';
-import MarketPage from '../subsystems/orders/pages/MarketPage.jsx';
-import StorePage from '../subsystems/orders/pages/StorePage.jsx';
+import MarketPage from '../subsystems/orders/pages/MarketPage/MarketPage.jsx';
+import StorePage from '../subsystems/orders/pages/MarketPage/StorePage.jsx';
 import ProfilePage from '../subsystems/auth/pages/ProfilePage.jsx';
-import NotificationsPage from '../subsystems/orders/pages/NotificationsPage.jsx';
+import NotificationsPage from '../subsystems/orders/pages/Messages/NotificationsPage.jsx';
 
 // Import your new Admin Dashboard
 import AdminDashboard from '../subsystems/admin/pages/AdminDashboard.jsx';

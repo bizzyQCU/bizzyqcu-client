@@ -9,12 +9,12 @@ export default function Lightbox({ open, onClose, title, images }) {
       open={open}
       onClose={onClose}
       label={title}
-      overlayClassName="bg-white/30 backdrop-blur-xl"
+      overlayClassName="bg-white/30 dark:bg-slate-900 backdrop-blur-xl"
       panelClassName="w-full max-w-xl"
     >
       <div className="cascade mb-3 flex items-center justify-between" style={{ "--d": "0ms" }}>
-        <span className="text-sm font-bold text-slate-900">{title}</span>
-        <button type="button" aria-label="Close photos" onClick={onClose} className="rounded-full bg-white p-1.5 text-slate-600 transition hover:text-slate-900">
+        <span className="text-sm font-bold text-slate-900 dark:text-slate-100">{title}</span>
+        <button type="button" aria-label="Close photos" onClick={onClose} className="rounded-full bg-white dark:bg-slate-900 p-1.5 text-slate-600 dark:text-slate-300 transition hover:text-slate-900">
           <Icon name="x" className="h-4 w-4" />
         </button>
       </div>

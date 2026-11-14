@@ -38,7 +38,7 @@ export default function ProductGallery({ images, zoomable = true }) {
   return (
     <div className="space-y-3 select-none">
       <div
-        className="relative aspect-[4/3] w-full touch-pan-y overflow-hidden rounded-2xl bg-sky-50 shadow-[0_10px_30px_-12px_rgba(15,23,42,0.35)]"
+        className="relative aspect-[4/3] w-full touch-pan-y overflow-hidden rounded-2xl bg-sky-50 dark:bg-sky-950/40 shadow-[0_10px_30px_-12px_rgba(15,23,42,0.35)]"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -60,11 +60,11 @@ export default function ProductGallery({ images, zoomable = true }) {
           </div>
         ))}
 
-        <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-slate-700 shadow-sm">
+        <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/90 dark:bg-slate-900 px-2.5 py-1 text-[10px] font-semibold text-slate-700 dark:text-slate-200 shadow-sm">
           {images[index].label}{n > 1 ? ` · ${index + 1} of ${n}` : ""}
         </span>
         {zoomable && (
-          <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-slate-700 shadow-sm">
+          <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/90 dark:bg-slate-900 px-2.5 py-1 text-[10px] font-semibold text-slate-700 dark:text-slate-200 shadow-sm">
             {zoomed ? "Tap to reset" : "Tap to zoom"}
           </span>
         )}

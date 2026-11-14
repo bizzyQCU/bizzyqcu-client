@@ -1,11 +1,11 @@
-import useIsMobile from "../../../hooks/useIsMobile.js";
-import MB_MarketPage from "./MB_MarketPage.jsx";
+import useIsMobile from "../../../../hooks/useIsMobile.js";
+import MB_MarketPage from "../MobileUI/MB_MarketPage.jsx";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Icon from "../../../components/Icon.jsx";
-import VerifiedSeal from "../../../components/VerifiedSeal.jsx";
-import { getProducts } from "../../marketplace/api.js";
-import apiClient, { getErrorMessage } from "../../../lib/api-client.js";
+import Icon from "../../../../components/Icon.jsx";
+import VerifiedSeal from "../../../../components/VerifiedSeal.jsx";
+import { getProducts } from "../../../marketplace/api.js";
+import apiClient, { getErrorMessage } from "../../../../lib/api-client.js";
 
 // ─── Seller-type enum → display label ───────────────────────────────────────
 const SELLER_TYPE_LABELS = {
@@ -112,20 +112,20 @@ function MarketDesktop() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Marketplace</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Marketplace</h1>
         <div className="relative w-full sm:w-80">
-          <Icon name="search" className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Icon name="search" className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search sellers and products"
-            className="w-full rounded-full border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-xs placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            className="w-full rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-2.5 pl-10 pr-4 text-xs placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
           />
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
         {/* Category pills */}
         <div className="flex flex-wrap gap-2">
           {categories.map((c) => {
@@ -137,7 +137,7 @@ function MarketDesktop() {
                 aria-pressed={selected}
                 onClick={() => setCategoryId(c.id)}
                 className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                  selected ? "bg-slate-900 text-white shadow-sm" : "border border-slate-200 bg-white text-slate-700 hover:border-sky-200 hover:bg-sky-50"
+                  selected ? "bg-slate-900 text-white shadow-sm dark:bg-amber-400 dark:text-slate-900" : "border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:border-sky-200 hover:bg-sky-50 dark:hover:bg-sky-950/40"
                 }`}
               >
                 {c.name}
@@ -147,7 +147,7 @@ function MarketDesktop() {
         </div>
 
         {/* Seller-type toggle */}
-        <div className="flex flex-wrap gap-1 rounded-full border border-sky-200 bg-sky-100 p-1">
+        <div className="flex flex-wrap gap-1 rounded-full border border-sky-200 dark:border-slate-700 bg-sky-100 dark:bg-slate-900 p-1">
           {SELLER_TYPE_ENUMS.map((enumVal) => {
             const selected = sellerType === enumVal;
             return (
@@ -157,7 +157,7 @@ function MarketDesktop() {
                 aria-pressed={selected}
                 onClick={() => setSellerType(selected ? null : enumVal)}
                 className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                  selected ? "bg-sky-200 text-sky-800 shadow-sm" : "text-slate-600 hover:bg-white/70"
+                  selected ? "bg-sky-200 text-sky-800 shadow-sm dark:bg-amber-400 dark:text-slate-900" : "text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-800"
                 }`}
               >
                 {SELLER_TYPE_LABELS[enumVal]}
@@ -169,17 +169,17 @@ function MarketDesktop() {
 
       {/* Loading / error / empty states */}
       {loading && (
-        <p className="py-10 text-center text-sm text-slate-500">Loading sellers…</p>
+        <p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">Loading sellers…</p>
       )}
       {!loading && error && (
-        <p className="py-10 text-center text-sm text-rose-600">{error}</p>
+        <p className="py-10 text-center text-sm text-rose-600 dark:text-rose-400">{error}</p>
       )}
       {!loading && !error && (
         <>
-          <p className="text-xs text-slate-500">{stores.length} {stores.length === 1 ? "seller" : "sellers"}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{stores.length} {stores.length === 1 ? "seller" : "sellers"}</p>
 
           {stores.length === 0 && (
-            <p className="py-10 text-center text-sm text-slate-500">No sellers match these filters.</p>
+            <p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">No sellers match these filters.</p>
           )}
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -190,16 +190,16 @@ function MarketDesktop() {
                 tabIndex={0}
                 onClick={() => navigate(`/stores/${s.id}`)}
                 onKeyDown={(e) => e.key === "Enter" && navigate(`/stores/${s.id}`)}
-                className="group cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-[#8ACFF8] hover:shadow-[0_12px_24px_-4px_rgba(2,132,199,0.10)] focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+                className="group cursor-pointer overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition hover:border-[#8ACFF8] hover:shadow-[0_12px_24px_-4px_rgba(2,132,199,0.10)] focus:outline-none focus:ring-2 focus:ring-sky-500/30"
               >
                 <div className="relative h-28 bg-[#8ACFF8]/70">
-                  <div className="absolute -bottom-7 left-5 flex h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-sky-100 text-sm font-bold text-sky-700 shadow-sm transition group-hover:scale-105">
+                  <div className="absolute -bottom-7 left-5 flex h-14 w-14 items-center justify-center rounded-full border-4 border-white dark:border-slate-900 bg-sky-100 dark:bg-slate-800 text-sm font-bold text-sky-700 dark:text-amber-300 shadow-sm transition group-hover:scale-105">
                     {s.initials}
                   </div>
                 </div>
                 <div className="px-5 pb-4 pt-10">
                   <div className="flex items-center gap-1.5">
-                    <h2 className="truncate text-sm font-bold text-slate-900">{s.name}</h2>
+                    <h2 className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">{s.name}</h2>
                     <button
                       type="button"
                       aria-label="Verified seller info"
@@ -217,12 +217,12 @@ function MarketDesktop() {
                       )}
                     </button>
                   </div>
-                  <p className="mt-1.5 line-clamp-2 min-h-[2.25rem] text-xs text-slate-500">
+                  <p className="mt-1.5 line-clamp-2 min-h-[2.25rem] text-xs text-slate-500 dark:text-slate-400">
                     {s.description || s.category}
                   </p>
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     <span className="truncate pr-2">{SELLER_TYPE_LABELS[s.sellerType] ?? s.sellerType}</span>
-                    <span className="shrink-0 text-slate-700">
+                    <span className="shrink-0 text-slate-700 dark:text-slate-200">
                       from ₱{Number(s.minPrice).toLocaleString("en-PH")}
                     </span>
                   </div>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Icon from '../../../components/Icon.jsx'
-import { useAuth } from '../../../hooks/useAuth'
-import { getMyOrders } from '../api.js'
+import Icon from '../../../../components/Icon.jsx'
+import { useAuth } from '../../../../hooks/useAuth'
+import { getMyOrders } from '../../api.js'
 
 const STATUS_MESSAGES = {
   PENDING_PAYMENT: 'is waiting for payment',
@@ -61,23 +61,23 @@ export default function NotificationsPage() {
     <div className="mx-auto max-w-2xl space-y-4">
       <div className="flex items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Notifications</h1>
-          <p className="mt-1 text-xs text-slate-500">{unread} unread</p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Notifications</h1>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{unread} unread</p>
         </div>
         <button
           type="button"
           disabled={unread === 0}
           onClick={() => setReadIds(items.map((n) => n.id))}
-          className="rounded-full px-3 py-1.5 text-xs font-semibold text-sky-600 hover:bg-sky-50 disabled:opacity-40"
+          className="rounded-full px-3 py-1.5 text-xs font-semibold text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-950/40 disabled:opacity-40"
         >
           Mark all as read
         </button>
       </div>
 
       {loading ? (
-        <p className="py-10 text-center text-sm text-slate-500">Loading notifications…</p>
+        <p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">Loading notifications…</p>
       ) : items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
+        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-10 text-center text-sm text-slate-500 dark:text-slate-400">
           {isAuthenticated ? 'No notifications yet.' : 'Sign in to view your order notifications.'}
         </div>
       ) : (
@@ -92,14 +92,14 @@ export default function NotificationsPage() {
                     setReadIds((ids) => (ids.includes(n.id) ? ids : [...ids, n.id]))
                     navigate(n.to)
                   }}
-                  className="flex w-full items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm"
+                  className="flex w-full items-start gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 text-left shadow-sm"
                 >
-                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${read ? 'bg-slate-100 text-slate-400' : 'bg-sky-100 text-sky-600'}`}>
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${read ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500' : 'bg-sky-100 text-sky-600'}`}>
                     <Icon name="bell" className="h-4 w-4" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className={`block text-sm ${read ? 'text-slate-500' : 'font-semibold text-slate-900'}`}>{n.text}</span>
-                    <span className="mt-1 block text-[11px] text-slate-400">{n.time}</span>
+                    <span className={`block text-sm ${read ? 'text-slate-500 dark:text-slate-400' : 'font-semibold text-slate-900 dark:text-slate-100'}`}>{n.text}</span>
+                    <span className="mt-1 block text-[11px] text-slate-400 dark:text-slate-500">{n.time}</span>
                   </span>
                   {!read && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-sky-500" />}
                 </button>

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Icon from "../../../components/Icon.jsx";
-import { useCart } from "../../../lib/CartContext.jsx";
+import Icon from "../../../../components/Icon.jsx";
+import { useCart } from "../../../../lib/CartContext.jsx";
 
 export default function PaymentFailedPage() {
   const navigate = useNavigate();
@@ -13,11 +13,11 @@ export default function PaymentFailedPage() {
 
   return (
     <div className="flex justify-center py-8">
-      <div className="flex w-full max-w-[490px] flex-col items-center rounded-2xl border border-slate-100/80 bg-white p-7 text-center shadow-sm md:p-8">
+      <div className="flex w-full max-w-[490px] flex-col items-center rounded-2xl border border-slate-100/80 bg-white dark:bg-slate-900 p-7 text-center shadow-sm md:p-8">
         <div aria-hidden="true" className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-rose-100 text-rose-500">
           <Icon name="alert" className="h-6 w-6" strokeWidth={2.5} />
         </div>
-        <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-600">
+        <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-rose-50 dark:bg-rose-950/40 px-3 py-1 text-xs font-semibold text-rose-600 dark:text-rose-400">
           <Icon name="alert" className="h-3.5 w-3.5 shrink-0 text-rose-500" />
           <span>Payment failed (GCash Checkout Timeout / Cancelled)</span>
         </div>
@@ -36,7 +36,7 @@ export default function PaymentFailedPage() {
           <button
             type="button"
             onClick={() => navigate("/payment/confirmed", { state: { method: "cash" } })}
-            className="flex w-full items-center justify-center gap-2 rounded-full border-[1.5px] border-[#8ACFF8] bg-white px-5 py-3 text-sm font-semibold text-[#0369A1] transition-all hover:bg-sky-50/50 active:scale-[0.99]"
+            className="flex w-full items-center justify-center gap-2 rounded-full border-[1.5px] border-[#8ACFF8] bg-white dark:bg-slate-900 px-5 py-3 text-sm font-semibold text-[#0369A1] transition-all hover:bg-sky-50/50 dark:hover:bg-sky-950/40 active:scale-[0.99]"
           >
             <Icon name="cash" className="h-4 w-4" />
             <span>Pay with cash instead</span>
@@ -47,13 +47,13 @@ export default function PaymentFailedPage() {
           Cancel order
         </Link>
 
-        <section aria-label="Order Breakdown" className="w-full rounded-xl border border-slate-100 bg-[#F1F5F9]/60 p-4 text-left">
+        <section aria-label="Order Breakdown" className="w-full rounded-xl border border-slate-100 dark:border-slate-800 bg-[#F1F5F9]/60 p-4 text-left">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
             <div className="flex items-center gap-1 text-xs font-medium text-[#64748B]">
               <span>Order Reference:</span>
               <span className="font-bold text-[#0F172A]">{orderNumber}</span>
             </div>
-            <div className="inline-flex items-center gap-1 rounded border border-sky-100 bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700">
+            <div className="inline-flex items-center gap-1 rounded border border-sky-100 bg-sky-50 dark:bg-sky-950/40 px-2 py-0.5 text-[10px] font-semibold text-sky-700">
               <Icon name="pin" className="h-3 w-3 text-sky-500" />
               <span>QCU San Bartolome</span>
             </div>
