@@ -1,0 +1,39 @@
+/*
+ * Inventory Management — small extras Tailwind utilities don't cover.
+ * Imported once by pages/Inventory.jsx. All class names are prefixed `inv-`
+ * to avoid collisions with existing BizzyQCU styles.
+ */
+
+@keyframes inv-dropdown-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes inv-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes inv-modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes inv-toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.inv-dropdown-enter { animation: inv-dropdown-in 140ms ease-out; transform-origin: top; }
+.inv-fade-in        { animation: inv-fade-in 160ms ease-out; }
+.inv-backdrop-enter { animation: inv-fade-in 160ms ease-out; }
+.inv-modal-enter    { animation: inv-modal-in 180ms cubic-bezier(0.16, 1, 0.3, 1); }
+.inv-toast-enter    { animation: inv-toast-in 200ms ease-out; }
+
+/* Hide the native clear "x" on type=search so our own clear button is the only one. */
+.inv-search::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-dropdown-enter,
+  .inv-fade-in,
+  .inv-backdrop-enter,
+  .inv-modal-enter,
+  .inv-toast-enter { animation: none; }
+}
