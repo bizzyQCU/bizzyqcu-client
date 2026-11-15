@@ -4,6 +4,7 @@ import containerQueries from '@tailwindcss/container-queries'
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       borderRadius: { card: '16px', field: '12px' },
