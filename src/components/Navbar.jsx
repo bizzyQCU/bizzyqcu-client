@@ -11,7 +11,7 @@ const hashLinks = [
 
 export default function Navbar() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isAdmin } = useAuth()
   const { count } = useCart()
   const { pathname } = useLocation()
   const isSellerMessages = pathname === '/seller/messages'
@@ -51,6 +51,31 @@ export default function Navbar() {
                   {l.label}
                 </Link>
               ))}
+              <NavLink
+                to="/contact-admin"
+                className={({ isActive }) =>
+                  `transition-colors flex items-center gap-1.5 ${
+                    isActive
+                      ? 'text-amber-600 border-b-2 border-amber-600 pb-0.5'
+                      : 'text-amber-600 hover:text-amber-700 font-bold'
+                  }`
+                }
+              >
+                <span>🛡️</span>
+                <span>CONTACT ADMIN</span>
+              </NavLink>
+              {isAdmin && (
+                <NavLink
+                  to="/admin"
+                  className={({ isActive }) =>
+                    `transition-colors hover:text-[#10439F] ${
+                      isActive ? 'text-[#10439F] border-b-2 border-[#10439F] pb-0.5' : 'text-slate-900 font-black'
+                    }`
+                  }
+                >
+                  ADMIN PORTAL
+                </NavLink>
+              )}
             </>
           )}
         </div>

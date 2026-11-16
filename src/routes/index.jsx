@@ -44,12 +44,18 @@ import OrgAnalytics from "../subsystems/marketplace/organization/pages/Analytics
 import OrgMessages from "../subsystems/marketplace/organization/pages/Messages.jsx";
 import OrgSettings from "../subsystems/marketplace/organization/pages/Settings.jsx";
 
-// Import Admin Dashboard
+// Admin Subsystem Pages
 import AdminDashboard from "../subsystems/admin/pages/AdminDashboard.jsx";
+import AdminLogin from "../subsystems/admin/pages/AdminLogin.jsx";
+import ContactAdmin from "../subsystems/admin/pages/ContactAdmin.jsx";
 
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* Standalone Admin Portal Routes (No Public Navbar) */}
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+
       {/* Auth Routes - No Navbar */}
       <Route element={<AuthLayout />}>
         <Route path="/" element={<LandingPage />} />
@@ -169,8 +175,10 @@ export default function AppRoutes() {
           element={<Placeholder title="Product" text="Product details page." />}
         />
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminDashboard />} />
+        {/* Customer Contact Admin & Support Ticket Resolution Desk */}
+        <Route path="/contact-admin" element={<ContactAdmin />} />
+        <Route path="/support" element={<ContactAdmin />} />
+        <Route path="/complaints" element={<ContactAdmin />} />
 
         {/* Fallback */}
         <Route
