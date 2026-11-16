@@ -291,15 +291,11 @@ export function SellerRegistrationForm({
                 <Icon name="storefront" className="text-[13px] text-[#0284C7] dark:text-amber-300" />
                 <span>{SELLER_TYPE_LABELS[sellerType] || badge}</span>
               </span>
-              <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
-                <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                  {titlePrefix}{' '}
-                  <span className="text-[#0284C7] dark:text-amber-400">{titleHighlight}</span>
-                  {titleSuffix && ` ${titleSuffix}`}
-                </h1>
-                <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
-              </div>
+              <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                {titlePrefix}{' '}
+                <span className="text-[#0284C7] dark:text-amber-400">{titleHighlight}</span>
+                {titleSuffix && ` ${titleSuffix}`}
+              </h1>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                 {subtitle || 'Verified QCU students only. Store profile details are set up after seller approval.'}
               </p>

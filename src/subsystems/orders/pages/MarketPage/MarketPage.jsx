@@ -1,7 +1,7 @@
 import useIsMobile from "../../../../hooks/useIsMobile.js";
 import MB_MarketPage from "../MobileUI/MB_MarketPage.jsx";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Icon from "../../../../components/Icon.jsx";
 import VerifiedSeal from "../../../../components/VerifiedSeal.jsx";
 import { getProducts } from "../../../marketplace/api.js";
@@ -60,15 +60,23 @@ async function fetchCategories() {
 
 function MarketDesktop() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const urlQuery = searchParams.get("search") || "";
   const [stores, setStores] = useState([]);
   const [categories, setCategories] = useState([{ id: null, name: "All Categories" }]);
   const [categoryId, setCategoryId] = useState(null); // null = All Categories
   const [sellerType, setSellerType] = useState(null); // API enum or null
-  const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [query, setQuery] = useState(urlQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(urlQuery);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openBadge, setOpenBadge] = useState(null);
+
+  // Sync search query state from URL search params
+  useEffect(() => {
+    const currentUrlQuery = searchParams.get("search") || "";
+    setQuery(currentUrlQuery);
+  }, [searchParams]);
 
   // Debounce search input ~300 ms
   const debounceRef = useRef(null);

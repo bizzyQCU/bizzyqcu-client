@@ -44,16 +44,16 @@ export default function SellerTopBar({ storeName, storeLocation, onMessagesClick
   }
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-20">
+    <header className="h-16 bg-white dark:bg-[#0b1120] border-b border-slate-200 dark:border-white/10 px-8 flex items-center justify-between sticky top-0 z-20 transition-colors">
       <div className="min-w-0">
-        <h2 className="font-bold text-slate-900 text-base truncate">{displayName}</h2>
-        <p className="text-xs text-slate-500 truncate">{displayLocation}</p>
+        <h2 className="font-bold text-slate-900 dark:text-white text-base truncate">{displayName}</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{displayLocation}</p>
       </div>
       <div className="flex items-center space-x-4 shrink-0">
         <button
           type="button"
           onClick={handleMessages}
-          className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
+          className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.08] rounded-full transition-colors"
           aria-label="Messages"
           title="Messages"
         >
@@ -63,7 +63,7 @@ export default function SellerTopBar({ storeName, storeLocation, onMessagesClick
         <button
           type="button"
           onClick={() => navigate('/seller/org/orders')}
-          className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative"
+          className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.08] rounded-full transition-colors relative"
           aria-label="Notifications"
           title="Orders & Notifications"
         >
@@ -73,7 +73,7 @@ export default function SellerTopBar({ storeName, storeLocation, onMessagesClick
         <button
           type="button"
           onClick={() => navigate('/seller/org/settings')}
-          className="w-8 h-8 rounded-full bg-[#0284C7] text-white flex items-center justify-center cursor-pointer hover:bg-[#0369A1] transition-colors"
+          className="w-8 h-8 rounded-full bg-[#0284C7] hover:bg-[#0369A1] text-white dark:bg-amber-400 dark:text-slate-950 dark:hover:bg-amber-300 flex items-center justify-center cursor-pointer transition-colors shadow-sm"
           aria-label="Account Settings"
           title="Account Settings"
         >

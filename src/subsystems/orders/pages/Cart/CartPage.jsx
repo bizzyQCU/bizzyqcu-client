@@ -73,13 +73,56 @@ function CartDesktop() {
               >
                 <SelectCircle checked={checked} onToggle={() => toggleSelected(i.id)} label={`Select ${i.title}`} />
 
-                <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border transition-colors duration-200 ${checked ? "border-sky-100 bg-sky-50 dark:bg-sky-950/40 text-sky-600" : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500"}`}>
-                  <Icon name="tag" className="h-6 w-6" />
+                <div className={`relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border transition-colors duration-200 ${
+                  checked
+                    ? "border-sky-100 bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:border-white/10"
+                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500"
+                }`}>
+                  {(i.imageUrl || i.image) ? (
+                    <img
+                      src={i.imageUrl || i.image}
+                      alt={i.title || i.name}
+                      className="h-full w-full object-cover rounded-xl"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        if (e.currentTarget.nextSibling) {
+                          e.currentTarget.nextSibling.style.display = 'flex';
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className={`h-full w-full items-center justify-center ${
+                      (i.imageUrl || i.image) ? "hidden" : "flex"
+                    }`}
+                  >
+                    <Icon name="tag" className="h-6 w-6" />
+                  </div>
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <h2 className={`truncate text-sm font-bold ${checked ? "text-slate-900 dark:text-slate-100" : "text-slate-500 dark:text-slate-400"}`}>{i.title}</h2>
-                  <p className="mt-0.5 truncate text-[11px] text-slate-500 dark:text-slate-400">{i.meta}</p>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <h2 className={`truncate text-sm font-bold ${checked ? "text-slate-900 dark:text-slate-100" : "text-slate-500 dark:text-slate-400"}`}>{i.title}</h2>
+                    {i.storeName && (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-300">
+                        <Icon name="storefront" className="h-3 w-3" />
+                        <span className="truncate max-w-[130px]">{i.storeName}</span>
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                    {i.meta && <span>{i.meta}</span>}
+                    {i.stockQuantity !== undefined && i.stockQuantity > 0 && i.stockQuantity <= 5 && (
+                      <span className="font-semibold text-amber-600 dark:text-amber-400">
+                        Only {i.stockQuantity} left
+                      </span>
+                    )}
+                    {i.stockQuantity === 0 && (
+                      <span className="font-semibold text-rose-600 dark:text-rose-400">
+                        Out of stock
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-1 text-xs font-semibold text-slate-700 dark:text-slate-200">₱{i.price.toFixed(2)} each</p>
                 </div>
 

@@ -36,6 +36,14 @@ export default function OrdersLayout() {
 
   const [menuOpen, setMenuOpen] = useState(false)
   const [confirmSignOut, setConfirmSignOut] = useState(false)
+  const [navSearch, setNavSearch] = useState('')
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault()
+    if (navSearch.trim()) {
+      navigate(`/marketplace?search=${encodeURIComponent(navSearch.trim())}`)
+    }
+  }
 
   // On phones, "Message seller" opens the full-screen messages page instead of the chat window.
   useEffect(() => {
@@ -189,6 +197,16 @@ export default function OrdersLayout() {
               <NavLink to="/marketplace" className={navClass}>Marketplace</NavLink>
               <NavLink to="/orders" className={navClass}>Orders</NavLink>
             </nav>
+            <form onSubmit={handleSearchSubmit} className="relative hidden md:block w-48 lg:w-64">
+              <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+              <input
+                type="search"
+                placeholder="Search products or stores…"
+                value={navSearch}
+                onChange={(e) => setNavSearch(e.target.value)}
+                className="w-full rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1.5 pl-8 pr-3 text-xs placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-800 dark:text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              />
+            </form>
             <div className="flex items-center gap-5">
               <ThemeToggle theme={theme} onToggle={toggleTheme} />
               <button type="button" id="cart-button" aria-label="Cart" onClick={() => navigate('/cart')} className="relative p-1.5 text-slate-500 dark:text-slate-600 transition hover:text-slate-700 dark:hover:text-slate-900">

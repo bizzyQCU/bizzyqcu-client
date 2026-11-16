@@ -227,13 +227,9 @@ export default function SellerLoginForm() {
 
             {/* Header */}
             <div className="text-center mb-3">
-              <div className="flex items-center justify-center gap-1.5">
-                <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
-                <h1 id="seller-form-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                  Seller Portal Sign In
-                </h1>
-                <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
-              </div>
+              <h1 id="seller-form-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Seller Portal Sign In
+              </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
                 Sign in with your QCU ID using Password + Email OTP or a registered WebAuthn Passkey.
               </p>

@@ -233,8 +233,11 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
 
 export default function AccountSecurity() {
   const navigate = useNavigate()
-  const { logout, refreshUser } = useAuth()
+  const { user, isSeller, logout, refreshUser } = useAuth()
   const [profile, setProfile] = useState(null)
+  const sellerRole = isSeller || user?.role === 'SELLER' || profile?.role === 'SELLER'
+  const returnDestination = sellerRole ? '/seller/org/dashboard' : '/marketplace'
+  const returnLabel = sellerRole ? 'Back to Seller Dashboard' : 'Back to Marketplace'
   const [statusData, setStatusData] = useState(null)
   const [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(true)
@@ -454,7 +457,7 @@ export default function AccountSecurity() {
               setLoading(true)
               load()
             }}
-            className="w-full py-2.5 rounded-xl bg-white hover:bg-sky-50 border-[1.5px] dark:border border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] dark:bg-white/[0.06] dark:hover:bg-white/[0.1] dark:border-white/10 text-sm font-semibold dark:text-white"
+            className="w-full py-2.5 rounded-xl font-bold text-sm text-white dark:text-slate-950 bg-[#0284C7] hover:bg-[#0369A1] dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:shadow-none transition-all"
           >
             Try again
           </button>
@@ -469,6 +472,27 @@ export default function AccountSecurity() {
 
   return (
     <main className="flex-1 min-h-0 overflow-y-auto auth-card-scroll w-full max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-8 space-y-5">
+      {/* Top Role-Aware Return Navigation */}
+      <div className="flex items-center justify-between gap-3">
+        <Link
+          to={returnDestination}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl font-bold text-xs text-[#0284C7] dark:text-amber-400 bg-white/80 dark:bg-white/[0.04] border border-[#8ACFF8]/60 dark:border-white/10 hover:border-[#0284C7] dark:hover:border-amber-400/50 hover:bg-sky-50 dark:hover:bg-white/[0.08] transition-all"
+        >
+          <Icon name="arrow_back" className="text-[18px]" />
+          <span>{returnLabel}</span>
+        </Link>
+
+        {!sellerRole && (
+          <Link
+            to="/profile"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#0284C7] dark:text-slate-400 dark:hover:text-amber-300 transition-colors"
+          >
+            <Icon name="person" className="text-[16px]" />
+            <span>View Profile</span>
+          </Link>
+        )}
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <div>
@@ -773,7 +797,7 @@ export default function AccountSecurity() {
               <button
                 type="submit"
                 disabled={savingEmail || newEmail.trim() === profile.email}
-                className="px-4 py-2.5 rounded-xl font-bold text-sm bg-white hover:bg-sky-50 border-[1.5px] dark:border border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:border-white/15 dark:text-white flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
+                className="px-4 py-2.5 rounded-xl font-bold text-sm text-white dark:text-slate-950 bg-[#0284C7] hover:bg-[#0369A1] dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:hover:from-amber-300 dark:hover:to-amber-400 shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:shadow-none flex items-center justify-center gap-1.5 disabled:opacity-50 transition-all whitespace-nowrap"
               >
                 {savingEmail && <Spinner className="text-[16px]" />}
                 <span>Update Email</span>
@@ -837,7 +861,7 @@ export default function AccountSecurity() {
             <button
               type="submit"
               disabled={savingPass || !passwords.newPassword}
-              className="px-4 py-2.5 rounded-xl font-bold text-sm bg-white hover:bg-sky-50 border-[1.5px] dark:border border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:border-white/15 dark:text-white flex items-center gap-1.5 disabled:opacity-50 transition-colors"
+              className="px-4 py-2.5 rounded-xl font-bold text-sm text-white dark:text-slate-950 bg-[#0284C7] hover:bg-[#0369A1] dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:hover:from-amber-300 dark:hover:to-amber-400 shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:shadow-none flex items-center justify-center gap-1.5 disabled:opacity-50 transition-all"
             >
               {savingPass && <Spinner className="text-[16px]" />}
               <span>Save New Password</span>
@@ -847,8 +871,8 @@ export default function AccountSecurity() {
       </AuthCard>
 
       <p className="text-center text-xs text-slate-500">
-        <Link to="/marketplace" className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-semibold hover:underline">
-          Continue to marketplace →
+        <Link to={returnDestination} className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-semibold hover:underline">
+          {sellerRole ? '← Return to Seller Dashboard' : 'Continue to marketplace →'}
         </Link>
       </p>
     </main>

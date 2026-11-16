@@ -235,13 +235,9 @@ export default function Signup() {
           closeLabel="Close and return to login"
         >
           <div className="text-center mb-2.5 px-4">
-            <div className="flex items-center justify-center gap-2">
-              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
-              <h1 id="signup-title" className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Create your QCU account
-              </h1>
-              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
-            </div>
+            <h1 id="signup-title" className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Create your QCU account
+            </h1>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
               Verified QCU students only — reviewed by an administrator.
             </p>

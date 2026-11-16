@@ -74,33 +74,27 @@ export default function SellerSignup() {
       <section className="w-full max-w-[840px] mx-auto" aria-labelledby="seller-signup-title">
         <AuthCard className="!p-4 sm:!px-6 sm:!py-5" onClose={closeModal} closeLabel="Close">
           {/* Header */}
-          <div className="relative text-center max-w-xl mx-auto mb-3.5">
-            <div className="flex items-center justify-center gap-2">
-              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
-              <h1 id="seller-signup-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Register a Seller Account
-              </h1>
-              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
-            </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+          <div className="relative text-center max-w-2xl mx-auto mb-4 px-2">
+            <h1 id="seller-signup-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Register a Seller Account
+            </h1>
+            <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
               Only enrolled QCU students (<code className="text-[#0369A1] dark:text-amber-300 font-semibold dark:font-normal">STUDENT</code>) may register as campus sellers. Select your seller category and upload your required endorsement document.
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Already have a seller account?{' '}
-              <Link className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline" to="/seller-login-form">
-                Seller Log in
-              </Link>
-              {' · '}
-              Already have a buyer account?{' '}
-              <Link className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline" to="/account">
-                Apply from Account Settings
-              </Link>
-            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+              <span className="whitespace-nowrap">
+                Already have a seller account?{' '}
+                <Link className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline" to="/seller-login-form">
+                  Seller Log in
+                </Link>
+              </span>
 
-            <div className="inline-flex items-center gap-2 mt-2.5 px-3.5 py-0.5 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] dark:bg-amber-500/10 dark:border-amber-400/25">
+            </div>
+
+            <div className="inline-flex items-center gap-2 mt-3 px-3.5 py-1 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] dark:bg-amber-500/10 dark:border-amber-400/25">
               <span className="w-1.5 h-1.5 rounded-full bg-[#0284C7] dark:bg-amber-400" />
               <span className="text-[10px] font-extrabold tracking-wider uppercase text-slate-900 dark:text-amber-300">
-                SELECT YOUR SELLER TYPE:
+                Select your seller type
               </span>
             </div>
           </div>
@@ -150,11 +144,10 @@ export default function SellerSignup() {
                 <button
                   type="button"
                   onClick={() => navigate(s.route)}
-                  className={`w-full text-xs font-extrabold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 mt-3.5 active:scale-[0.98] ${
-                    s.primary
+                  className={`w-full text-xs font-extrabold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 mt-3.5 active:scale-[0.98] ${s.primary
                       ? 'bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:bg-gradient-to-r dark:from-amber-400 dark:via-amber-500 dark:to-amber-600 dark:hover:from-amber-300 dark:hover:via-amber-400 dark:hover:to-amber-500 dark:text-slate-950 dark:ring-1 dark:ring-inset dark:ring-amber-200/50 dark:shadow-md dark:shadow-amber-500/25'
                       : 'bg-white hover:bg-sky-50 border-[1.5px] dark:border border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] dark:bg-white/[0.05] dark:hover:bg-white/[0.1] dark:border-white/15 dark:hover:border-amber-400/40 dark:text-white dark:hover:text-amber-300'
-                  }`}
+                    }`}
                 >
                   <span>{s.cta}</span>
                 </button>

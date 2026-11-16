@@ -44,7 +44,7 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-[#F8FAFC]">
+      <div className="flex min-h-screen bg-[#F8FAFC] dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 transition-colors">
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <SellerTopBar
@@ -55,8 +55,8 @@ export default function Analytics() {
           <main className="p-8 max-w-7xl mx-auto w-full">
             <div className="flex items-center justify-center h-96">
               <div className="flex flex-col items-center gap-3">
-                <div className="w-8 h-8 border-4 border-slate-200 border-t-[#0091FF] rounded-full animate-spin" />
-                <span className="text-sm text-slate-500">
+                <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-800 border-t-[#0091FF] rounded-full animate-spin" />
+                <span className="text-sm text-slate-500 dark:text-slate-400">
                   Loading analytics...
                 </span>
               </div>
@@ -69,7 +69,7 @@ export default function Analytics() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen bg-[#F8FAFC]">
+      <div className="flex min-h-screen bg-[#F8FAFC] dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 transition-colors">
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <SellerTopBar
@@ -78,11 +78,11 @@ export default function Analytics() {
             onMessagesClick={handleMessagesClick}
           />
           <main className="p-8 max-w-7xl mx-auto w-full">
-            <div className="bg-rose-50 border border-rose-200 rounded-xl p-6 text-center">
-              <h3 className="text-lg font-bold text-rose-900 mb-2">
+            <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-xl p-6 text-center">
+              <h3 className="text-lg font-bold text-rose-900 dark:text-rose-200 mb-2">
                 Failed to load analytics
               </h3>
-              <p className="text-sm text-rose-700 mb-4">{error.message}</p>
+              <p className="text-sm text-rose-700 dark:text-rose-300 mb-4">{error.message}</p>
               <button
                 onClick={refresh}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-lg transition-colors"
@@ -99,7 +99,7 @@ export default function Analytics() {
   if (!data) return null;
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC]">
+    <div className="flex min-h-screen bg-[#F8FAFC] dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 transition-colors">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <SellerTopBar
@@ -128,9 +128,9 @@ export default function Analytics() {
                 projected={data.projectedNovember}
               />
             ) : (
-              <div className="lg:col-span-8 bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="text-base font-bold text-slate-900 mb-2">Weekly Sales</h3>
-                <p className="text-sm text-slate-500">No sales recorded for this period yet.</p>
+              <div className="lg:col-span-8 bg-white dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-white/10 p-6">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">Weekly Sales</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">No sales recorded for this period yet.</p>
               </div>
             )}
             <TopRevenueDrivers
@@ -143,9 +143,9 @@ export default function Analytics() {
             {data.traffic && data.traffic.channels && data.traffic.channels.length > 0 ? (
               <TrafficChannels traffic={data.traffic} />
             ) : (
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="text-base font-bold text-slate-900 mb-2">Traffic Channels</h3>
-                <p className="text-sm text-slate-500">No traffic channel visits recorded for this period yet.</p>
+              <div className="bg-white dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-white/10 p-6">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">Traffic Channels</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">No traffic channel visits recorded for this period yet.</p>
               </div>
             )}
             {data.actions && data.actions.length > 0 ? (
@@ -154,9 +154,9 @@ export default function Analytics() {
                 nextReview={data.nextReview}
               />
             ) : (
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="text-base font-bold text-slate-900 mb-2">Priority Actions</h3>
-                <p className="text-sm text-slate-500">No priority actions at this time. Check back later for recommendations.</p>
+              <div className="bg-white dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-white/10 p-6">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">Priority Actions</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">No priority actions at this time. Check back later for recommendations.</p>
               </div>
             )}
           </section>

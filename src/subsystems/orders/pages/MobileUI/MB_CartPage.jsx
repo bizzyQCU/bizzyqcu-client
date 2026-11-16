@@ -101,22 +101,61 @@ export default function MB_CartPage() {
             return (
               <li key={i.id} className={`flex items-center gap-3 rounded-2xl border bg-white dark:bg-slate-900 p-3 transition-all ${checked ? "border-sky-300 shadow-sm" : "border-slate-200 dark:border-slate-800 opacity-70"}`}>
                 <SelectCircle checked={checked} onToggle={() => toggleSelected(i.id)} label={`Select ${i.title}`} />
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
-                  <Icon name="tag" className="h-5 w-5" />
+                <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sky-100 dark:bg-sky-950/40 text-sky-700">
+                  {(i.imageUrl || i.image) ? (
+                    <img
+                      src={i.imageUrl || i.image}
+                      alt={i.title || i.name}
+                      className="h-full w-full object-cover rounded-xl"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        if (e.currentTarget.nextSibling) {
+                          e.currentTarget.nextSibling.style.display = 'flex';
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className={`h-full w-full items-center justify-center ${
+                      (i.imageUrl || i.image) ? "hidden" : "flex"
+                    }`}
+                  >
+                    <Icon name="tag" className="h-5 w-5" />
+                  </div>
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="truncate text-xs font-bold text-slate-900 dark:text-slate-100">{i.title}</p>
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-bold text-slate-900 dark:text-slate-100">{i.title}</p>
+                      {i.storeName && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400">
+                          <Icon name="storefront" className="h-2.5 w-2.5" />
+                          <span className="truncate max-w-[120px]">{i.storeName}</span>
+                        </span>
+                      )}
+                    </div>
                     <button
                       type="button"
                       aria-label={`Delete ${i.title} from cart`}
                       onClick={() => setConfirm({ title: "Delete this item?", message: `${i.title} will be removed from your cart.`, confirmLabel: "Delete", tone: "danger", action: () => remove(i.id) })}
-                      className="text-slate-400 dark:text-slate-500 transition hover:text-rose-500"
+                      className="text-slate-400 dark:text-slate-500 transition hover:text-rose-500 shrink-0"
                     >
                       <Icon name="trash" className="h-4 w-4" />
                     </button>
                   </div>
-                  <p className="truncate text-[10px] text-slate-500 dark:text-slate-400">{i.meta}</p>
+                  <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
+                    {i.meta && <span className="truncate">{i.meta}</span>}
+                    {i.stockQuantity !== undefined && i.stockQuantity > 0 && i.stockQuantity <= 5 && (
+                      <span className="font-semibold text-amber-600 dark:text-amber-400 shrink-0">
+                        Only {i.stockQuantity} left
+                      </span>
+                    )}
+                    {i.stockQuantity === 0 && (
+                      <span className="font-semibold text-rose-600 dark:text-rose-400 shrink-0">
+                        Out of stock
+                      </span>
+                    )}
+                  </div>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100">₱{(i.price * i.qty).toFixed(2)}</span>
                     <div className="flex items-center rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">

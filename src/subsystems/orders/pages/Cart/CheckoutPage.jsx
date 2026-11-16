@@ -66,15 +66,14 @@ export default function CheckoutPage() {
   const [building, setBuilding] = useState("Tech Building / San Bartolome Campus");
   const [room, setRoom] = useState("");
   const [phone, setPhone] = useState("");
-  const [sms, setSms] = useState("");
   const [notes, setNotes] = useState("");
   const [confirm, setConfirm] = useState(null);
   const [placing, setPlacing] = useState(false);
   const [placeError, setPlaceError] = useState(null);
   const [orderConfirm, setOrderConfirm] = useState(false);
 
-  const smsDigits = sms.replace(/\D/g, "").length;
-  const smsIncomplete = smsDigits < 10;
+  const phoneDigits = phone.replace(/\D/g, "").length;
+  const phoneIncomplete = phoneDigits < 10;
 
   // Check if any item is out of stock or has 0 quantity
   const hasOutOfStockItem = items.some((item) => item.stockQuantity !== undefined && item.stockQuantity === 0);
@@ -96,7 +95,7 @@ export default function CheckoutPage() {
   const buildingEmpty = apiDeliveryMethod === "ROOM_TO_ROOM" && !building.trim();
   const roomEmpty = apiDeliveryMethod === "ROOM_TO_ROOM" && !room.trim();
   
-  const canPlaceOrder = !smsIncomplete && !hasOutOfStockItem && !hasZeroQuantity && !buildingEmpty && !roomEmpty && items.length > 0 && !placing;
+  const canPlaceOrder = !phoneIncomplete && !hasOutOfStockItem && !hasZeroQuantity && !buildingEmpty && !roomEmpty && items.length > 0 && !placing;
 
   function updateBuyNowQuantity(productId, newQty) {
     setBuyNowQuantities((prev) => ({
@@ -181,9 +180,14 @@ export default function CheckoutPage() {
         clearCheckedOut(items);
       }
 
-      // Handle GCash redirect
-      if (results.gcashCheckoutUrls && results.gcashCheckoutUrls.length > 0) {
-        window.location.href = results.gcashCheckoutUrls[0].checkoutUrl;
+      // Handle GCash redirect to PayMongo
+      const gcashRedirectUrl =
+        results.gcashCheckoutUrls?.[0]?.checkoutUrl ||
+        results.orders?.[0]?.checkoutUrl ||
+        results.orders?.[0]?.payment?.checkoutUrl;
+
+      if (paymentMethod === "GCASH_PAYMONGO" && gcashRedirectUrl) {
+        window.location.href = gcashRedirectUrl;
         return;
       }
 
@@ -353,18 +357,12 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label htmlFor="phone" className="mb-1.5 block text-xs font-bold text-slate-700 dark:text-slate-200">Active student phone number <span className="text-red-500">*</span></label>
-                  <PhoneInput id="phone" value={phone} onChange={setPhone} placeholder="9XX XXX XXXX" />
-                </div>
-                <div>
-                  <label htmlFor="sms" className="mb-1.5 block text-xs font-bold text-slate-700 dark:text-slate-200">Backup SMS line for security <span className="text-red-500">*</span></label>
-                  <PhoneInput id="sms" value={sms} onChange={setSms} invalid={smsIncomplete} placeholder="9XX XXX XXXX" />
-                  {smsIncomplete && (
-                    <p className="mt-1 text-[11px] font-medium leading-tight text-red-500">Add a complete backup SMS line to place the order.</p>
-                  )}
-                </div>
+              <div>
+                <label htmlFor="phone" className="mb-1.5 block text-xs font-bold text-slate-700 dark:text-slate-200">Active student phone number <span className="text-red-500">*</span></label>
+                <PhoneInput id="phone" value={phone} onChange={setPhone} invalid={phoneIncomplete && phoneDigits > 0} placeholder="9XX XXX XXXX" />
+                {phoneIncomplete && phoneDigits > 0 && (
+                  <p className="mt-1 text-[11px] font-medium leading-tight text-red-500">Please enter a valid 10-digit mobile number.</p>
+                )}
               </div>
 
               <div>
