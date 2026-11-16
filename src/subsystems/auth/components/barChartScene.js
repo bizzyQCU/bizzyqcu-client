@@ -13,13 +13,13 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 const PALETTE = {
-  floorFill: '#0f1b33',
-  gridLine: 'rgba(253, 184, 19, 0.22)',
-  gridBorder: 'rgba(253, 184, 19, 0.45)',
-  barLow: 0xd97706, // amber-600
-  barHigh: 0xfde68a, // amber-200 / bright gold
-  keyLight: 0xfff4dc,
-  fillLight: 0x38bdf8,
+  floorFill: '#EFF6FF',
+  gridLine: 'rgba(2, 132, 199, 0.20)',
+  gridBorder: 'rgba(3, 105, 161, 0.45)',
+  barLow: 0x0369a1, // Text & Border Blue
+  barHigh: 0x8acff8, // Electric Sky
+  keyLight: 0xfffdf0,
+  fillLight: 0xffd444, // Golden Alert
 };
 
 const clamp01 = (x) => Math.min(1, Math.max(0, x));

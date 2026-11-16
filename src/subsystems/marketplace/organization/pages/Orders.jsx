@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useSellerOrders } from "../components/orders/useSellerOrders";
 import FilterModal from "../components/orders/FilterModal";
 import Sidebar from "../components/Sidebar";
-import SellerMessages from "../../pages/SellerMessages";
+import SellerMessages from "../components/messages/SellerMessages";
 
 import "../components/orders/SellerOrders.css";
 

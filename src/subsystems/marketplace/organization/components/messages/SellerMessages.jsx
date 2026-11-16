@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../../hooks/useAuth.jsx'
-import { ORDER_STATUS } from '../../../lib/constants.js'
+import { useAuth } from '../../../../../hooks/useAuth.jsx'
+import { ORDER_STATUS } from '../../../../../lib/constants.js'
 import './SellerMessages.css'
 
 const ACTIVE_ORDER_STATUSES = new Set([

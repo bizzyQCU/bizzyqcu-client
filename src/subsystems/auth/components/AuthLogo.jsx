@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import logoImage from '../assets/bizzyqcu-logo.png';
 
 /**
  * AuthLogo - Displays the BizzyQCU logo in the top-left corner of auth pages.
@@ -11,12 +10,12 @@ export default function AuthLogo() {
         to="/"
         state={{ blinds: true }}
         aria-label="BizzyQCU Home"
-        className="inline-flex items-center px-3 py-1.5 rounded-2xl bg-slate-900/50 hover:bg-slate-900/80 border border-white/10 hover:border-amber-400/40 backdrop-blur-md shadow-md shadow-black/25 transition-all duration-200 group"
+        className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-white/95 hover:bg-white border border-slate-200 hover:border-[#8ACFF8] backdrop-blur-md shadow-[0_4px_16px_-4px_rgba(15,23,42,0.08)] transition-all duration-200 group"
       >
         <img
-          src={logoImage}
+          src="/logo-clear.png"
           alt="BizzyQCU"
-          className="h-8 sm:h-9 w-auto object-contain select-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] transition-transform duration-200 group-hover:scale-[1.03]"
+          className="h-8 sm:h-9 w-auto object-contain select-none transition-transform duration-200 group-hover:scale-[1.03]"
         />
       </Link>
     </header>

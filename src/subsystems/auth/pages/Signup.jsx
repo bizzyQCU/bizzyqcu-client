@@ -20,6 +20,7 @@ import {
 import ImageDropzone from '../components/ImageDropzone.jsx'
 import CameraCapture from '../components/CameraCapture.jsx'
 import PasskeySetup from '../components/PasskeySetup.jsx'
+import { EulaConsentField, EulaModal } from '../components/EulaModal.jsx'
 import { RegistrationOtpStep, useRegistrationOtp } from '../components/RegistrationOtpStep.jsx'
 import { MEMBER_TYPES, QCU_ID_PATTERN, MIN_PASSWORD_LENGTH } from '../../../lib/constants'
 import { isWebAuthnSupported } from '../../../lib/webauthn'
@@ -58,6 +59,8 @@ export default function Signup() {
   const [errors, setErrors] = useState({})
   const [registered, setRegistered] = useState(null) // server user object
   const [passkeyAdded, setPasskeyAdded] = useState(false)
+  const [eulaAccepted, setEulaAccepted] = useState(false)
+  const [eulaModalOpen, setEulaModalOpen] = useState(true)
 
   const busy = status !== 'idle'
   const passkeyCapable = isWebAuthnSupported()
@@ -81,6 +84,7 @@ export default function Signup() {
     }
     if (!idPhoto) next.idPhoto = 'Please upload a photo of your QCU Student ID'
     if (!selfie) next.selfie = 'Please take a live selfie'
+    if (!eulaAccepted) next.eula = 'Please read and agree to the BizzyQCU End-User License Agreement to continue.'
     return next
   }
 
@@ -108,6 +112,11 @@ export default function Signup() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (!eulaAccepted) {
+      setErrors(validate())
+      setEulaModalOpen(true)
+      return undefined
+    }
     return otpFlow.handleFormSubmit({
       email: form.email,
       qcuIdNumber: form.qcuIdNumber,
@@ -146,18 +155,18 @@ export default function Signup() {
         <section className="w-full max-w-[480px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="signup-done-title">
           <AuthCard>
             <div className="text-center space-y-3">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+              <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
                 <Icon name="how_to_reg" className="text-3xl" />
               </div>
-              <h1 id="signup-done-title" className="text-2xl font-extrabold text-white">
+              <h1 id="signup-done-title" className="text-2xl font-extrabold text-slate-900">
                 Registration submitted
               </h1>
-              <p className="text-sm text-slate-300 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 An administrator will review your QCU ID and live selfie. You&apos;ll get full marketplace access once your account is verified.
               </p>
             </div>
 
-            <dl className="mt-5 rounded-2xl bg-white/[0.03] border border-white/10 divide-y divide-white/5 text-sm">
+            <dl className="mt-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 divide-y divide-slate-200 text-sm">
               {[
                 ['Name', registered.fullName],
                 ['QCU ID', registered.qcuIdNumber],
@@ -165,19 +174,19 @@ export default function Signup() {
                 ['Role', `${registered.memberType} · ${registered.role}`],
               ].map(([k, v]) => (
                 <div key={k} className="flex items-center justify-between gap-3 px-4 py-2.5">
-                  <dt className="text-slate-400">{k}</dt>
-                  <dd className="text-white font-medium truncate">{v}</dd>
+                  <dt className="text-slate-500">{k}</dt>
+                  <dd className="text-slate-900 font-medium truncate">{v}</dd>
                 </div>
               ))}
               <div className="flex items-center justify-between gap-3 px-4 py-2.5">
-                <dt className="text-slate-400">Status</dt>
+                <dt className="text-slate-500">Status</dt>
                 <dd>
                   <VerificationBadge status={registered.verificationStatus} />
                 </dd>
               </div>
             </dl>
 
-            <div className="mt-5 pt-5 border-t border-white/10 space-y-3">
+            <div className="mt-5 pt-5 border-t border-slate-200 space-y-3">
               {needsPasskey && passkeyCapable && (
                 <Alert tone="warning">
                   You didn&apos;t set a password, so a passkey is the only way to sign in. Create one now on this device.
@@ -221,13 +230,13 @@ export default function Signup() {
         <AuthCard onClose={() => navigate('/login')} closeLabel="Close and return to login">
           <div className="text-center mb-5 px-4">
             <div className="flex items-center justify-center gap-2">
-              <Icon name="auto_awesome" className="text-amber-400 text-[20px]" />
-              <h1 id="signup-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+              <Icon name="auto_awesome" className="text-[#0284C7] text-[20px]" />
+              <h1 id="signup-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
                 Create your QCU account
               </h1>
-              <Icon name="auto_awesome" className="text-amber-400 text-[20px]" />
+              <Icon name="auto_awesome" className="text-[#0284C7] text-[20px]" />
             </div>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
               Verified QCU students only — your ID and selfie are reviewed by an administrator.
             </p>
           </div>
@@ -299,7 +308,7 @@ export default function Signup() {
             </div>
 
             {/* Sign-in method: password is optional on the server */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-3.5 space-y-3.5">
+            <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-3.5 space-y-3.5">
               <label className="flex items-start gap-2.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -310,11 +319,11 @@ export default function Signup() {
                     clearError('password')
                     clearError('confirmPassword')
                   }}
-                  className="mt-0.5 w-4 h-4 rounded bg-white/5 border-white/20 text-amber-500 focus:ring-amber-400 focus:ring-offset-slate-900"
+                  className="mt-0.5 w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white"
                 />
                 <span>
-                  <span className="block text-sm font-semibold text-white">Set a password</span>
-                  <span className="block text-[11px] text-slate-400">
+                  <span className="block text-sm font-semibold text-slate-900">Set a password</span>
+                  <span className="block text-[11px] text-slate-500">
                     Sign in with your password plus a 6-digit code sent to your email.
                     {passkeyCapable && ' Skip this to use a passkey only — you\u2019ll create it right after submitting.'}
                   </span>
@@ -392,7 +401,7 @@ export default function Signup() {
             </div>
 
             <p className="flex items-start gap-1.5 text-[11px] text-slate-500 leading-relaxed">
-              <Icon name="shield_lock" className="text-[14px] text-slate-400 mt-px" />
+              <Icon name="shield_lock" className="text-[14px] text-[#0284C7] mt-px" />
               <span>
                 Your ID photo and selfie are protected under the Data Privacy Act (RA 10173) and are viewable by BizzyQCU administrators only.
               </span>
@@ -404,7 +413,19 @@ export default function Signup() {
               </Alert>
             )}
 
-            <button type="submit" disabled={busy} className={primaryButton}>
+            <EulaConsentField
+              id="buyer-eula"
+              accepted={eulaAccepted}
+              error={errors.eula}
+              disabled={busy}
+              onToggle={(val) => {
+                setEulaAccepted(val)
+                if (val) clearError('eula')
+              }}
+              onOpenModal={() => setEulaModalOpen(true)}
+            />
+
+            <button type="submit" disabled={busy || !eulaAccepted} className={primaryButton}>
               <span>{status === 'idle' && emailAlreadyVerified ? 'Submit for Verification' : SUBMIT_TEXT[status]}</span>
               {busy && <Spinner />}
             </button>
@@ -412,10 +433,10 @@ export default function Signup() {
           )}
 
           <div className="mt-auto pt-4">
-            <div className="pt-3.5 border-t border-white/10 text-center">
-              <p className="text-sm text-slate-400">
+            <div className="pt-3.5 border-t border-slate-200 text-center">
+              <p className="text-sm text-slate-500">
                 Already have an account?{' '}
-                <Link className="text-amber-300 font-bold hover:text-amber-200 hover:underline" to="/login">
+                <Link className="text-[#0369A1] font-bold hover:text-[#0284C7] hover:underline" to="/login">
                   Log in
                 </Link>
               </p>
@@ -425,6 +446,16 @@ export default function Signup() {
 
         <TrustBadges />
       </section>
+
+      <EulaModal
+        open={eulaModalOpen && !registered}
+        accepted={eulaAccepted}
+        onToggle={(val) => {
+          setEulaAccepted(val)
+          if (val) clearError('eula')
+        }}
+        onClose={() => setEulaModalOpen(false)}
+      />
     </main>
   )
 }

@@ -8,14 +8,14 @@
   overflow: hidden;
 }
 
-/* Soft amber spotlight behind the coins, fading into the navy page */
+/* Soft sunlit-yellow and electric-sky spotlight behind the coins, fading into the canvas */
 .coin-stack-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(45% 40% at 50% 55%, rgba(253, 184, 19, 0.16) 0%, rgba(245, 158, 11, 0.06) 45%, transparent 75%),
-    radial-gradient(60% 50% at 50% 70%, rgba(30, 58, 138, 0.35) 0%, transparent 70%);
+    radial-gradient(45% 40% at 50% 55%, rgba(255, 212, 68, 0.24) 0%, rgba(244, 235, 108, 0.14) 45%, transparent 75%),
+    radial-gradient(60% 50% at 50% 70%, rgba(138, 207, 248, 0.28) 0%, transparent 70%);
 }
 
 .coin-stack-gl {

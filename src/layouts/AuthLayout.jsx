@@ -23,11 +23,11 @@ function ScrollManager() {
 
 export default function AuthLayout() {
   return (
-    <DotGridBackground className="h-screen flex flex-col text-white overflow-hidden relative">
+    <DotGridBackground className="h-screen flex flex-col text-slate-900 overflow-hidden relative">
       <ScrollManager />
       <AuthLogo />
       <BlindsOutlet />
-      <Footer />
+      <Footer textClassName="text-slate-500" />
     </DotGridBackground>
   )
 }

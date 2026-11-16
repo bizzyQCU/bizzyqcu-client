@@ -4,7 +4,7 @@ import ProductList from "../components/products/ProductList";
 import AddProduct from "../components/products/AddProduct";
 import EditProduct from "../components/products/EditProduct";
 import { useProducts } from "../components/products/useProducts";
-import SellerMessages from "../../pages/SellerMessages";
+import SellerMessages from "../components/messages/SellerMessages";
 
 import "../components/products/Products.css";
 

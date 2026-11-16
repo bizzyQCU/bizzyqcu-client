@@ -15,9 +15,8 @@ import {
 } from "../subsystems/auth";
 import Placeholder from "../components/Placeholder.jsx";
 import SellerPlaceholder from "../subsystems/marketplace/organization/components/SellerPlaceholder.jsx";
-import SellerMessages from "../subsystems/marketplace/pages/SellerMessages.jsx";
+import SellerMessages from "../subsystems/marketplace/organization/components/messages/SellerMessages.jsx";
 import SellerOrders from "../subsystems/marketplace/organization/pages/Orders.jsx";
-import SellerAnalytics from "../subsystems/marketplace/pages/SellerAnalytics.jsx";
 
 // Subsystem 3: Orders, cart, checkout, payment, messages
 import CartPage from "../subsystems/orders/pages/Cart/CartPage.jsx";
@@ -157,7 +156,7 @@ export default function AppRoutes() {
             />
           }
         />
-        <Route path="/seller/analytics" element={<SellerAnalytics />} />
+        <Route path="/seller/analytics" element={<OrgAnalytics />} />
 
         {/* Product Detail Route */}
         <Route

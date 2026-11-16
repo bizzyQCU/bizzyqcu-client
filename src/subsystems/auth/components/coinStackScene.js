@@ -15,17 +15,17 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
-// BizzyQCU palette (keep in sync with tailwind.config.js -> brand)
+// BizzyQCU buyer palette (keep in sync with tailwind.config.js)
 const PALETTE = {
-  coinLight: '#FDE68A', // amber-200
-  coinMid: '#FDB813', // brand.yellow
-  coinDark: '#D97706', // amber-600
-  rim: 0xf59e0b, // brand.gold
-  faceInk: 'rgba(15, 39, 86, 0.92)', // brand.deepBlue
-  faceRing: 'rgba(255, 255, 255, 0.85)',
-  shadow: '11, 17, 32', // #0b1120 (DotGridBackground base), as r,g,b
-  keyLight: 0xfff4dc, // warm key light
-  fillLight: 0x3b82f6, // cool navy/blue rim light
+  coinLight: '#F4EB6C', // Sunlit Yellow
+  coinMid: '#FFD444', // Golden Alert (pop)
+  coinDark: '#EAB308',
+  rim: 0xffd444,
+  faceInk: 'rgba(3, 105, 161, 0.95)', // Text & Border Blue (#0369A1)
+  faceRing: 'rgba(255, 255, 255, 0.9)',
+  shadow: '2, 132, 199', // #0284C7 Ocean tint shadow on light canvas
+  keyLight: 0xfffdf0, // warm key light
+  fillLight: 0x8acff8, // Electric Sky rim light
 };
 
 const FONT = '"Plus Jakarta Sans", system-ui, sans-serif';

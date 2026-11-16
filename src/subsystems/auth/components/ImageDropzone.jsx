@@ -49,9 +49,9 @@ export default function ImageDropzone({
 
   return (
     <div>
-      <label className="flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-slate-300" htmlFor={id}>
+      <label className="flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-slate-700" htmlFor={id}>
         <span>{label}</span>
-        <span className="text-amber-400" aria-hidden="true">*</span>
+        <span className="text-[#0284C7]" aria-hidden="true">*</span>
       </label>
       <input
         ref={inputRef}
@@ -85,31 +85,31 @@ export default function ImageDropzone({
           disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
         } ${
           error
-            ? 'border-red-400/70 bg-red-500/5'
+            ? 'border-rose-400 bg-rose-50'
             : dragging
-              ? 'border-amber-400 bg-amber-400/10'
-              : 'border-amber-400/35 bg-white/[0.03] hover:border-amber-400/60 hover:bg-white/[0.06]'
+              ? 'border-[#0284C7] bg-[#8ACFF8]/20'
+              : 'border-[#8ACFF8] bg-[#F8FAFC] hover:border-[#0284C7] hover:bg-sky-50/70'
         }`}
       >
         {preview ? (
-          <img src={preview} alt="" className="w-14 h-14 rounded-xl object-cover border border-white/15 shrink-0" />
+          <img src={preview} alt="" className="w-14 h-14 rounded-xl object-cover border border-slate-200 shrink-0" />
         ) : (
-          <span className="w-12 h-12 rounded-full bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
+          <span className="w-12 h-12 rounded-full bg-[#8ACFF8]/25 border border-[#8ACFF8] flex items-center justify-center text-[#0369A1] shrink-0">
             <Icon name={isPdf ? 'picture_as_pdf' : file ? 'task_alt' : 'cloud_upload'} className="text-[22px]" />
           </span>
         )}
         <div className="text-left min-w-0">
           {file ? (
             <>
-              <p className="text-xs sm:text-sm font-semibold text-white truncate">{file.name}</p>
-              <p className="text-[11px] text-amber-300">
+              <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate">{file.name}</p>
+              <p className="text-[11px] text-[#0369A1]">
                 {(file.size / 1024 / 1024).toFixed(2)} MB · Click to replace
               </p>
             </>
           ) : (
             <>
-              <p className="text-xs sm:text-sm text-slate-300">
-                <span className="font-bold text-amber-300">Click to upload</span> or drag and drop
+              <p className="text-xs sm:text-sm text-slate-600">
+                <span className="font-bold text-[#0369A1]">Click to upload</span> or drag and drop
               </p>
               <p className="text-[11px] text-slate-500">
                 {hint || (allowPdf ? 'JPG, PNG, or PDF (Max 5MB)' : 'JPG or PNG (Max 5MB)')}
@@ -118,7 +118,7 @@ export default function ImageDropzone({
           )}
         </div>
       </div>
-      {error && <p className="mt-1 text-[11px] text-red-400">{error}</p>}
+      {error && <p className="mt-1 text-[11px] text-rose-600">{error}</p>}
     </div>
   )
 }

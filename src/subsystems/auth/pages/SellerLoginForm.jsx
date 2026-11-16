@@ -24,7 +24,7 @@ const PORTALS = {
     label: 'Student Enterprise',
     badge: 'STUDENT_ENTERPRISE',
     icon: 'school',
-    pillCls: 'bg-amber-400/15 text-amber-300 border-amber-400/35',
+    pillCls: 'bg-[#FFD444]/25 text-[#854D0E] border-[#FFD444]',
   },
   individual: {
     key: 'individual',
@@ -32,7 +32,7 @@ const PORTALS = {
     label: 'Independent Student Seller',
     badge: 'INDEPENDENT_SELLER',
     icon: 'person',
-    pillCls: 'bg-sky-400/15 text-sky-300 border-sky-400/35',
+    pillCls: 'bg-[#8ACFF8]/25 text-[#0369A1] border-[#8ACFF8]',
   },
   organization: {
     key: 'organization',
@@ -40,7 +40,7 @@ const PORTALS = {
     label: 'Recognized Organization',
     badge: 'RECOGNIZED_ORGANIZATION',
     icon: 'groups',
-    pillCls: 'bg-purple-400/15 text-purple-300 border-purple-400/35',
+    pillCls: 'bg-sky-100 text-[#0284C7] border-[#8ACFF8]',
   },
 }
 
@@ -174,9 +174,9 @@ export default function SellerLoginForm() {
       <SellerShowcase badge={portal.badge} />
 
       <section className="w-full max-w-[440px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="seller-form-title">
-        <AuthCard className="border-amber-400/20">
+        <AuthCard className="border-[#8ACFF8]/70">
             {/* Seller Portal Selector Bar */}
-            <div className="flex items-center justify-center pb-3.5 mb-4 border-b border-white/10">
+            <div className="flex items-center justify-center pb-3.5 mb-4 border-b border-slate-200">
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-extrabold uppercase tracking-wide ${portal.pillCls}`}>
                 <Icon name={portal.icon} className="text-[14px]" />
                 <span>{portal.label}</span>
@@ -184,7 +184,7 @@ export default function SellerLoginForm() {
             </div>
 
             {/* Quick 3-portal pills */}
-            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-white/[0.03] border border-white/10 mb-4">
+            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[#F8FAFC] border border-slate-200 mb-4">
               {Object.values(PORTALS).map((p) => {
                 const active = p.key === portal.key
                 return (
@@ -194,8 +194,8 @@ export default function SellerLoginForm() {
                     onClick={() => setSearchParams({ type: p.key }, { replace: true })}
                     className={`py-1.5 px-2 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all ${
                       active
-                        ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40 shadow-sm'
-                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                        ? 'bg-[#0284C7] text-white shadow-sm'
+                        : 'text-slate-600 hover:text-[#0369A1] hover:bg-sky-50'
                     }`}
                   >
                     <Icon name={p.icon} className="text-[14px]" />
@@ -208,13 +208,13 @@ export default function SellerLoginForm() {
             {/* Header */}
             <div className="text-center mb-4">
               <div className="flex items-center justify-center gap-1.5">
-                <Icon name="auto_awesome" className="text-amber-400 text-[18px]" />
-                <h1 id="seller-form-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+                <Icon name="auto_awesome" className="text-[#0284C7] text-[18px]" />
+                <h1 id="seller-form-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
                   Seller Portal Sign In
                 </h1>
-                <Icon name="auto_awesome" className="text-amber-400 text-[18px]" />
+                <Icon name="auto_awesome" className="text-[#0284C7] text-[18px]" />
               </div>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                 Sign in with your QCU ID using Password + Email OTP or a registered WebAuthn Passkey.
               </p>
             </div>
@@ -235,13 +235,13 @@ export default function SellerLoginForm() {
             {step === 'password' ? (
               <form className="space-y-3.5" onSubmit={handleRequestOtp}>
                 <div>
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-login-id">
-                    <Icon name="badge" className="text-[15px] text-amber-400" />
+                  <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700" htmlFor="seller-login-id">
+                    <Icon name="badge" className="text-[15px] text-[#0284C7]" />
                     <span>QCU ID Number</span>
-                    <span className="text-amber-400" aria-hidden="true">*</span>
+                    <span className="text-[#0284C7]" aria-hidden="true">*</span>
                   </label>
                   <div className="relative mt-1.5">
-                    <Icon name="account_circle" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-[20px] pointer-events-none" />
+                    <Icon name="account_circle" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none" />
                     <input
                       ref={idInputRef}
                       id="seller-login-id"
@@ -252,19 +252,19 @@ export default function SellerLoginForm() {
                       value={identifier}
                       onChange={(e) => setIdentifier(e.target.value)}
                       placeholder="e.g. 24-0001"
-                      className={`${inputBase} border-white/10 pl-11 pr-4`}
+                      className={`${inputBase} border-slate-200 pl-11 pr-4`}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-login-password">
-                    <Icon name="lock" className="text-[15px] text-amber-400" />
+                  <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700" htmlFor="seller-login-password">
+                    <Icon name="lock" className="text-[15px] text-[#0284C7]" />
                     <span>Password</span>
-                    <span className="text-amber-400" aria-hidden="true">*</span>
+                    <span className="text-[#0284C7]" aria-hidden="true">*</span>
                   </label>
                   <div className="relative mt-1.5">
-                    <Icon name="lock" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-[20px] pointer-events-none" />
+                    <Icon name="lock" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none" />
                     <input
                       id="seller-login-password"
                       type={showPassword ? 'text' : 'password'}
@@ -275,21 +275,21 @@ export default function SellerLoginForm() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className={`${inputBase} border-white/10 pl-11 pr-11`}
+                      className={`${inputBase} border-slate-200 pl-11 pr-11`}
                     />
                     <PasswordToggle visible={showPassword} onToggle={() => setShowPassword((s) => !s)} />
                   </div>
                 </div>
 
-                <p className="flex items-center gap-1.5 text-xs text-slate-400">
-                  <Icon name="verified_user" className="text-[15px] text-emerald-400" />
+                <p className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <Icon name="verified_user" className="text-[15px] text-emerald-600" />
                   <span>A 6-digit verification code will be sent to your registered QCU email.</span>
                 </p>
 
                 <button
                   type="submit"
                   disabled={busy}
-                  className="w-full py-3 rounded-xl font-extrabold text-base bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:via-amber-400 hover:to-amber-500 text-slate-950 ring-1 ring-inset ring-amber-200/50 shadow-lg shadow-amber-500/25 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full py-3 rounded-xl font-extrabold text-base bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <span>
                     {loginState === 'done'
@@ -317,19 +317,19 @@ export default function SellerLoginForm() {
                 {otpNotice && (
                   <Alert tone="info" icon="mark_email_read">
                     {otpNotice}
-                    <span className="block text-xs text-amber-200/70 mt-0.5">Signing in as {identifier.trim()}</span>
+                    <span className="block text-xs text-[#0369A1]/80 mt-0.5">Signing in as {identifier.trim()}</span>
                   </Alert>
                 )}
 
                 <div>
                   <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200" htmlFor="seller-login-otp">
-                      <Icon name="pin" className="text-[16px] text-amber-400" />
+                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700" htmlFor="seller-login-otp">
+                      <Icon name="pin" className="text-[16px] text-[#0284C7]" />
                       <span>6-Digit Verification Code</span>
                     </label>
                     <span
                       className={`text-xs font-semibold tabular-nums ${
-                        otpExpired ? 'text-red-400' : otpSecondsLeft <= 60 ? 'text-orange-300' : 'text-slate-400'
+                        otpExpired ? 'text-rose-600' : otpSecondsLeft <= 60 ? 'text-amber-600' : 'text-slate-500'
                       }`}
                       aria-live="polite"
                     >
@@ -349,7 +349,7 @@ export default function SellerLoginForm() {
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="••••••"
-                    className={`${inputBase} border-white/10 mt-1.5 px-4 text-center tracking-[0.6em] text-xl font-mono`}
+                    className={`${inputBase} border-slate-200 mt-1.5 px-4 text-center tracking-[0.6em] text-xl font-mono`}
                   />
                 </div>
 
@@ -358,8 +358,8 @@ export default function SellerLoginForm() {
                   disabled={loginState !== 'idle' || otp.length !== 6 || otpExpired}
                   className={`w-full py-3 rounded-xl font-extrabold text-base transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:cursor-not-allowed ${
                     loginState === 'done'
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 disabled:opacity-60'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] disabled:opacity-60'
                   }`}
                 >
                   <span>
@@ -378,7 +378,7 @@ export default function SellerLoginForm() {
                       setOtpExpiresAt(null)
                       setLoginError(null)
                     }}
-                    className="text-xs text-slate-400 hover:text-white"
+                    className="text-xs text-slate-500 hover:text-[#0369A1]"
                   >
                     ← Back to password
                   </button>
@@ -386,7 +386,7 @@ export default function SellerLoginForm() {
                     type="button"
                     onClick={handleRequestOtp}
                     disabled={loginState !== 'idle' || resendSecondsLeft > 0}
-                    className="text-xs font-semibold text-amber-300 hover:underline disabled:text-slate-500 disabled:no-underline"
+                    className="text-xs font-semibold text-[#0369A1] hover:text-[#0284C7] hover:underline disabled:text-slate-400 disabled:no-underline"
                   >
                     {resendSecondsLeft > 0 ? `Resend code in ${resendSecondsLeft}s` : 'Resend code'}
                   </button>
@@ -396,12 +396,12 @@ export default function SellerLoginForm() {
 
             {/* Footer links */}
             <div className="mt-auto pt-4">
-              <div className="pt-3.5 border-t border-white/10 text-center">
+              <div className="pt-3.5 border-t border-slate-200 text-center">
                 <Link
                   to="/login"
-                  className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide px-3.5 py-1.5 rounded-full bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/10 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide px-3.5 py-1.5 rounded-full bg-sky-50 text-[#0369A1] hover:bg-[#8ACFF8]/25 hover:text-[#0284C7] border border-[#8ACFF8] transition-colors"
                 >
-                  <Icon name="shopping_bag" className="text-[14px] text-amber-400" />
+                  <Icon name="shopping_bag" className="text-[14px] text-[#0284C7]" />
                   <span>Shopping instead? Buyer Login</span>
                 </Link>
               </div>
