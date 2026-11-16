@@ -188,16 +188,20 @@ export const verifyWebAuthnRegistration = async ({ response, deviceName, userId 
 /**
  * POST /auth/webauthn/login/options
  */
-export const getWebAuthnLoginOptions = async (qcuIdNumber) => {
-  const response = await apiClient.post('/auth/webauthn/login/options', { qcuIdNumber });
+export const getWebAuthnLoginOptions = async (qcuIdNumber, portal) => {
+  const payload = { qcuIdNumber };
+  if (portal) payload.portal = portal;
+  const response = await apiClient.post('/auth/webauthn/login/options', payload);
   return response.data;
 };
 
 /**
  * POST /auth/webauthn/login/verify
  */
-export const verifyWebAuthnLogin = async ({ qcuIdNumber, response }) => {
-  const res = await apiClient.post('/auth/webauthn/login/verify', { qcuIdNumber, response });
+export const verifyWebAuthnLogin = async ({ qcuIdNumber, response, portal }) => {
+  const payload = { qcuIdNumber, response };
+  if (portal) payload.portal = portal;
+  const res = await apiClient.post('/auth/webauthn/login/verify', payload);
   return res.data;
 };
 
@@ -263,10 +267,10 @@ export const registerPasskey = async ({ userId, deviceName }) => {
 /**
  * Full passkey login ceremony (options -> browser prompt -> verify).
  */
-export const loginWithPasskey = async (qcuIdNumber) => {
-  const { data: options } = await getWebAuthnLoginOptions(qcuIdNumber);
+export const loginWithPasskey = async (qcuIdNumber, portal) => {
+  const { data: options } = await getWebAuthnLoginOptions(qcuIdNumber, portal);
   const assertion = await startPasskeyLogin(options);
-  const result = await verifyWebAuthnLogin({ qcuIdNumber, response: assertion });
+  const result = await verifyWebAuthnLogin({ qcuIdNumber, response: assertion, portal });
   return result.data;
 };
 

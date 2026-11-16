@@ -9,11 +9,17 @@ export default function KpiCard({
   footerLabel, 
   footerValue 
 }) {
-  const isPositive = delta >= 0;
-  const deltaStyles = isPositive 
-    ? 'text-emerald-600 bg-emerald-50' 
+  const numericDelta = Number(delta ?? 0);
+  const isPositive = numericDelta > 0;
+  const isNeutral = numericDelta === 0;
+
+  const deltaStyles = isNeutral
+    ? 'text-slate-600 bg-slate-100'
+    : isPositive
+    ? 'text-emerald-600 bg-emerald-50'
     : 'text-rose-600 bg-rose-50';
-  const deltaSymbol = isPositive ? '↑ +' : '↓ ';
+
+  const deltaSymbol = isNeutral ? '' : isPositive ? '↑ +' : '↓ ';
 
   return (
     <div className="bg-white p-5 rounded-xl border border-slate-200/90 shadow-sm">

@@ -34,37 +34,120 @@ export function CartProvider({ children }) {
 
   const value = useMemo(() => {
     const selected = items.filter(isChecked);
-    const count = items.reduce((s, i) => s + i.qty, 0);
-    const selectedCount = selected.reduce((s, i) => s + i.qty, 0);
-    const selectedTotal = selected.reduce((s, i) => s + i.price * i.qty, 0);
+    const getItemQty = (i) => i.qty ?? i.quantity ?? 1;
+    const count = items.reduce((s, i) => s + getItemQty(i), 0);
+    const selectedCount = selected.reduce((s, i) => s + getItemQty(i), 0);
+    const selectedTotal = selected.reduce((s, i) => s + (Number(i.price) || 0) * getItemQty(i), 0);
     const allSelected = items.length > 0 && items.every(isChecked);
 
     // Adding the same product again raises its quantity instead of adding a new line.
     const add = (item) =>
       setItems((prev) => {
-        const found = prev.find((i) => i.id === item.id);
-        if (found) return prev.map((i) => (i.id === item.id ? { ...i, qty: i.qty + 1, checked: true } : i));
-        return [...prev, { ...item, qty: 1, checked: true }];
+        const itemId = item.id || item.productId;
+        const addQty = item.qty ?? item.quantity ?? 1;
+        const found = prev.find((i) => (i.id || i.productId) === itemId);
+        if (found) {
+          const newQty = getItemQty(found) + addQty;
+          return prev.map((i) =>
+            (i.id || i.productId) === itemId
+              ? {
+                  ...i,
+                  ...item,
+                  id: itemId,
+                  productId: item.productId || itemId,
+                  qty: newQty,
+                  quantity: newQty,
+                  checked: true,
+                }
+              : i
+          );
+        }
+        return [
+          ...prev,
+          {
+            ...item,
+            id: itemId,
+            productId: item.productId || itemId,
+            qty: addQty,
+            quantity: addQty,
+            checked: true,
+          },
+        ];
       });
 
     const setQty = (id, qty) =>
-      setItems((prev) => prev.map((i) => (i.id === id ? { ...i, qty: Math.max(1, Math.min(99, qty)) } : i)));
+      setItems((prev) =>
+        prev.map((i) => {
+          if ((i.id || i.productId) === id) {
+            const clamped = Math.max(1, Math.min(99, qty));
+            return { ...i, qty: clamped, quantity: clamped };
+          }
+          return i;
+        })
+      );
 
     const toggleSelected = (id) =>
-      setItems((prev) => prev.map((i) => (i.id === id ? { ...i, checked: !isChecked(i) } : i)));
+      setItems((prev) =>
+        prev.map((i) =>
+          (i.id || i.productId) === id ? { ...i, checked: !isChecked(i) } : i
+        )
+      );
 
-    const setAllSelected = (on) => setItems((prev) => prev.map((i) => ({ ...i, checked: on })));
+    const setAllSelected = (on) =>
+      setItems((prev) => prev.map((i) => ({ ...i, checked: on })));
 
-    const remove = (id) => setItems((prev) => prev.filter((i) => i.id !== id));
+    const remove = (id) =>
+      setItems((prev) => prev.filter((i) => (i.id || i.productId) !== id));
+
     const removeSelected = () => setItems((prev) => prev.filter((i) => !isChecked(i)));
+
+    const clearCheckedOut = (checkedOutItems) => {
+      if (Array.isArray(checkedOutItems) && checkedOutItems.length > 0) {
+        const checkedOutIds = new Set(
+          checkedOutItems.flatMap((i) => [i.id, i.productId].filter(Boolean))
+        );
+        setItems((prev) =>
+          prev.filter((i) => !checkedOutIds.has(i.id) && !checkedOutIds.has(i.productId))
+        );
+      } else {
+        removeSelected();
+      }
+    };
+
     const clear = () => setItems([]);
-    const buyNow = (item) => setItems([{ ...item, qty: 1, checked: true }]);
+
+    const buyNow = (item) => {
+      const itemId = item.id || item.productId;
+      const qty = item.qty ?? item.quantity ?? 1;
+      setItems([
+        {
+          ...item,
+          id: itemId,
+          productId: item.productId || itemId,
+          qty,
+          quantity: qty,
+          checked: true,
+        },
+      ]);
+    };
 
     return {
-      items, count, allSelected,
-      selected, selectedCount, selectedTotal,
-      add, setQty, remove, removeSelected, clear, buyNow,
-      toggleSelected, setAllSelected, isChecked,
+      items,
+      count,
+      allSelected,
+      selected,
+      selectedCount,
+      selectedTotal,
+      add,
+      setQty,
+      remove,
+      removeSelected,
+      clearCheckedOut,
+      clear,
+      buyNow,
+      toggleSelected,
+      setAllSelected,
+      isChecked,
     };
   }, [items]);
 

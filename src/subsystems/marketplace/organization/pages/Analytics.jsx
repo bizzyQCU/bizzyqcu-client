@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAnalytics } from "../../hooks/useAnalytics";
 import { useDateRange } from "../../hooks/useDateRange";
-import { fmtRange } from "../../utils/dates";
+import { fmtRange, toISODate } from "../../utils/dates";
 import SellerSidebar from "../components/SellerSidebar";
 import SellerTopBar from "../components/SellerTopBar";
 import PageHeader from "../components/analytics/PageHeader";
@@ -24,10 +24,10 @@ export default function Analytics() {
   const [dateModalOpen, setDateModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
 
-  // Convert dates for useAnalytics hook (keeping old format for now)
+  // Convert dates for useAnalytics hook using local date string (avoid UTC timezone backward shift)
   const dateRange = {
-    start: applied.start.toISOString().split("T")[0],
-    end: applied.end.toISOString().split("T")[0],
+    start: toISODate(applied.start),
+    end: toISODate(applied.end),
   };
 
   const { data, loading, error, refresh } = useAnalytics(dateRange);
@@ -117,7 +117,7 @@ export default function Analytics() {
             ) : (
               <div className="lg:col-span-8 bg-white rounded-xl border border-slate-200 p-6">
                 <h3 className="text-base font-bold text-slate-900 mb-2">Weekly Sales</h3>
-                <p className="text-sm text-slate-500">Historical sales data not yet available. This feature requires backend implementation.</p>
+                <p className="text-sm text-slate-500">No sales recorded for this period yet.</p>
               </div>
             )}
             <TopRevenueDrivers
@@ -132,7 +132,7 @@ export default function Analytics() {
             ) : (
               <div className="bg-white rounded-xl border border-slate-200 p-6">
                 <h3 className="text-base font-bold text-slate-900 mb-2">Traffic Channels</h3>
-                <p className="text-sm text-slate-500">Traffic analytics not yet available. This feature requires visitor tracking implementation.</p>
+                <p className="text-sm text-slate-500">No traffic channel visits recorded for this period yet.</p>
               </div>
             )}
             {data.actions && data.actions.length > 0 ? (

@@ -4,9 +4,11 @@ import { useCart } from "../../../../lib/CartContext.jsx";
 
 export default function PaymentFailedPage() {
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const { state, search } = useLocation();
+  const queryOrder = new URLSearchParams(search).get("order");
   const order = state?.order;
-  const orderNumber = order?.orderNumber ? `#${order.orderNumber}` : "—";
+  const rawOrderNumber = order?.orderNumber || queryOrder;
+  const orderNumber = rawOrderNumber ? (rawOrderNumber.startsWith("#") ? rawOrderNumber : `#${rawOrderNumber}`) : "—";
   const { selected: items, selectedTotal: total } = useCart();
   const displayTotal = order?.totalAmount != null ? Number(order.totalAmount) : total;
   const itemCount = order?.items?.length ?? items.length;
@@ -19,7 +21,7 @@ export default function PaymentFailedPage() {
         </div>
         <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-rose-50 dark:bg-rose-950/40 px-3 py-1 text-xs font-semibold text-rose-600 dark:text-rose-400">
           <Icon name="alert" className="h-3.5 w-3.5 shrink-0 text-rose-500" />
-          <span>Payment failed (GCash Checkout Timeout / Cancelled)</span>
+          <span>Payment cancelled or incomplete</span>
         </div>
         <h1 className="mb-2 text-xl font-bold tracking-tight text-[#0F172A] md:text-2xl">Payment didn't go through.</h1>
         <p className="mb-6 max-w-sm text-sm text-[#64748B]">No payment was recorded. Your items are still in your cart.</p>
@@ -27,24 +29,24 @@ export default function PaymentFailedPage() {
         <div className="mb-4 flex w-full flex-col gap-3">
           <button
             type="button"
-            onClick={() => navigate("/payment/pending", { state: { method: "gcash" } })}
+            onClick={() => navigate("/checkout")}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0284C7] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#0369A1] active:scale-[0.99]"
           >
             <Icon name="refresh" className="h-4 w-4" strokeWidth={2.5} />
-            <span>Try GCash again</span>
+            <span>Retry checkout</span>
           </button>
           <button
             type="button"
-            onClick={() => navigate("/payment/confirmed", { state: { method: "cash" } })}
+            onClick={() => navigate("/cart")}
             className="flex w-full items-center justify-center gap-2 rounded-full border-[1.5px] border-[#8ACFF8] bg-white dark:bg-slate-900 px-5 py-3 text-sm font-semibold text-[#0369A1] transition-all hover:bg-sky-50/50 dark:hover:bg-sky-950/40 active:scale-[0.99]"
           >
-            <Icon name="cash" className="h-4 w-4" />
-            <span>Pay with cash instead</span>
+            <Icon name="cart" className="h-4 w-4" />
+            <span>Return to cart</span>
           </button>
         </div>
 
         <Link to="/marketplace" className="mb-6 text-xs font-semibold text-[#0369A1] underline underline-offset-2 transition-colors hover:text-[#0284C7]">
-          Cancel order
+          Back to marketplace
         </Link>
 
         <section aria-label="Order Breakdown" className="w-full rounded-xl border border-slate-100 dark:border-slate-800 bg-[#F1F5F9]/60 p-4 text-left">

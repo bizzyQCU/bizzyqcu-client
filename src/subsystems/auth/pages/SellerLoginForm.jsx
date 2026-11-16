@@ -50,9 +50,10 @@ const RESEND_COOLDOWN_SECONDS = 60
 const formatClock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
 function destinationFor(user) {
-  if (user?.verificationStatus !== 'VERIFIED') return '/account'
   if (user?.role === 'ADMIN') return '/admin'
-  return '/dashboard'
+  if (user?.verificationStatus !== 'VERIFIED') return '/account'
+  if (user?.role === 'SELLER') return '/seller/analytics'
+  return '/account'
 }
 
 export default function SellerLoginForm() {
@@ -97,6 +98,12 @@ export default function SellerLoginForm() {
 
   const finishLogin = (session) => {
     const { token, accessToken, user } = session
+    if (user?.role === 'BUYER' && !user?.hasSellerProfile && !user?.sellerProfile) {
+      setLoginError('This account is registered as a buyer. Please use the buyer login or register for a seller account.')
+      setLoginState('idle')
+      setBioState('idle')
+      return
+    }
     authLogin(user, token || accessToken)
     later(() => navigate(destinationFor(user), { replace: true }), 600)
   }
@@ -110,6 +117,7 @@ export default function SellerLoginForm() {
       const result = await requestPasswordOtp({
         qcuIdNumber: identifier.trim(),
         password,
+        portal: 'seller',
       })
       if (result?.data?.accessToken || result?.data?.token) {
         setLoginState('done')
@@ -139,6 +147,7 @@ export default function SellerLoginForm() {
       const result = await verifyPasswordOtp({
         qcuIdNumber: identifier.trim(),
         otp: otp.trim(),
+        portal: 'seller',
       })
       setLoginState('done')
       finishLogin(result.data)
@@ -158,7 +167,7 @@ export default function SellerLoginForm() {
     }
     setBioState('scanning')
     try {
-      const session = await loginWithPasskey(identifier.trim())
+      const session = await loginWithPasskey(identifier.trim(), 'seller')
       setBioState('done')
       finishLogin(session)
     } catch (err) {

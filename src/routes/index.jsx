@@ -21,6 +21,8 @@ import SellerOrders from "../subsystems/marketplace/organization/pages/Orders.js
 // Subsystem 3: Orders, cart, checkout, payment, messages
 import CartPage from "../subsystems/orders/pages/Cart/CartPage.jsx";
 import CheckoutPage from "../subsystems/orders/pages/Cart/CheckoutPage.jsx";
+import CheckoutSuccessPage from "../subsystems/orders/pages/Cart/CheckoutSuccessPage.jsx";
+import CheckoutCancelPage from "../subsystems/orders/pages/Cart/CheckoutCancelPage.jsx";
 import PaymentPage from "../subsystems/orders/pages/Cart/PaymentPage.jsx";
 import PaymentPendingPage from "../subsystems/orders/pages/Cart/PaymentPendingPage.jsx";
 import PaymentConfirmedPage from "../subsystems/orders/pages/Cart/PaymentConfirmedPage.jsx";
@@ -92,6 +94,8 @@ export default function AppRoutes() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+        <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/payment/pending" element={<PaymentPendingPage />} />
         <Route path="/payment/confirmed" element={<PaymentConfirmedPage />} />
