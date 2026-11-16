@@ -1,11 +1,17 @@
-import apiClient from "../../lib/api-client";
+import apiClient, { getErrorMessage, getFieldErrors } from "../../lib/api-client";
 
 // ============================================================================
-// SUBSYSTEM 2: MARKETPLACE & ENTERPRISE MANAGEMENT
-// Mirrors bizzyqcu-server: src/modules/marketplace
-//
-// Not available on the server yet (do not call): stores, categories,
-// single-product lookup, product update/delete, seller inventory list.
+// SUBSYSTEM 2: MARKETPLACE & ORGANIZATION SELLER MANAGEMENT
+// Mirrors bizzyqcu-server:
+//   - src/modules/marketplace (products, catalog, inventory, dashboard, analytics, stores, categories)
+//   - src/modules/orders (orders, messages, pickup locations, paymongo onboarding)
+//   - src/modules/organization (profile, cooldown-enforced updates, password)
+//   - src/modules/upload (single & multiple file uploads)
+//   - src/modules/auth (profile, email, password fallback)
+// ============================================================================
+
+// ============================================================================
+// PRODUCTS & CATALOG
 // ============================================================================
 
 /**
@@ -35,7 +41,41 @@ export const getProducts = async (filters = {}) => {
 };
 
 /**
- * POST /marketplace/products
+ * GET /marketplace/products/:id (public)
+ */
+export const getPublicProduct = async (productId) => {
+  const response = await apiClient.get(`/marketplace/products/${productId}`);
+  return response.data;
+};
+
+/**
+ * GET /marketplace/seller/products (seller only)
+ * Returns the authenticated seller's own products including PENDING/REJECTED.
+ *
+ * @param {object} [query]
+ * @param {number} [query.page]    default 1
+ * @param {number} [query.limit]   default 20
+ * @param {'PENDING'|'VERIFIED'|'REJECTED'} [query.approvalStatus]
+ * @returns {Promise<{ success: boolean, items: object[], pagination: object }>}
+ */
+export const getSellerProducts = async (query = {}) => {
+  const params = Object.fromEntries(
+    Object.entries(query).filter(([, v]) => v !== "" && v !== null && v !== undefined),
+  );
+  const response = await apiClient.get("/marketplace/seller/products", { params });
+  return response.data;
+};
+
+/**
+ * GET /marketplace/seller/products/:id (seller only)
+ */
+export const getSellerProduct = async (productId) => {
+  const response = await apiClient.get(`/marketplace/seller/products/${productId}`);
+  return response.data;
+};
+
+/**
+ * POST /marketplace/products (seller only)
  * Product is created as PENDING and awaits admin approval.
  *
  * @param {object} productData
@@ -49,6 +89,25 @@ export const getProducts = async (filters = {}) => {
  */
 export const createProduct = async (productData) => {
   const response = await apiClient.post("/marketplace/products", productData);
+  return response.data;
+};
+
+/**
+ * PATCH /marketplace/products/:id (seller only)
+ */
+export const updateProduct = async (productId, productData) => {
+  const response = await apiClient.patch(
+    `/marketplace/products/${productId}`,
+    productData,
+  );
+  return response.data;
+};
+
+/**
+ * DELETE /marketplace/products/:id (seller only)
+ */
+export const deleteProduct = async (productId) => {
+  const response = await apiClient.delete(`/marketplace/products/${productId}`);
   return response.data;
 };
 
@@ -74,22 +133,125 @@ export const setProductAvailability = async (productId, isAvailable) => {
   return response.data;
 };
 
+// ============================================================================
+// CATEGORIES
+// ============================================================================
+
+/**
+ * GET /marketplace/categories (public)
+ * @returns {Promise<{ success: boolean, data: { id: string, name: string, slug: string }[] }>}
+ */
+export const getCategories = async () => {
+  const response = await apiClient.get("/marketplace/categories");
+  return response.data;
+};
+
+/**
+ * GET /marketplace/categories/:id (public)
+ */
+export const getCategoryById = async (categoryId) => {
+  const response = await apiClient.get(`/marketplace/categories/${categoryId}`);
+  return response.data;
+};
+
+// ============================================================================
+// STORES
+// ============================================================================
+
 /**
  * GET /marketplace/stores/:id (public)
  * Returns the store with its VERIFIED products.
- *
- * @param {string} storeId  uuid
- * @returns {Promise<{success: boolean, data: {
- *   id: string, name: string, description: string, pickupLocation: string,
- *   isOpen: boolean, sellerProfile: { sellerType: string },
- *   products: Array<{ id: string, name: string, price: string, stockQuantity: number,
- *                      imageUrls: string[], category: { id: string, name: string, slug: string } }>
- * }}>}
  */
 export const getStore = async (storeId) => {
   const response = await apiClient.get(`/marketplace/stores/${storeId}`);
   return response.data;
 };
+
+/**
+ * GET /marketplace/stores/slug/:slug (public)
+ */
+export const getStoreBySlug = async (slug) => {
+  const response = await apiClient.get(`/marketplace/stores/slug/${slug}`);
+  return response.data;
+};
+
+/**
+ * GET /marketplace/stores/me (seller only)
+ */
+export const getMyStore = async () => {
+  const response = await apiClient.get("/marketplace/stores/me");
+  return response.data;
+};
+
+/**
+ * PATCH /marketplace/stores/me (seller only)
+ */
+export const updateMyStore = async (storeData) => {
+  const response = await apiClient.patch("/marketplace/stores/me", storeData);
+  return response.data;
+};
+
+/**
+ * DELETE /marketplace/stores/me (seller only)
+ */
+export const deleteMyStore = async () => {
+  const response = await apiClient.delete("/marketplace/stores/me");
+  return response.data;
+};
+
+/**
+ * POST /marketplace/stores (seller only)
+ */
+export const createStore = async (storeData) => {
+  const response = await apiClient.post("/marketplace/stores", storeData);
+  return response.data;
+};
+
+/**
+ * GET /marketplace/stores/me (seller only)
+ * Fetches the authenticated seller's store profile, returning null on 404.
+ */
+export const getStoreSettings = async () => {
+  try {
+    const response = await apiClient.get("/marketplace/stores/me");
+    return response.data?.data || response.data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+};
+
+/**
+ * PATCH /marketplace/stores/me (seller only)
+ * Updates the seller's store profile; creates it via POST /marketplace/stores if 404.
+ */
+export const updateStoreSettings = async (storeData) => {
+  try {
+    const response = await apiClient.patch("/marketplace/stores/me", storeData);
+    return response.data?.data || response.data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      const payload = {
+        name: storeData.name || "Organization Store",
+        description:
+          storeData.description ||
+          "Student Organization Store at Quezon City University",
+        pickupLocation: storeData.pickupLocation,
+        logoUrl: storeData.logoUrl,
+        bannerUrl: storeData.bannerUrl,
+      };
+      const createRes = await apiClient.post("/marketplace/stores", payload);
+      return createRes.data?.data || createRes.data;
+    }
+    throw error;
+  }
+};
+
+// ============================================================================
+// SELLER DASHBOARD & ANALYTICS
+// ============================================================================
 
 /**
  * GET /marketplace/seller/dashboard (seller only)
@@ -100,217 +262,12 @@ export const getSellerDashboard = async () => {
   return response.data;
 };
 
-// ============================================================================
-// ORDERS
-// Mirrors bizzyqcu-server: src/modules/orders
-// All routes require authentication (requireAuth). Buyer/Seller roles are
-// enforced server-side via RBAC middleware.
-// ============================================================================
-
-/**
- * GET /orders/seller
- * Returns all incoming orders for the authenticated seller's store.
- * Requires SELLER role.
- *
- * Each order has the shape:
- *   { id, orderNumber, orderStatus, deliveryMethod, paymentMethod, totalAmount,
- *     createdAt, updatedAt,
- *     buyer: { id, fullName, email, qcuIdNumber },
- *     items: [{ id, productNameSnapshot, unitPriceSnapshot, quantity, subtotal }],
- *     payment: { id, amount, method, status, paidAt },
- *     _count: { messages } }
- *
- * @returns {Promise<{ success: boolean, count: number, data: object[] }>}
- */
-export const getSellerOrders = async () => {
-  const response = await apiClient.get("/orders/seller");
-  return response.data;
-};
-
-/**
- * GET /orders/my-orders
- * Returns all orders placed by the authenticated buyer.
- * Requires BUYER role.
- *
- * @returns {Promise<{ success: boolean, count: number, data: object[] }>}
- */
-export const getMyOrders = async () => {
-  const response = await apiClient.get("/orders/my-orders");
-  return response.data;
-};
-
-/**
- * GET /orders/:id
- * Returns a single order by ID. Accessible by the order's buyer, the store's
- * seller, or an admin.
- *
- * @param {string} orderId  UUID
- * @returns {Promise<{ success: boolean, data: object }>}
- */
-export const getOrderById = async (orderId) => {
-  const response = await apiClient.get(`/orders/${orderId}`);
-  return response.data;
-};
-
-/**
- * PATCH /orders/:id/status
- * Advances (or cancels) an order through the state machine.
- *
- * Valid status values:
- *   PENDING_PAYMENT | PENDING_CONFIRMATION | PREPARING |
- *   READY_FOR_PICKUP | OUT_FOR_DELIVERY | COMPLETED | CANCELLED
- *
- * Transitions are enforced server-side (order.state.ts).
- * - SELLER can move: PENDING_CONFIRMATION → PREPARING → READY_FOR_PICKUP /
- *   OUT_FOR_DELIVERY → COMPLETED, or cancel before fulfillment.
- * - BUYER can only cancel orders in PENDING_PAYMENT or PENDING_CONFIRMATION.
- *
- * @param {string} orderId  UUID
- * @param {string} status   One of the valid OrderStatus enum values above
- * @returns {Promise<{ success: boolean, message: string, data: object }>}
- */
-export const updateOrderStatus = async (orderId, status) => {
-  const response = await apiClient.patch(`/orders/${orderId}/status`, {
-    status,
-  });
-  return response.data;
-};
-
-/**
- * GET /orders/:id/messages
- * Returns the buyer-seller communication log for an order.
- * Accessible by the order's buyer, the seller, or an admin.
- *
- * @param {string} orderId  UUID
- * @returns {Promise<{ success: boolean, count: number, data: object[] }>}
- */ 
-export const getOrderMessages = async (orderId) => {
-  const response = await apiClient.get(`/orders/${orderId}/messages`);
-  return response.data;
-};
-
-/**
- * POST /orders/:id/messages
- * Sends a message on an order thread.
- * Accessible by the order's buyer, the seller, or an admin.
- *
- * @param {string} orderId  UUID
- * @param {string} message  1–1000 characters
- * @returns {Promise<{ success: boolean, message: string, data: object }>}
- */
-export const createOrderMessage = async (orderId, message) => {
-  const response = await apiClient.post(`/orders/${orderId}/messages`, {
-    message,
-  });
-  return response.data;
-};
-
-/**
- * GET /orders/pickup-locations
- * Returns verified store pickup locations and a list of campus buildings.
- *
- * @returns {Promise<{ success: boolean, data: { pickupStores: object[], campusBuildings: string[] } }>}
- */
-export const getPickupLocations = async () => {
-  const response = await apiClient.get("/orders/pickup-locations");
-  return response.data;
-};
-
-/**
- * POST /orders
- * Checks out the buyer's cart. Creates one order per seller in the cart.
- * Requires BUYER + VERIFIED roles.
- *
- * @param {object} checkoutData
- * @param {'ROOM_TO_ROOM'|'PICKUP'} checkoutData.deliveryMethod
- * @param {'CASH'|'GCASH_PAYMONGO'}  checkoutData.paymentMethod
- * @param {string}  [checkoutData.campusBuilding]      Required for ROOM_TO_ROOM
- * @param {string}  [checkoutData.campusRoomNumber]    Required for ROOM_TO_ROOM
- * @param {string}  [checkoutData.pickupInstructions]  Optional, max 500 chars
- * @param {string}  [checkoutData.deliveryNotes]       Optional, max 500 chars
- * @returns {Promise<{ success: boolean, message: string, data: { orders: object[] } }>}
- */
-export const checkoutCart = async (checkoutData) => {
-  const response = await apiClient.post("/orders", checkoutData);
-  return response.data;
-};
-
-// ============================================================================
-// SELLER INVENTORY
-// ============================================================================
-
-/**
- * GET /marketplace/seller/products (seller only)
- * Returns the authenticated seller's own products including PENDING/REJECTED.
- *
- * @param {object} [query]
- * @param {number} [query.page]    default 1
- * @param {number} [query.limit]   default 20
- * @param {'PENDING'|'VERIFIED'|'REJECTED'} [query.approvalStatus]
- * @returns {Promise<{ success: boolean, items: object[], pagination: object }>}
- */
-export const getSellerProducts = async (query = {}) => {
-  const params = Object.fromEntries(
-    Object.entries(query).filter(([, v]) => v !== '' && v !== null && v !== undefined),
-  );
-  const response = await apiClient.get('/marketplace/seller/products', { params });
-  return response.data;
-};
-
-/**
- * GET /marketplace/categories (public)
- * @returns {Promise<{ success: boolean, data: { id: string, name: string, slug: string }[] }>}
- */
-export const getCategories = async () => {
-  const response = await apiClient.get('/marketplace/categories');
-  return response.data;
-};
-
-// ============================================================================
-// STORES
-// ============================================================================
-
-/**
- * GET /marketplace/stores/me (seller only)
- */
-export const getMyStore = async () => {
-  const response = await apiClient.get('/marketplace/stores/me');
-  return response.data;
-};
-
-/**
- * PATCH /marketplace/stores/me (seller only)
- */
-export const updateMyStore = async (storeData) => {
-  const response = await apiClient.patch('/marketplace/stores/me', storeData);
-  return response.data;
-};
-
-/**
- * POST /marketplace/stores (seller only)
- */
-export const createStore = async (storeData) => {
-  const response = await apiClient.post('/marketplace/stores', storeData);
-  return response.data;
-};
-
-// ============================================================================
-// ANALYTICS
-// ============================================================================
-
 /**
  * GET /marketplace/seller/analytics (seller only)
- * Returns seller analytics and dashboard data including:
- * - Store information
- * - Sales metrics & historical comparisons
- * - Weekly sales chart series
- * - Traffic channels & attribution
- * - Priority actions
- * - Conversion metrics
- * 
  * @param {object} [dateRange] Optional date range filter
  * @param {string} [dateRange.start] Start date in YYYY-MM-DD format
  * @param {string} [dateRange.end] End date in YYYY-MM-DD format
+ * @param {'day'|'week'|'month'} [dateRange.groupBy] Bucket grouping
  * @returns {Promise<{ success: boolean, data: object }>}
  */
 export const getSellerAnalytics = async (dateRange) => {
@@ -323,8 +280,295 @@ export const getSellerAnalytics = async (dateRange) => {
     params.end = dateRange.end;
     params.to = dateRange.end;
   }
-  
-  const response = await apiClient.get('/marketplace/seller/analytics', { params });
+  if (dateRange?.groupBy) {
+    params.groupBy = dateRange.groupBy;
+  }
+
+  const response = await apiClient.get("/marketplace/seller/analytics", { params });
   return response.data;
 };
 
+// ============================================================================
+// ORDERS & SELLER FULFILLMENT / PAYMONGO
+// ============================================================================
+
+/**
+ * GET /orders/seller
+ * Returns all incoming orders for the authenticated seller's store.
+ * Requires SELLER role.
+ */
+export const getSellerOrders = async () => {
+  const response = await apiClient.get("/orders/seller");
+  return response.data;
+};
+
+/**
+ * GET /orders/my-orders
+ * Returns all orders placed by the authenticated buyer.
+ */
+export const getMyOrders = async () => {
+  const response = await apiClient.get("/orders/my-orders");
+  return response.data;
+};
+
+/**
+ * GET /orders/:id
+ * Returns a single order by ID.
+ */
+export const getOrderById = async (orderId) => {
+  const response = await apiClient.get(`/orders/${orderId}`);
+  return response.data;
+};
+
+/**
+ * PATCH /orders/:id/status
+ * Advances (or cancels) an order through the state machine.
+ */
+export const updateOrderStatus = async (orderId, status) => {
+  const response = await apiClient.patch(`/orders/${orderId}/status`, {
+    status,
+  });
+  return response.data;
+};
+
+/**
+ * GET /orders/:id/messages
+ * Returns the buyer-seller communication log for an order.
+ */
+export const getOrderMessages = async (orderId) => {
+  const response = await apiClient.get(`/orders/${orderId}/messages`);
+  return response.data;
+};
+
+/**
+ * POST /orders/:id/messages
+ * Sends a message on an order thread.
+ */
+export const createOrderMessage = async (orderId, message) => {
+  const response = await apiClient.post(`/orders/${orderId}/messages`, {
+    message,
+  });
+  return response.data;
+};
+
+/**
+ * GET /orders/pickup-locations
+ */
+export const getPickupLocations = async () => {
+  const response = await apiClient.get("/orders/pickup-locations");
+  return response.data;
+};
+
+/**
+ * POST /orders
+ */
+export const checkoutCart = async (checkoutData) => {
+  const response = await apiClient.post("/orders", checkoutData);
+  return response.data;
+};
+
+/**
+ * GET /orders/seller/paymongo-status
+ */
+export const getSellerPaymongoStatus = async () => {
+  const response = await apiClient.get("/orders/seller/paymongo-status");
+  return response.data;
+};
+
+/**
+ * POST /orders/seller/paymongo-onboard
+ */
+export const onboardSellerPaymongo = async (payload) => {
+  const response = await apiClient.post("/orders/seller/paymongo-onboard", payload);
+  return response.data;
+};
+
+// ============================================================================
+// UPLOADS
+// ============================================================================
+
+/**
+ * POST /upload (auth required)
+ */
+export const uploadFile = async (file, folder = "stores") => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("folder", folder);
+
+  const response = await apiClient.post("/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data?.data || response.data;
+};
+
+/**
+ * POST /upload (folder: 'stores/logos')
+ */
+export const uploadLogo = async (file) => {
+  return uploadFile(file, "stores/logos");
+};
+
+/**
+ * POST /upload/multiple (auth required, max 5 files)
+ */
+export const uploadMultipleFiles = async (files, folder = "products") => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    if (file instanceof File || file instanceof Blob) {
+      formData.append("files", file);
+    }
+  });
+  formData.append("folder", folder);
+
+  const response = await apiClient.post("/upload/multiple", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};
+
+// ============================================================================
+// ORGANIZATION PROFILE & SETTINGS
+// ============================================================================
+
+/**
+ * GET /auth/profile (auth required)
+ */
+export const getUserProfile = async () => {
+  const response = await apiClient.get("/auth/profile");
+  return response.data?.data || response.data;
+};
+
+/**
+ * PATCH /auth/email (auth required)
+ */
+export const updateUserEmail = async (email) => {
+  const response = await apiClient.patch("/auth/email", { email });
+  return response.data?.data || response.data;
+};
+
+/**
+ * GET /organization/profile (auth required)
+ */
+export const getOrganizationProfile = async () => {
+  try {
+    const response = await apiClient.get("/organization/profile");
+    return response.data?.data || response.data;
+  } catch (error) {
+    if (error.response?.status === 404) return null;
+    throw error;
+  }
+};
+
+/**
+ * PUT /organization/profile (auth required)
+ */
+export const updateOrganizationProfile = async (field, value) => {
+  const response = await apiClient.put("/organization/profile", {
+    field,
+    value,
+  });
+  return response.data?.data || response.data;
+};
+
+/**
+ * POST /organization/change-password (auth required)
+ */
+export const changeOrganizationPassword = async ({
+  currentPassword,
+  newPassword,
+}) => {
+  const response = await apiClient.post("/organization/change-password", {
+    currentPassword,
+    newPassword,
+  });
+  return response.data;
+};
+
+/**
+ * Changes the seller password via /organization/change-password with PATCH /auth/password fallback.
+ */
+export const updatePassword = async ({ currentPassword, newPassword }) => {
+  try {
+    return await changeOrganizationPassword({ currentPassword, newPassword });
+  } catch (err) {
+    if (err.response?.status === 404) {
+      const response = await apiClient.patch("/auth/password", {
+        currentPassword,
+        newPassword,
+      });
+      return response.data;
+    }
+    throw err;
+  }
+};
+
+/**
+ * Convenience helper: Fetches all organization settings data in parallel.
+ */
+export const getSettingsData = async () => {
+  const [orgResult, storeResult, userResult] = await Promise.allSettled([
+    getOrganizationProfile(),
+    getStoreSettings(),
+    getUserProfile(),
+  ]);
+
+  const org = orgResult.status === "fulfilled" ? orgResult.value : null;
+  const store = storeResult.status === "fulfilled" ? storeResult.value : null;
+  const user = userResult.status === "fulfilled" ? userResult.value : null;
+
+  return {
+    store: org || store,
+    user,
+    orgInfo: {
+      name: org?.name || store?.name || user?.fullName || "",
+      location: org?.location || store?.pickupLocation || "",
+      bio: org?.bio || store?.description || "",
+    },
+    credentials: {
+      email: org?.email || user?.email || "",
+      contact:
+        org?.contactNumber || user?.contactNumber || store?.contactNumber || "",
+    },
+    cooldowns: org?.cooldowns || null,
+    avatarPreview: org?.logoUrl || store?.logoUrl || null,
+  };
+};
+
+/**
+ * Convenience helper: Saves a specific organization setting field.
+ */
+export const updateSettingField = async (type, value) => {
+  const trimmed = value.trim();
+  try {
+    return await updateOrganizationProfile(type, trimmed);
+  } catch (err) {
+    if (err.response?.status === 404) {
+      switch (type) {
+        case "name":
+          return updateStoreSettings({ name: trimmed });
+        case "location":
+          return updateStoreSettings({ pickupLocation: trimmed });
+        case "bio":
+          return updateStoreSettings({ description: trimmed });
+        case "email":
+          return updateUserEmail(trimmed);
+        case "contact":
+          localStorage.setItem("bizzy_contact_number", trimmed);
+          return { contact: trimmed };
+        default:
+          throw new Error(`Unknown setting field type: ${type}`);
+      }
+    }
+    throw err;
+  }
+};
+
+// Re-export core client and error utilities
+export { apiClient, getErrorMessage, getFieldErrors };
+export default apiClient;

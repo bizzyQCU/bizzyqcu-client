@@ -113,6 +113,7 @@ export default function AppRoutes() {
       <Route path="/seller/orders" element={<SellerOrders />} />
 
       {/* Organization Seller Portal Routes */}
+      <Route path="/seller/org" element={<Navigate to="/seller/org/dashboard" replace />} />
       <Route path="/seller/org/dashboard" element={<OrgDashboard />} />
       <Route path="/seller/org/products" element={<OrgProducts />} />
       <Route path="/seller/org/inventory" element={<OrgInventory />} />

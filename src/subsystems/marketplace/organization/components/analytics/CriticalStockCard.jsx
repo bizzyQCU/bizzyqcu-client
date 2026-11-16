@@ -34,7 +34,7 @@ export default function CriticalStockCard({ isCritical, productName, unitsLeft, 
         <div className={`mt-2 pt-2 border-t ${isHealthy ? 'border-emerald-200' : 'border-amber-200'} flex items-center justify-between text-xs`}>
           <span className={isHealthy ? 'text-emerald-700' : 'text-amber-700'}>{note || (isHealthy ? 'Healthy inventory levels' : 'Low stock')}</span>
           <Link 
-            to="/seller/inventory" 
+            to="/seller/org/inventory" 
             className={`font-semibold ${isHealthy ? 'text-emerald-900 hover:text-emerald-800' : 'text-amber-900 hover:text-amber-800'} hover:underline`}
           >
             {isHealthy ? 'View Inventory →' : 'Restock Now →'}

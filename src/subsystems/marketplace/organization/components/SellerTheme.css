@@ -1,0 +1,385 @@
+/* ============================================================================
+   Seller Portal Theme (Aligned with Auth Light & Dark Visual Design)
+   Applies to all pages rendered alongside the Organization Seller Sidebar.
+   ============================================================================ */
+
+/* Light mode: Auth buyer sky/ocean/gold canvas dot-grid background */
+html.seller-portal div.flex.min-h-screen,
+html.seller-portal div.flex.h-screen,
+html.seller-portal div.fixed.inset-0.flex {
+  background-color: #F8FAFC !important;
+  background-image: radial-gradient(rgba(2, 132, 199, 0.14) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  color: #0F172A;
+}
+
+/* Dark mode: Auth royal-navy/gold canvas dot-grid background */
+html.seller-portal.dark div.flex.min-h-screen,
+html.seller-portal.dark div.flex.h-screen,
+html.seller-portal.dark div.fixed.inset-0.flex {
+  background-color: #0b1120 !important;
+  background-image: radial-gradient(rgba(234, 179, 8, 0.16) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  color: #f8fafc;
+}
+
+/* Light mode SellerMessages dot-grid canvas */
+html.seller-portal .seller-messages {
+  background-color: #F8FAFC;
+  background-image: radial-gradient(rgba(2, 132, 199, 0.14) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+/* ============================================================================
+   Dark Mode Page Surfaces, Typography, Borders & Actions
+   Scoped to main content siblings (.seller-sidebar ~ *) & modals in document.body
+   ============================================================================ */
+
+/* Cards, panels, tables, headers & modals */
+html.seller-portal.dark .seller-sidebar ~ * .bg-white,
+html.seller-portal.dark .seller-sidebar ~ * header.bg-white,
+html.seller-portal.dark body > div.fixed.inset-0 .bg-white {
+  background-color: rgba(15, 23, 42, 0.88) !important;
+  backdrop-filter: blur(12px);
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .bg-slate-50,
+html.seller-portal.dark .seller-sidebar ~ * .bg-slate-50\/50,
+html.seller-portal.dark .seller-sidebar ~ * .bg-slate-50\/60,
+html.seller-portal.dark .seller-sidebar ~ * .bg-slate-50\/80,
+html.seller-portal.dark .seller-sidebar ~ * .bg-slate-100,
+html.seller-portal.dark .seller-sidebar ~ * .bg-\[\#F8FAFC\],
+html.seller-portal.dark .seller-sidebar ~ * .bg-\[\#f8fafc\],
+html.seller-portal.dark .seller-sidebar ~ * .bg-\[\#f1f3f6\],
+html.seller-portal.dark .seller-sidebar ~ * .bg-slate-200\/60,
+html.seller-portal.dark body > div.fixed.inset-0 .bg-slate-50,
+html.seller-portal.dark body > div.fixed.inset-0 .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .hover\:bg-slate-50:hover,
+html.seller-portal.dark .seller-sidebar ~ * .hover\:bg-slate-50\/70:hover,
+html.seller-portal.dark .seller-sidebar ~ * .hover\:bg-slate-50\/80:hover,
+html.seller-portal.dark .seller-sidebar ~ * .hover\:bg-slate-100:hover,
+html.seller-portal.dark body > div.fixed.inset-0 .hover\:bg-slate-50:hover,
+html.seller-portal.dark body > div.fixed.inset-0 .hover\:bg-slate-100:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Total summary highlight card in Orders slide-over */
+html.seller-portal.dark .seller-sidebar ~ * .bg-slate-900.text-white {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  color: #fef3c7 !important;
+}
+
+/* Primary & Secondary Typography */
+html.seller-portal.dark .seller-sidebar ~ * .text-slate-900,
+html.seller-portal.dark .seller-sidebar ~ * .text-slate-800,
+html.seller-portal.dark .seller-sidebar ~ * .text-\[\#11183c\],
+html.seller-portal.dark body > div.fixed.inset-0 .text-slate-900,
+html.seller-portal.dark body > div.fixed.inset-0 .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .text-slate-700,
+html.seller-portal.dark .seller-sidebar ~ * .text-slate-600,
+html.seller-portal.dark body > div.fixed.inset-0 .text-slate-700,
+html.seller-portal.dark body > div.fixed.inset-0 .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .text-slate-500,
+html.seller-portal.dark .seller-sidebar ~ * .text-slate-400,
+html.seller-portal.dark body > div.fixed.inset-0 .text-slate-500,
+html.seller-portal.dark body > div.fixed.inset-0 .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* Borders & Dividers */
+html.seller-portal.dark .seller-sidebar ~ * .border-slate-100,
+html.seller-portal.dark .seller-sidebar ~ * .border-slate-200,
+html.seller-portal.dark .seller-sidebar ~ * .border-slate-200\/90,
+html.seller-portal.dark .seller-sidebar ~ * .border-slate-300,
+html.seller-portal.dark body > div.fixed.inset-0 .border-slate-100,
+html.seller-portal.dark body > div.fixed.inset-0 .border-slate-200 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.seller-portal.dark .seller-sidebar ~ * .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Primary Buttons & User Avatar (Amber Gold Theme matching Auth dark mode) */
+html.seller-portal.dark .seller-sidebar ~ * button.bg-\[\#0284C7\],
+html.seller-portal.dark .seller-sidebar ~ * a.bg-\[\#0284C7\],
+html.seller-portal.dark .seller-sidebar ~ * div.bg-\[\#0284C7\],
+html.seller-portal.dark .seller-sidebar ~ * button.bg-\[\#0091FF\],
+html.seller-portal.dark .seller-sidebar ~ * a.bg-\[\#0091FF\],
+html.seller-portal.dark .seller-sidebar ~ * button.bg-blue-600,
+html.seller-portal.dark .seller-sidebar ~ * button.bg-\[\#1e2746\],
+html.seller-portal.dark body > div.fixed.inset-0 button.bg-\[\#1a6fb5\] {
+  background: linear-gradient(to right, #fbbf24, #f59e0b, #d97706) !important;
+  color: #020617 !important;
+  border-color: rgba(253, 230, 138, 0.45) !important;
+  box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.35);
+}
+
+html.seller-portal.dark .seller-sidebar ~ * button.bg-\[\#0284C7\]:hover,
+html.seller-portal.dark .seller-sidebar ~ * a.bg-\[\#0284C7\]:hover,
+html.seller-portal.dark .seller-sidebar ~ * button.bg-\[\#0091FF\]:hover,
+html.seller-portal.dark .seller-sidebar ~ * a.bg-\[\#0091FF\]:hover,
+html.seller-portal.dark .seller-sidebar ~ * button.bg-blue-600:hover,
+html.seller-portal.dark .seller-sidebar ~ * button.bg-\[\#1e2746\]:hover,
+html.seller-portal.dark body > div.fixed.inset-0 button.bg-\[\#1a6fb5\]:hover {
+  background: linear-gradient(to right, #fcd34d, #fbbf24, #f59e0b) !important;
+}
+
+/* Chart bars & progress dots using #0091FF */
+html.seller-portal.dark .seller-sidebar ~ * div.bg-\[\#0091FF\],
+html.seller-portal.dark .seller-sidebar ~ * span.bg-\[\#0091FF\] {
+  background-color: #f59e0b !important;
+}
+
+/* Disabled button backgrounds */
+html.seller-portal.dark .seller-sidebar ~ * button.bg-slate-300 {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: #94a3b8 !important;
+}
+
+/* Links & Brand Accent Text */
+html.seller-portal.dark .seller-sidebar ~ * .text-\[\#0284C7\],
+html.seller-portal.dark .seller-sidebar ~ * .text-\[\#0369A1\],
+html.seller-portal.dark .seller-sidebar ~ * .text-\[\#0091FF\],
+html.seller-portal.dark .seller-sidebar ~ * .text-blue-600,
+html.seller-portal.dark .seller-sidebar ~ * .text-blue-500 {
+  color: #fbbf24 !important;
+}
+
+/* Translucent Semantic Badges & Icon Boxes */
+html.seller-portal.dark .seller-sidebar ~ * .bg-sky-50,
+html.seller-portal.dark .seller-sidebar ~ * .bg-blue-50,
+html.seller-portal.dark .seller-sidebar ~ * .bg-blue-50\/60,
+html.seller-portal.dark .seller-sidebar ~ * .bg-blue-100,
+html.seller-portal.dark .seller-sidebar ~ * .bg-sky-100,
+html.seller-portal.dark body > div.fixed.inset-0 .bg-blue-50\/60 {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .text-sky-700,
+html.seller-portal.dark .seller-sidebar ~ * .text-sky-600,
+html.seller-portal.dark .seller-sidebar ~ * .text-sky-900,
+html.seller-portal.dark .seller-sidebar ~ * .text-blue-700 {
+  color: #fcd34d !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .bg-emerald-50,
+html.seller-portal.dark .seller-sidebar ~ * .bg-emerald-50\/50,
+html.seller-portal.dark .seller-sidebar ~ * .bg-emerald-100,
+html.seller-portal.dark .seller-sidebar ~ * .bg-green-50,
+html.seller-portal.dark body > div.fixed.inset-0 .bg-green-50 {
+  background-color: rgba(16, 185, 129, 0.14) !important;
+  border-color: rgba(52, 211, 153, 0.28) !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .text-emerald-700,
+html.seller-portal.dark .seller-sidebar ~ * .text-emerald-800,
+html.seller-portal.dark .seller-sidebar ~ * .text-emerald-900,
+html.seller-portal.dark .seller-sidebar ~ * .text-green-800,
+html.seller-portal.dark .seller-sidebar ~ * .text-green-700,
+html.seller-portal.dark body > div.fixed.inset-0 .text-green-700 {
+  color: #6ee7b7 !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .bg-amber-50,
+html.seller-portal.dark .seller-sidebar ~ * .bg-amber-50\/50,
+html.seller-portal.dark .seller-sidebar ~ * .bg-amber-100,
+html.seller-portal.dark body > div.fixed.inset-0 .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+  border-color: rgba(251, 191, 36, 0.28) !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .text-amber-700,
+html.seller-portal.dark .seller-sidebar ~ * .text-amber-800,
+html.seller-portal.dark .seller-sidebar ~ * .text-amber-900,
+html.seller-portal.dark body > div.fixed.inset-0 .text-amber-800 {
+  color: #fcd34d !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .bg-rose-50,
+html.seller-portal.dark .seller-sidebar ~ * .bg-red-50,
+html.seller-portal.dark body > div.fixed.inset-0 .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.14) !important;
+  border-color: rgba(248, 113, 113, 0.28) !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .text-rose-700,
+html.seller-portal.dark .seller-sidebar ~ * .text-rose-900,
+html.seller-portal.dark .seller-sidebar ~ * .text-red-800,
+html.seller-portal.dark .seller-sidebar ~ * .text-red-700,
+html.seller-portal.dark .seller-sidebar ~ * .text-red-600,
+html.seller-portal.dark body > div.fixed.inset-0 .text-red-700,
+html.seller-portal.dark body > div.fixed.inset-0 .text-red-600 {
+  color: #fca5a5 !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .bg-indigo-50 {
+  background-color: rgba(99, 102, 241, 0.16) !important;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .text-indigo-700 {
+  color: #a5b4fc !important;
+}
+
+/* Skeleton Shimmer & Table Scrollbars in Dark Mode */
+html.seller-portal.dark .seller-sidebar ~ * .skeleton-shimmer {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 37%, #1e293b 63%);
+  background-size: 200% 100%;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .overflow-x-auto::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+html.seller-portal.dark .seller-sidebar ~ * .overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.3);
+}
+
+/* ============================================================================
+   SellerMessages Dark Mode Support
+   ============================================================================ */
+
+html.seller-portal.dark .seller-messages {
+  --sm-primary: #fbbf24;
+  --sm-link: #fbbf24;
+  --sm-ink: #f8fafc;
+  --sm-muted: #94a3b8;
+  --sm-border: rgba(255, 255, 255, 0.1);
+  --sm-canvas: #0b1120;
+  background-color: #0b1120;
+  background-image: radial-gradient(rgba(234, 179, 8, 0.16) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  color: #f8fafc;
+}
+
+html.seller-portal.dark .seller-messages .sm-panel,
+html.seller-portal.dark .seller-messages .sm-conversation {
+  background: rgba(15, 23, 42, 0.88);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+
+html.seller-portal.dark .seller-messages .sm-conversation:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+html.seller-portal.dark .seller-messages .sm-conversation.active {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(251, 191, 36, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.35);
+}
+
+html.seller-portal.dark .seller-messages .sm-convo-heading h1,
+html.seller-portal.dark .seller-messages .sm-convo-name,
+html.seller-portal.dark .seller-messages .sm-contact strong,
+html.seller-portal.dark .seller-messages .sm-order-summary strong,
+html.seller-portal.dark .seller-messages .sm-order-panel-heading strong,
+html.seller-portal.dark .seller-messages .sm-banner-total strong,
+html.seller-portal.dark .seller-messages .sm-total-row strong,
+html.seller-portal.dark .seller-messages .sm-seller strong,
+html.seller-portal.dark .seller-messages .sm-item strong,
+html.seller-portal.dark .seller-messages .sm-item b,
+html.seller-portal.dark .seller-messages .sm-delivery strong {
+  color: #f8fafc;
+}
+
+html.seller-portal.dark .seller-messages .sm-order-id,
+html.seller-portal.dark .seller-messages .sm-view-order,
+html.seller-portal.dark .seller-messages .sm-location-pin {
+  color: #fbbf24;
+}
+
+html.seller-portal.dark .seller-messages .sm-unread-count,
+html.seller-portal.dark .seller-messages .sm-student-badge,
+html.seller-portal.dark .seller-messages .sm-status-badge {
+  background: rgba(251, 191, 36, 0.16);
+  border-color: rgba(251, 191, 36, 0.35);
+  color: #fcd34d;
+}
+
+html.seller-portal.dark .seller-messages .sm-chat-header,
+html.seller-portal.dark .seller-messages .sm-composer,
+html.seller-portal.dark .seller-messages .sm-divider,
+html.seller-portal.dark .seller-messages .sm-banner-total {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+html.seller-portal.dark .seller-messages .sm-divider {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+html.seller-portal.dark .seller-messages .sm-order-banner,
+html.seller-portal.dark .seller-messages .sm-handover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+html.seller-portal.dark .seller-messages .sm-order-icon {
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
+
+html.seller-portal.dark .seller-messages .sm-search {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+html.seller-portal.dark .seller-messages .sm-search input {
+  background: transparent !important;
+  color: #f8fafc !important;
+}
+
+html.seller-portal.dark .seller-messages .sm-filters button {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+
+html.seller-portal.dark .seller-messages .sm-filters button.selected {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #020617;
+}
+
+html.seller-portal.dark .seller-messages .sm-bubble {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+}
+
+html.seller-portal.dark .seller-messages .outgoing .sm-bubble {
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+  border-color: #f59e0b;
+  color: #020617;
+  font-weight: 600;
+}
+
+html.seller-portal.dark .seller-messages .sm-send {
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+  color: #020617 !important;
+}
+
+html.seller-portal.dark .seller-messages .sm-open-order {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(251, 191, 36, 0.4);
+  color: #fcd34d !important;
+}
+
+html.seller-portal.dark .seller-messages .sm-open-order:hover {
+  background: rgba(251, 191, 36, 0.12);
+}

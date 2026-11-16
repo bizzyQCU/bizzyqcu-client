@@ -70,7 +70,7 @@ export default function TopRevenueDrivers({ products = [], totalRevenue = 0 }) {
           <span className="font-bold text-slate-900">{topThreeShare}%</span>
         </div>
         <Link
-          to="/seller/products"
+          to="/seller/org/products"
           className="text-[#0091FF] hover:text-[#0284C7] font-semibold hover:underline"
         >
           View All Products →

@@ -1,5 +1,15 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import apiClient, { getErrorMessage } from "../../../../../lib/api-client";
+import {
+  getMyStore,
+  getCategories,
+  getSellerProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct as deleteSellerProduct,
+  setProductAvailability,
+  uploadMultipleFiles,
+  getErrorMessage,
+} from "../../../api";
 import {
   deleteProductImages,
   getProductImages,
@@ -75,8 +85,8 @@ export function useProducts() {
   // 1. Fetch Store Info from backend (GET /marketplace/stores/me)
   const fetchStoreInfo = useCallback(async () => {
     try {
-      const res = await apiClient.get("/marketplace/stores/me");
-      const store = res.data?.data || res.data;
+      const res = await getMyStore();
+      const store = res?.data || res;
       if (store && store.id) {
         setStoreInfo({
           id: store.id,
@@ -94,8 +104,8 @@ export function useProducts() {
   // 2. Fetch Categories from backend (GET /marketplace/categories)
   const fetchCategories = useCallback(async () => {
     try {
-      const res = await apiClient.get("/marketplace/categories");
-      const list = res.data?.data || res.data;
+      const res = await getCategories();
+      const list = res?.data || res;
       if (Array.isArray(list) && list.length > 0) {
         setCategories(list);
       }
@@ -109,10 +119,8 @@ export function useProducts() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiClient.get("/marketplace/seller/products", {
-        params: { limit: 100 },
-      });
-      const rawList = res.data?.items || res.data?.data || [];
+      const res = await getSellerProducts({ limit: 100 });
+      const rawList = res?.items || res?.data || [];
       const normalised = (Array.isArray(rawList) ? rawList : [])
         .map(normaliseProduct)
         .filter(Boolean);
@@ -321,19 +329,10 @@ export function useProducts() {
         let uploadedUrls = [];
         if (Array.isArray(imageFiles) && imageFiles.length > 0) {
           try {
-            const formData = new FormData();
-            imageFiles.forEach((file) => {
-              if (file instanceof File || file instanceof Blob) {
-                formData.append("files", file);
-              }
-            });
-            formData.append("folder", "products");
-            const uploadRes = await apiClient.post("/upload/multiple", formData, {
-              headers: { "Content-Type": "multipart/form-data" },
-            });
+            const uploadRes = await uploadMultipleFiles(imageFiles, "products");
             uploadedUrls =
-              uploadRes.data?.urls ||
-              uploadRes.data?.data?.map((d) => d.url) ||
+              uploadRes?.urls ||
+              uploadRes?.data?.map((d) => d.url) ||
               [];
           } catch (uploadErr) {
             console.warn("Direct file upload to backend skipped or failed:", uploadErr);
@@ -368,8 +367,8 @@ export function useProducts() {
           imageUrls: backendImageUrls,
         };
 
-        const res = await apiClient.post("/marketplace/products", payload);
-        const createdRaw = res.data?.data || res.data;
+        const res = await createProduct(payload);
+        const createdRaw = res?.data || res;
         const created = normaliseProduct(createdRaw);
 
         // 4. Save actual images to IndexedDB using productImageStorage.js
@@ -390,10 +389,7 @@ export function useProducts() {
         // 5. If availability was set to false, call PATCH availability
         if (newProductData.isAvailable === false) {
           try {
-            await apiClient.patch(
-              `/marketplace/products/${created.id}/availability`,
-              { isAvailable: false }
-            );
+            await setProductAvailability(created.id, false);
             created.isAvailable = false;
           } catch (availErr) {
             console.warn("Failed to update availability on create:", availErr);
@@ -424,19 +420,10 @@ export function useProducts() {
         let uploadedUrls = [];
         if (Array.isArray(imageFiles) && imageFiles.length > 0) {
           try {
-            const formData = new FormData();
-            imageFiles.forEach((file) => {
-              if (file instanceof File || file instanceof Blob) {
-                formData.append("files", file);
-              }
-            });
-            formData.append("folder", "products");
-            const uploadRes = await apiClient.post("/upload/multiple", formData, {
-              headers: { "Content-Type": "multipart/form-data" },
-            });
+            const uploadRes = await uploadMultipleFiles(imageFiles, "products");
             uploadedUrls =
-              uploadRes.data?.urls ||
-              uploadRes.data?.data?.map((d) => d.url) ||
+              uploadRes?.urls ||
+              uploadRes?.data?.map((d) => d.url) ||
               [];
           } catch (uploadErr) {
             console.warn("Direct file upload to backend skipped or failed:", uploadErr);
@@ -472,11 +459,8 @@ export function useProducts() {
           payload.stockQuantity = parseInt(updatedData.stockQuantity, 10);
         if (backendImageUrls.length > 0) payload.imageUrls = backendImageUrls;
 
-        const res = await apiClient.patch(
-          `/marketplace/products/${productId}`,
-          payload
-        );
-        const updatedRaw = res.data?.data || res.data;
+        const res = await updateProduct(productId, payload);
+        const updatedRaw = res?.data || res;
 
         // 3. Save actual updated images to IndexedDB
         if (updatedData.rawImages && updatedData.rawImages.length > 0) {
@@ -490,10 +474,7 @@ export function useProducts() {
         // 4. Update availability if explicitly provided
         if (updatedData.isAvailable !== undefined) {
           try {
-            await apiClient.patch(
-              `/marketplace/products/${productId}/availability`,
-              { isAvailable: Boolean(updatedData.isAvailable) }
-            );
+            await setProductAvailability(productId, Boolean(updatedData.isAvailable));
           } catch (availErr) {
             console.warn("Failed to update availability on edit:", availErr);
           }
@@ -538,7 +519,7 @@ export function useProducts() {
     setActionLoading(true);
     setActionError(null);
     try {
-      await apiClient.delete(`/marketplace/products/${productId}`);
+      await deleteSellerProduct(productId);
       await deleteProductImages(productId);
       setProducts((prev) => prev.filter((item) => item.id !== productId));
     } catch (err) {

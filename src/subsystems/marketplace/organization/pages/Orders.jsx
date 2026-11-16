@@ -49,6 +49,8 @@ export default function Orders() {
     loading,
     error,
     updating,
+    storeInfo,
+    metrics,
     refresh,
     confirmOrder,
     readyForPickup,
@@ -75,10 +77,10 @@ export default function Orders() {
         <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between">
           <div>
             <h2 className="font-bold text-slate-900 text-base">
-              QCU Computer Society (QCS)
+              {storeInfo.name}
             </h2>
             <p className="text-xs text-slate-500">
-              AWS IK Building, Basement, Booth No. 3
+              {storeInfo.pickupLocation}
             </p>
           </div>
           <div className="flex items-center space-x-4">
@@ -129,7 +131,7 @@ export default function Orders() {
                   <CreditCard className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-slate-900">4</div>
+              <div className="text-2xl font-bold text-slate-900">{metrics.newOrders}</div>
               <p className="text-xs text-slate-500 mt-1">
                 Awaiting confirmation
               </p>
@@ -143,7 +145,7 @@ export default function Orders() {
                   <PackageCheck className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-slate-900">12</div>
+              <div className="text-2xl font-bold text-slate-900">{metrics.toProcess}</div>
               <p className="text-xs text-slate-500 mt-1">
                 Ready for packaging/prep
               </p>
@@ -157,7 +159,7 @@ export default function Orders() {
                   <Truck className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-slate-900">8</div>
+              <div className="text-2xl font-bold text-slate-900">{metrics.inTransit}</div>
               <p className="text-xs text-slate-500 mt-1">
                 En route to delivery/pickup
               </p>
@@ -171,7 +173,7 @@ export default function Orders() {
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-slate-900">142</div>
+              <div className="text-2xl font-bold text-slate-900">{metrics.completed}</div>
               <p className="text-xs text-slate-500 mt-1">
                 Fulfilled successfully
               </p>

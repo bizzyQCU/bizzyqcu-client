@@ -12,10 +12,13 @@ import {
   Spinner,
   TrustBadges,
 } from '../components/AuthUI.jsx'
-import { requestPasswordOtp, verifyPasswordOtp, loginWithPasskey } from '../api'
+import { requestPasswordOtp, verifyPasswordOtp, loginWithPasskey, getCurrentUser } from '../api'
 import { getWebAuthnErrorMessage, isWebAuthnSupported } from '../../../lib/webauthn'
 import { useAuth } from '../../../hooks/useAuth'
-import { getErrorMessage } from '../../../lib/api-client'
+import { AUTH_TOKEN_KEY, getErrorMessage } from '../../../lib/api-client'
+import { destinationFor } from '../utils/sellerRedirect.js'
+
+export { destinationFor }
 
 const PORTALS = {
   entrepreneur: {
@@ -48,13 +51,6 @@ const OTP_TTL_SECONDS = 5 * 60
 const RESEND_COOLDOWN_SECONDS = 60
 
 const formatClock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-
-function destinationFor(user) {
-  if (user?.role === 'ADMIN') return '/admin'
-  if (user?.verificationStatus !== 'VERIFIED') return '/account'
-  if (user?.role === 'SELLER') return '/seller/analytics'
-  return '/account'
-}
 
 export default function SellerLoginForm() {
   const navigate = useNavigate()
@@ -96,16 +92,31 @@ export default function SellerLoginForm() {
   const resendSecondsLeft = resendAt ? Math.max(0, Math.ceil((resendAt - now) / 1000)) : 0
   const otpExpired = step === 'otp' && otpSecondsLeft === 0
 
-  const finishLogin = (session) => {
+  const finishLogin = async (session) => {
     const { token, accessToken, user } = session
-    if (user?.role === 'BUYER' && !user?.hasSellerProfile && !user?.sellerProfile) {
+    const authToken = token || accessToken
+    let resolvedUser = user
+
+    // If session user is missing sellerProfile/sellerType, load full profile
+    if (authToken && !resolvedUser?.sellerProfile && !resolvedUser?.sellerType) {
+      try {
+        localStorage.setItem(AUTH_TOKEN_KEY, authToken)
+        const profile = await getCurrentUser()
+        if (profile) resolvedUser = profile
+      } catch {
+        // Fall back to session user
+      }
+    }
+
+    if (resolvedUser?.role === 'BUYER' && !resolvedUser?.hasSellerProfile && !resolvedUser?.sellerProfile) {
       setLoginError('This account is registered as a buyer. Please use the buyer login or register for a seller account.')
       setLoginState('idle')
       setBioState('idle')
       return
     }
-    authLogin(user, token || accessToken)
-    later(() => navigate(destinationFor(user), { replace: true }), 600)
+
+    authLogin(resolvedUser, authToken)
+    later(() => navigate(destinationFor(resolvedUser, portal?.badge), { replace: true }), 600)
   }
 
   // 1. POST /auth/login/password — verify credentials; issues session directly for dev test accounts or sends OTP.
@@ -121,7 +132,7 @@ export default function SellerLoginForm() {
       })
       if (result?.data?.accessToken || result?.data?.token) {
         setLoginState('done')
-        finishLogin(result.data)
+        await finishLogin(result.data)
         return
       }
       const sentAt = Date.now()
@@ -150,7 +161,7 @@ export default function SellerLoginForm() {
         portal: 'seller',
       })
       setLoginState('done')
-      finishLogin(result.data)
+      await finishLogin(result.data)
     } catch (err) {
       setLoginError(getErrorMessage(err))
       setLoginState('idle')
@@ -169,7 +180,7 @@ export default function SellerLoginForm() {
     try {
       const session = await loginWithPasskey(identifier.trim(), 'seller')
       setBioState('done')
-      finishLogin(session)
+      await finishLogin(session)
     } catch (err) {
       setBioState('idle')
       setLoginError(getWebAuthnErrorMessage(err) || getErrorMessage(err))

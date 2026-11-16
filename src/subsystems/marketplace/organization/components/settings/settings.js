@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import apiClient, {
+import {
+  getSettingsData,
   updateStoreSettings,
   updateSettingField,
-  updateUserEmail,
   updatePassword,
   uploadLogo,
   getErrorMessage,
-} from '../../../../../api';
+} from '../../../api';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -118,35 +118,17 @@ export function useAccountSettings() {
       setErrorMessage('');
 
       try {
-        let org = null;
-        let store = null;
-        let user = null;
-
-        // Fetch real data from backend endpoints in parallel
-        const results = await Promise.allSettled([
-          apiClient.get('/organization/profile'),
-          apiClient.get('/marketplace/stores/me'),
-          apiClient.get('/auth/profile'),
-        ]);
-
-        if (results[0].status === 'fulfilled') {
-          org = results[0].value.data?.data || results[0].value.data;
-        }
-        if (results[1].status === 'fulfilled') {
-          store = results[1].value.data?.data || results[1].value.data;
-        }
-        if (results[2].status === 'fulfilled') {
-          user = results[2].value.data?.data || results[2].value.data;
-        }
+        const settingsData = await getSettingsData();
 
         if (!isMounted) return;
 
-        const realName = org?.name || store?.name || user?.fullName || '';
-        const realLocation = org?.location || store?.pickupLocation || '';
-        const realBio = org?.bio || store?.description || '';
-        const realEmail = org?.email || user?.email || '';
-        const realContact = org?.contactNumber || user?.contactNumber || store?.contactNumber || '';
-        const realLogo = org?.logoUrl || store?.logoUrl || null;
+        const org = settingsData.store;
+        const realName = settingsData.orgInfo.name;
+        const realLocation = settingsData.orgInfo.location;
+        const realBio = settingsData.orgInfo.bio;
+        const realEmail = settingsData.credentials.email;
+        const realContact = settingsData.credentials.contact;
+        const realLogo = settingsData.avatarPreview;
 
         setOrgInfo({
           name: realName,
@@ -164,7 +146,7 @@ export function useAccountSettings() {
         }
 
         // Synchronize server-side cooldown timestamps if returned
-        const cooldownsData = org?.cooldowns;
+        const cooldownsData = settingsData.cooldowns;
         if (cooldownsData) {
           const now = Date.now();
           const serverCooldowns = {};

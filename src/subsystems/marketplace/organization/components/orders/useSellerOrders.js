@@ -1,6 +1,10 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { getSellerOrders, updateOrderStatus } from "../../../api";
-import { getErrorMessage } from "../../../../../lib/api-client";
+import {
+  getSellerOrders,
+  updateOrderStatus,
+  getMyStore,
+  getErrorMessage,
+} from "../../../api";
 
 const PAGE_SIZE = 6;
 
@@ -79,6 +83,10 @@ export function useSellerOrders() {
 
   // Remote data state
   const [rawOrders, setRawOrders] = useState([]);
+  const [storeInfo, setStoreInfo] = useState({
+    name: "Organization Store",
+    pickupLocation: "Campus Store / Booth",
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
@@ -89,7 +97,22 @@ export function useSellerOrders() {
     selectedPaymentStatuses: [],
   });
 
-  // ── Fetch orders from the server ──────────────────────────────────────────
+  // ── Fetch store & orders from the server ──────────────────────────────────
+  const fetchStore = useCallback(async () => {
+    try {
+      const res = await getMyStore();
+      const store = res?.data || res;
+      if (store) {
+        setStoreInfo({
+          name: store.name || "Organization Store",
+          pickupLocation: store.pickupLocation || "Campus Store / Booth",
+        });
+      }
+    } catch {
+      // Keep fallback labels if store profile has not been created yet
+    }
+  }, []);
+
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -104,11 +127,40 @@ export function useSellerOrders() {
   }, []);
 
   useEffect(() => {
+    fetchStore();
     fetchOrders();
-  }, [fetchOrders]);
+  }, [fetchStore, fetchOrders]);
 
   // Normalise once, memoised
   const allOrders = useMemo(() => rawOrders.map(normaliseOrder), [rawOrders]);
+
+  // Live summary metrics from fetched orders
+  const metrics = useMemo(() => {
+    let newOrders = 0;
+    let toProcess = 0;
+    let inTransit = 0;
+    let completed = 0;
+
+    for (const o of rawOrders) {
+      if (
+        o.orderStatus === "PENDING_PAYMENT" ||
+        o.orderStatus === "PENDING_CONFIRMATION"
+      ) {
+        newOrders += 1;
+      } else if (
+        o.orderStatus === "PREPARING" ||
+        o.orderStatus === "READY_FOR_PICKUP"
+      ) {
+        toProcess += 1;
+      } else if (o.orderStatus === "OUT_FOR_DELIVERY") {
+        inTransit += 1;
+      } else if (o.orderStatus === "COMPLETED") {
+        completed += 1;
+      }
+    }
+
+    return { newOrders, toProcess, inTransit, completed };
+  }, [rawOrders]);
 
   // ── State Machine Transitions via PATCH /orders/:id/status ───────────────
   const updateStatus = useCallback(
@@ -232,6 +284,8 @@ export function useSellerOrders() {
     loading,
     error,
     updating,
+    storeInfo,
+    metrics,
     // actions
     refresh: fetchOrders,
     updateStatus,

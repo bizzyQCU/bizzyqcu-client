@@ -1,5 +1,24 @@
 import { Link } from 'react-router-dom';
 
+const ORG_ROUTE_ALIASES = {
+  '/inventory': '/seller/org/inventory',
+  '/seller/inventory': '/seller/org/inventory',
+  '/products': '/seller/org/products',
+  '/seller/products': '/seller/org/products',
+  '/orders': '/seller/org/orders',
+  '/seller/orders': '/seller/org/orders',
+  '/dashboard': '/seller/org/dashboard',
+  '/seller/dashboard': '/seller/org/dashboard',
+  '/settings': '/seller/org/settings',
+  '/seller/settings': '/seller/org/settings',
+  '/analytics': '/seller/org/analytics',
+  '/seller/analytics': '/seller/org/analytics',
+};
+
+function resolveOrgPath(to) {
+  return ORG_ROUTE_ALIASES[to] || to;
+}
+
 const SEVERITY_STYLES = {
   urgent: {
     container: 'bg-amber-50 border-amber-200',
@@ -53,7 +72,7 @@ export default function PriorityActions({ actions, nextReview }) {
                   <h4 className={`text-sm font-bold ${styles.title}`}>{action.title}</h4>
                   <p className="text-xs text-slate-600 mt-1">{action.body}</p>
                   <Link 
-                    to={action.to}
+                    to={resolveOrgPath(action.to)}
                     className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${BUTTON_STYLES[action.variant] || BUTTON_STYLES.secondary}`}
                   >
                     {action.cta}

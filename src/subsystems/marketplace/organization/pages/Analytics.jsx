@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAnalytics } from "../../hooks/useAnalytics";
 import { useDateRange } from "../../hooks/useDateRange";
 import { fmtRange, toISODate } from "../../utils/dates";
-import SellerSidebar from "../components/SellerSidebar";
+import Sidebar from "../components/Sidebar";
 import SellerTopBar from "../components/SellerTopBar";
 import PageHeader from "../components/analytics/PageHeader";
 import KpiRow from "../components/analytics/KpiRow";
@@ -14,6 +15,7 @@ import DateRangeModal from "../components/date-range/DateRangeModal";
 import ExportCsvModal from "../components/export/ExportCsvModal";
 
 export default function Analytics() {
+  const navigate = useNavigate();
   const { applied, apply } = useDateRange({
     start: new Date(2026, 10, 1), // Nov 1, 2026
     end: new Date(2026, 10, 7), // Nov 7, 2026
@@ -35,8 +37,7 @@ export default function Analytics() {
   // Remove old handleExport since we now open modal instead
 
   const handleMessagesClick = () => {
-    // TODO: Open messages modal or navigate to messages page
-    console.log("Messages clicked");
+    navigate("/seller/org/messages");
   };
 
   const modalOpen = dateModalOpen || exportModalOpen;
@@ -44,9 +45,13 @@ export default function Analytics() {
   if (loading) {
     return (
       <div className="flex min-h-screen bg-[#F8FAFC]">
-        <SellerSidebar />
+        <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <SellerTopBar onMessagesClick={handleMessagesClick} />
+          <SellerTopBar
+            storeName={data?.org?.name}
+            storeLocation={data?.org?.location}
+            onMessagesClick={handleMessagesClick}
+          />
           <main className="p-8 max-w-7xl mx-auto w-full">
             <div className="flex items-center justify-center h-96">
               <div className="flex flex-col items-center gap-3">
@@ -65,9 +70,13 @@ export default function Analytics() {
   if (error) {
     return (
       <div className="flex min-h-screen bg-[#F8FAFC]">
-        <SellerSidebar />
+        <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <SellerTopBar onMessagesClick={handleMessagesClick} />
+          <SellerTopBar
+            storeName={data?.org?.name}
+            storeLocation={data?.org?.location}
+            onMessagesClick={handleMessagesClick}
+          />
           <main className="p-8 max-w-7xl mx-auto w-full">
             <div className="bg-rose-50 border border-rose-200 rounded-xl p-6 text-center">
               <h3 className="text-lg font-bold text-rose-900 mb-2">
@@ -91,9 +100,13 @@ export default function Analytics() {
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
-      <SellerSidebar />
+      <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <SellerTopBar onMessagesClick={handleMessagesClick} />
+        <SellerTopBar
+          storeName={data?.org?.name}
+          storeLocation={data?.org?.location}
+          onMessagesClick={handleMessagesClick}
+        />
         <main
           inert={modalOpen ? "" : undefined}
           aria-hidden={modalOpen}
@@ -165,7 +178,7 @@ export default function Analytics() {
             data={data}
             appliedRange={applied}
             org={data.org.name}
-            user="Demo User"
+            user={data.org.name}
             onClose={() => setExportModalOpen(false)}
           />
         )}

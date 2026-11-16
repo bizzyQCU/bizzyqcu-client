@@ -1,13 +1,13 @@
-import React from "react";
 import Sidebar from "../components/Sidebar";
+import SellerMessages from "../components/messages/SellerMessages";
 
 export default function Messages() {
   return (
-    <div className="flex h-screen bg-slate-100">
+    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
       <Sidebar />
-      <main className="flex-1 flex items-center justify-center">
-        <p className="text-slate-500 text-lg">Messages — coming soon.</p>
-      </main>
+      <div className="flex-1 min-w-0 h-full overflow-hidden">
+        <SellerMessages />
+      </div>
     </div>
   );
 }

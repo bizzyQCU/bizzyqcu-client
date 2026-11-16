@@ -1,4 +1,4 @@
-import SellerSidebar from './SellerSidebar'
+import Sidebar from './Sidebar'
 import SellerTopBar from './SellerTopBar'
 
 export default function SellerPlaceholder({ title, text }) {
@@ -8,7 +8,7 @@ export default function SellerPlaceholder({ title, text }) {
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
-      <SellerSidebar />
+      <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <SellerTopBar onMessagesClick={handleMessagesClick} />
         <main className="p-8 flex-1 flex items-center justify-center">

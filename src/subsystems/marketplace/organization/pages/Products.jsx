@@ -35,13 +35,8 @@ export default function Products() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [messagesOpen]);
 
-  // Static demo store information
-  const storeInfo = {
-    name: "QCU Computer Society (QCS)",
-    pickupLocation: "AWS IK Building, Basement, Booth No. 3",
-  };
-
   const productsHook = useProducts();
+  const storeInfo = productsHook.storeInfo;
 
   const handleAddProduct = () => {
     setCurrentView("add");
@@ -124,12 +119,17 @@ export default function Products() {
               onAddProduct={handleAddProduct}
               onEditProduct={handleEditProduct}
               deleteProduct={productsHook.deleteProduct}
+              categories={productsHook.categories}
+              loading={productsHook.loading}
+              error={productsHook.error}
+              onRefresh={productsHook.fetchProducts}
             />
           )}
 
           {/* VIEW: ADD PRODUCT */}
           {currentView === "add" && (
             <AddProduct
+              categories={productsHook.categories}
               onAddProduct={productsHook.addProduct}
               onCancel={handleBackToList}
             />
@@ -139,6 +139,7 @@ export default function Products() {
           {currentView === "edit" && (
             <EditProduct
               product={editingProduct}
+              categories={productsHook.categories}
               onUpdateProduct={productsHook.editProduct}
               onCancel={handleBackToList}
             />

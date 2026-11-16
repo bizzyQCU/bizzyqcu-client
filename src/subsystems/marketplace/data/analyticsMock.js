@@ -107,7 +107,7 @@ export const analytics = {
       title: 'Hoodie Re-order Required',
       body: 'Only 8 units in stock. Estimated stockout in 48 hours based on current velocity.',
       cta: 'Order Restock', 
-      to: '/inventory', 
+      to: '/seller/org/inventory', 
       variant: 'primary' 
     },
     { 
@@ -116,7 +116,7 @@ export const analytics = {
       title: 'Tech Summit Lanyard Pre-orders',
       body: 'Peak velocity on Wednesdays (+380 visits). Open second batch ordering.',
       cta: 'Manage Batch', 
-      to: '/orders', 
+      to: '/seller/org/orders', 
       variant: 'secondary' 
     },
   ],
