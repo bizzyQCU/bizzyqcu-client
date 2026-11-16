@@ -33,6 +33,7 @@ function normaliseOrder(raw) {
     // keep the real UUID for API calls
     _id: raw.id,
     id: raw.orderNumber,
+    orderNumber: raw.orderNumber,
     date: new Date(raw.createdAt).toLocaleString("en-US", {
       month: "short",
       day: "numeric",
@@ -58,6 +59,11 @@ function normaliseOrder(raw) {
     orderStatus: STATUS_DISPLAY[raw.orderStatus] ?? raw.orderStatus,
     // preserve the raw enum so we can send it back for status updates
     _rawStatus: raw.orderStatus,
+    deliveryMethod: raw.deliveryMethod,
+    campusBuilding: raw.campusBuilding,
+    campusRoomNumber: raw.campusRoomNumber,
+    pickupInstructions: raw.pickupInstructions,
+    deliveryNotes: raw.deliveryNotes,
     paymentMethod: raw.paymentMethod === "GCASH_PAYMONGO" ? "GCash" : "Cash",
     pickupBooth: raw.store?.pickupLocation ?? null,
     messageCount: raw._count?.messages ?? 0,
@@ -104,40 +110,55 @@ export function useSellerOrders() {
   // Normalise once, memoised
   const allOrders = useMemo(() => rawOrders.map(normaliseOrder), [rawOrders]);
 
-  // ── Mark an order as Completed via PATCH /orders/:id/status ───────────────
-  const markCompleted = useCallback(
-    async (order) => {
+  // ── State Machine Transitions via PATCH /orders/:id/status ───────────────
+  const updateStatus = useCallback(
+    async (order, newStatus) => {
       if (!order?._id) return;
       setUpdating(true);
       try {
-        await updateOrderStatus(order._id, "COMPLETED");
+        await updateOrderStatus(order._id, newStatus);
         await fetchOrders();
-        setSelectedOrder(null);
+        setSelectedOrder((prev) =>
+          prev && prev._id === order._id
+            ? {
+                ...prev,
+                _rawStatus: newStatus,
+                orderStatus: STATUS_DISPLAY[newStatus] ?? newStatus,
+              }
+            : null
+        );
       } catch (err) {
         alert(getErrorMessage(err));
       } finally {
         setUpdating(false);
       }
     },
-    [fetchOrders],
+    [fetchOrders]
   );
 
-  // ── Cancel an order ────────────────────────────────────────────────────────
+  const confirmOrder = useCallback(
+    (order) => updateStatus(order, "PREPARING"),
+    [updateStatus]
+  );
+
+  const readyForPickup = useCallback(
+    (order) => updateStatus(order, "READY_FOR_PICKUP"),
+    [updateStatus]
+  );
+
+  const outForDelivery = useCallback(
+    (order) => updateStatus(order, "OUT_FOR_DELIVERY"),
+    [updateStatus]
+  );
+
+  const completeOrder = useCallback(
+    (order) => updateStatus(order, "COMPLETED"),
+    [updateStatus]
+  );
+
   const cancelOrder = useCallback(
-    async (order) => {
-      if (!order?._id) return;
-      setUpdating(true);
-      try {
-        await updateOrderStatus(order._id, "CANCELLED");
-        await fetchOrders();
-        setSelectedOrder(null);
-      } catch (err) {
-        alert(getErrorMessage(err));
-      } finally {
-        setUpdating(false);
-      }
-    },
-    [fetchOrders],
+    (order) => updateStatus(order, "CANCELLED"),
+    [updateStatus]
   );
 
   // ── Filtering ─────────────────────────────────────────────────────────────
@@ -213,7 +234,12 @@ export function useSellerOrders() {
     updating,
     // actions
     refresh: fetchOrders,
-    markCompleted,
+    updateStatus,
+    confirmOrder,
+    readyForPickup,
+    outForDelivery,
+    completeOrder,
+    markCompleted: completeOrder,
     cancelOrder,
   };
 }

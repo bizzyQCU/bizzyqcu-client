@@ -1,25 +1,49 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Icon from "../../../../components/Icon.jsx";
 import { useMessages } from "../../../../lib/MessageContext.jsx";
 import VerifiedSeal from "../../../../components/VerifiedSeal.jsx";
 import { useCart } from "../../../../lib/CartContext.jsx";
 import { getInitials } from "../../../../lib/userDisplay.js";
+import { getMyOrders } from "../../api.js";
 
 const methodLabel = { gcash: "GCash", cash: "Cash", gcash_direct: "GCash Direct Transfer" };
 
 export default function PaymentConfirmedPage() {
   const { openSeller } = useMessages();
-  const { state } = useLocation();
-  const order = state?.order;
+  const { state, search } = useLocation();
+  const queryOrder = new URLSearchParams(search).get("order");
+  const stateOrder = state?.order;
   const method = state?.method ?? "gcash";
   const { selected: items, selectedTotal: total } = useCart();
   const isCash = method === "cash";
 
-  const orderNumber = order?.orderNumber ? `#${order.orderNumber}` : "—";
+  const [orderDetail, setOrderDetail] = useState(
+    stateOrder?.items ? stateOrder : null
+  );
+
+  useEffect(() => {
+    const targetOrderNumber = stateOrder?.orderNumber || queryOrder;
+    if (!orderDetail && targetOrderNumber) {
+      getMyOrders()
+        .then((res) => {
+          const list = res?.data || res || [];
+          const found = list.find(
+            (o) => o.orderNumber === targetOrderNumber || o.id === targetOrderNumber
+          );
+          if (found) setOrderDetail(found);
+        })
+        .catch(() => {});
+    }
+  }, [stateOrder, queryOrder, orderDetail]);
+
+  const order = orderDetail || stateOrder;
+  const rawOrderNumber = order?.orderNumber || queryOrder;
+  const orderNumber = rawOrderNumber ? (rawOrderNumber.startsWith("#") ? rawOrderNumber : `#${rawOrderNumber}`) : "—";
   const storeName = order?.store?.name ?? state?.storeName ?? "Campus Seller";
   const storeInitials = getInitials(storeName, "S");
   const displayTotal = order?.totalAmount != null ? Number(order.totalAmount) : total;
-  const itemCount = order?.items?.length ?? items.length;
+  const itemCount = order?.items?.length ?? (items.length > 0 ? items.length : 1);
   const fulfillment = order?.deliveryMethod === "PICKUP"
     ? order?.store?.pickupLocation || "Campus Pickup"
     : [order?.campusBuilding, order?.campusRoomNumber].filter(Boolean).join(" · ") || "Campus Delivery";

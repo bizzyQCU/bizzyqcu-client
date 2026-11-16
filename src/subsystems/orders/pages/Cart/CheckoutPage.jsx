@@ -48,7 +48,7 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const { selected: cartItems, selectedCount, remove, selectedTotal } = useCart();
+  const { selected: cartItems, selectedCount, remove, selectedTotal, clearCheckedOut } = useCart();
   
   // Use Buy Now items if they exist, otherwise use cart items
   const buyNowItems = location.state?.items;
@@ -57,7 +57,7 @@ export default function CheckoutPage() {
   
   // For Buy Now, track quantities separately
   const [buyNowQuantities, setBuyNowQuantities] = useState(
-    isBuyNow ? Object.fromEntries(buyNowItems.map((item) => [item.productId, item.quantity])) : {}
+    isBuyNow ? Object.fromEntries(buyNowItems.map((item) => [item.productId || item.id, item.quantity || item.qty || 1])) : {}
   );
   
   const [delivery, setDelivery] = useState("room");
@@ -76,9 +76,14 @@ export default function CheckoutPage() {
   const smsDigits = sms.replace(/\D/g, "").length;
   const smsIncomplete = smsDigits < 10;
 
-  // Check if any Buy Now item is out of stock or has 0 quantity
-  const hasOutOfStockItem = isBuyNow && items.some((item) => item.stockQuantity === 0);
-  const hasZeroQuantity = isBuyNow && items.some((item) => (buyNowQuantities[item.productId] || item.quantity) === 0);
+  // Check if any item is out of stock or has 0 quantity
+  const hasOutOfStockItem = items.some((item) => item.stockQuantity !== undefined && item.stockQuantity === 0);
+  const hasZeroQuantity = items.some((item) => {
+    const q = isBuyNow
+      ? (buyNowQuantities[item.productId || item.id] || item.quantity || 1)
+      : (item.qty ?? item.quantity ?? 1);
+    return q <= 0;
+  });
   
   // Map delivery radio to API enum
   const deliveryMethodMap = {
@@ -91,7 +96,7 @@ export default function CheckoutPage() {
   const buildingEmpty = apiDeliveryMethod === "ROOM_TO_ROOM" && !building.trim();
   const roomEmpty = apiDeliveryMethod === "ROOM_TO_ROOM" && !room.trim();
   
-  const canPlaceOrder = isBuyNow && !smsIncomplete && !hasOutOfStockItem && !hasZeroQuantity && !buildingEmpty && !roomEmpty && items.length > 0;
+  const canPlaceOrder = !smsIncomplete && !hasOutOfStockItem && !hasZeroQuantity && !buildingEmpty && !roomEmpty && items.length > 0 && !placing;
 
   function updateBuyNowQuantity(productId, newQty) {
     setBuyNowQuantities((prev) => ({
@@ -103,8 +108,8 @@ export default function CheckoutPage() {
   // Calculate Buy Now totals
   const buyNowCount = Object.values(buyNowQuantities).reduce((sum, qty) => sum + qty, 0);
   const buyNowTotal = buyNowItems ? buyNowItems.reduce((sum, item) => {
-    const qty = buyNowQuantities[item.productId] || item.quantity;
-    return sum + item.price * qty;
+    const qty = buyNowQuantities[item.productId || item.id] || item.quantity || 1;
+    return sum + (Number(item.price) || 0) * qty;
   }, 0) : 0;
   
   // Display values depend on flow
@@ -124,35 +129,56 @@ export default function CheckoutPage() {
     setPlaceError(null);
 
     try {
-      const item = items[0];
-      const qty = buyNowQuantities[item.productId] || item.quantity;
-      
-      const orderGroup = {
-        storeId: item.storeId,
-        deliveryMethod: apiDeliveryMethod,
-        paymentMethod,
-        items: [
-          {
-            productId: item.productId,
-            quantity: qty,
-          },
-        ],
-      };
+      // Group items by storeId
+      const itemsByStore = {};
+      for (const item of items) {
+        const sid = item.storeId || location.state?.storeId || "default";
+        const productId = item.productId || item.id;
+        const qty = isBuyNow
+          ? (buyNowQuantities[productId] || item.quantity || 1)
+          : (item.qty ?? item.quantity ?? 1);
 
-      // Add campus fields only for ROOM_TO_ROOM
-      if (apiDeliveryMethod === "ROOM_TO_ROOM") {
-        orderGroup.campusBuilding = building;
-        orderGroup.campusRoomNumber = room;
+        if (!itemsByStore[sid]) {
+          itemsByStore[sid] = [];
+        }
+        itemsByStore[sid].push({
+          productId,
+          quantity: qty,
+        });
       }
 
-      const results = await createMultiStoreOrders([orderGroup]);
+      const orderGroups = Object.entries(itemsByStore).map(([storeId, storeItems]) => {
+        const group = {
+          deliveryMethod: apiDeliveryMethod,
+          paymentMethod,
+          items: storeItems,
+        };
+        if (storeId && storeId !== "default" && storeId !== "undefined") {
+          group.storeId = storeId;
+        }
+        if (apiDeliveryMethod === "ROOM_TO_ROOM") {
+          group.campusBuilding = building;
+          group.campusRoomNumber = room;
+        }
+        if (notes.trim()) {
+          group.deliveryNotes = notes.trim();
+        }
+        return group;
+      });
+
+      const results = await createMultiStoreOrders(orderGroups);
 
       // Handle errors first
       if (Object.keys(results.errors).length > 0) {
-        const storeId = Object.keys(results.errors)[0];
-        setPlaceError(results.errors[storeId].message);
+        const firstStoreId = Object.keys(results.errors)[0];
+        setPlaceError(results.errors[firstStoreId]?.message || "Failed to place order.");
         setPlacing(false);
         return;
+      }
+
+      // Multi-item cart checkout: clear only checked-out items upon completion
+      if (!isBuyNow) {
+        clearCheckedOut(items);
       }
 
       // Handle GCash redirect
@@ -161,9 +187,18 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Handle success - navigate to order detail
+      // Handle success
       if (results.orders && results.orders.length > 0) {
-        navigate(`/orders/${results.orders[0].id}`);
+        if (paymentMethod === "CASH") {
+          navigate("/payment/confirmed", {
+            state: {
+              order: results.orders[0],
+              method: "cash",
+            },
+          });
+        } else {
+          navigate(`/orders/${results.orders[0].id}`);
+        }
       }
     } catch (err) {
       setPlaceError(err.message || "Failed to place order. Please try again.");
@@ -325,8 +360,8 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label htmlFor="sms" className="mb-1.5 block text-xs font-bold text-slate-700 dark:text-slate-200">Backup SMS line for security <span className="text-red-500">*</span></label>
-                  <PhoneInput id="sms" value={sms} onChange={setSms} invalid={isBuyNow && smsIncomplete} placeholder="9XX XXX XXXX" />
-                  {isBuyNow && smsIncomplete && (
+                  <PhoneInput id="sms" value={sms} onChange={setSms} invalid={smsIncomplete} placeholder="9XX XXX XXXX" />
+                  {smsIncomplete && (
                     <p className="mt-1 text-[11px] font-medium leading-tight text-red-500">Add a complete backup SMS line to place the order.</p>
                   )}
                 </div>
@@ -424,26 +459,33 @@ export default function CheckoutPage() {
                       );
                     })
                   ) : (
-                    // Cart flow: original code, no stepper
-                    cartItems.map((i) => (
-                      <div key={i.id} className="flex items-center justify-between gap-3 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-sky-100 bg-sky-50 dark:bg-sky-950/40 text-sky-600">
-                            <Icon name="tag" className="h-4 w-4" />
+                    // Cart flow: display selected cart items
+                    cartItems.map((i) => {
+                      const itemQty = i.qty ?? i.quantity ?? 1;
+                      const itemPrice = Number(i.price) || 0;
+                      const itemTitle = i.title || i.name;
+                      const itemSub = i.storeName || i.meta;
+                      return (
+                        <div key={i.id || i.productId} className="flex items-center justify-between gap-3 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-sky-100 bg-sky-50 dark:bg-sky-950/40 text-sky-600">
+                              <Icon name="tag" className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h3 className="text-xs font-bold leading-snug text-slate-800 dark:text-slate-100">{itemTitle}</h3>
+                              <p className="text-[10px] text-slate-400 dark:text-slate-500">{itemSub}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="text-xs font-bold leading-snug text-slate-800 dark:text-slate-100">{i.title}</h3>
-                            <p className="text-[10px] text-slate-400 dark:text-slate-500">{i.meta}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-slate-500 dark:text-slate-400">×{itemQty}</span>
+                            <span className="text-xs font-bold text-slate-800 dark:text-slate-100">₱{(itemPrice * itemQty).toFixed(2)}</span>
+                            <button type="button" aria-label={`Remove ${itemTitle}`} onClick={() => setConfirm({ title: "Remove this item?", message: `${itemTitle} will be removed from your order.`, confirmLabel: "Remove", tone: "danger", action: () => remove(i.id || i.productId) })} className="rounded p-1 text-slate-300 transition hover:text-rose-500">
+                              <Icon name="x" className="h-3.5 w-3.5" />
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100">₱{i.price.toFixed(2)}</span>
-                          <button type="button" aria-label={`Remove ${i.title}`} onClick={() => setConfirm({ title: "Remove this item?", message: `${i.title} will be removed from your order.`, confirmLabel: "Remove", tone: "danger", action: () => remove(i.id) })} className="rounded p-1 text-slate-300 transition hover:text-rose-500">
-                            <Icon name="x" className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
 
@@ -462,41 +504,32 @@ export default function CheckoutPage() {
               <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">₱{displayTotal.toFixed(2)}</span>
             </div>
 
-            {placeError && isBuyNow && (
+            {placeError && (
               <div className="mt-3 rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 p-3 text-xs text-rose-700 dark:text-rose-300">
                 <p className="font-semibold">Error placing order:</p>
                 <p>{placeError}</p>
               </div>
             )}
 
-            {isBuyNow && (buildingEmpty || roomEmpty) && (
+            {(buildingEmpty || roomEmpty) && (
               <div className="mt-3 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/30 p-3 text-xs text-amber-700 dark:text-amber-300">
                 <p>Enter your campus building and room to place the order.</p>
               </div>
             )}
 
             <div className="mt-5">
-              {isBuyNow ? (
-                <button
-                  type="button"
-                  onClick={placeOrder}
-                  disabled={!canPlaceOrder || placing}
-                  className="block w-full rounded-full bg-[#0284C7] px-4 py-3 text-center text-xs font-semibold tracking-wide text-white shadow-sm transition hover:bg-sky-700 hover:shadow active:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {placing ? "Placing order…" : "Place order"}
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    disabled={true}
-                    className="block w-full rounded-full bg-slate-300 px-4 py-3 text-center text-xs font-semibold tracking-wide text-slate-600 dark:text-slate-300 shadow-sm cursor-not-allowed"
-                  >
-                    Continue to payment
-                  </button>
-                  <p className="mt-2 text-center text-[11px] font-medium text-slate-500 dark:text-slate-400">Cart checkout is not connected yet.</p>
-                </>
-              )}
+              <button
+                type="button"
+                onClick={placeOrder}
+                disabled={!canPlaceOrder || placing}
+                className="block w-full rounded-full bg-[#0284C7] px-4 py-3 text-center text-xs font-semibold tracking-wide text-white shadow-sm transition hover:bg-sky-700 hover:shadow active:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {placing
+                  ? "Placing order…"
+                  : paymentMethod === "GCASH_PAYMONGO"
+                  ? "Proceed to GCash payment"
+                  : "Place order"}
+              </button>
               {items.length === 0 && <Link to="/marketplace" className="mt-2 block text-center text-[11px] font-semibold text-sky-600">Browse the marketplace</Link>}
             </div>
           </div>

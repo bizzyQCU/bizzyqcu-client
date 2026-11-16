@@ -95,9 +95,17 @@ export default function MB_StorePage() {
   function toCartItem(p) {
     return {
       id: p.id,
+      productId: p.id,
+      storeId: store.id,
+      storeName: store.name,
       title: p.name,
+      name: p.name,
       meta: p.category?.name ?? "",
       price: parseFloat(p.price),
+      quantity: 1,
+      qty: 1,
+      stockQuantity: p.stockQuantity,
+      imageUrl: p.imageUrls?.[0] || null,
     };
   }
 

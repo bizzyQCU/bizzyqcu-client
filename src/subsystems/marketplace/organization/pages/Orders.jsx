@@ -50,7 +50,11 @@ export default function Orders() {
     error,
     updating,
     refresh,
-    markCompleted,
+    confirmOrder,
+    readyForPickup,
+    outForDelivery,
+    completeOrder,
+    cancelOrder,
   } = useSellerOrders();
 
   const [messagesOpen, setMessagesOpen] = useState(false);
@@ -406,8 +410,20 @@ export default function Orders() {
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Current Status
                 </span>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                  ● {selectedOrder.orderStatus}
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                    selectedOrder._rawStatus === "COMPLETED"
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                      : selectedOrder._rawStatus === "CANCELLED"
+                      ? "bg-rose-50 text-rose-700 border border-rose-200"
+                      : selectedOrder._rawStatus === "PREPARING" ||
+                        selectedOrder._rawStatus === "READY_FOR_PICKUP" ||
+                        selectedOrder._rawStatus === "OUT_FOR_DELIVERY"
+                      ? "bg-sky-50 text-sky-700 border border-sky-200"
+                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                  }`}
+                >
+                  ● {selectedOrder._rawStatus ? selectedOrder._rawStatus.replace(/_/g, " ") : selectedOrder.orderStatus}
                 </span>
               </div>
 
@@ -507,16 +523,33 @@ export default function Orders() {
                 </h3>
                 <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-200 space-y-2.5 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Location</span>
-                    <span className="font-medium text-slate-800">
-                      AWS IK Bldg, Basement Booth #3
+                    <span className="text-slate-500">Method</span>
+                    <span className="font-semibold text-slate-800">
+                      {selectedOrder.deliveryMethod === "ROOM_TO_ROOM"
+                        ? "Room-to-room Delivery"
+                        : "Campus Pickup"}
                     </span>
                   </div>
                   <div className="flex justify-between">
+                    <span className="text-slate-500">Location</span>
+                    <span className="font-medium text-slate-800 text-right">
+                      {selectedOrder.deliveryMethod === "ROOM_TO_ROOM"
+                        ? [selectedOrder.campusBuilding, selectedOrder.campusRoomNumber].filter(Boolean).join(" · ") || "Campus Building & Room"
+                        : selectedOrder.pickupBooth || "AWS IK Bldg, Basement Booth #3"}
+                    </span>
+                  </div>
+                  {selectedOrder.pickupInstructions && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Pickup Note</span>
+                      <span className="font-medium text-slate-800 text-right">
+                        {selectedOrder.pickupInstructions}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
                     <span className="text-slate-500">Target Schedule</span>
                     <span className="font-medium text-slate-800 text-right">
-                      {selectedOrder.targetSchedule ||
-                        "Oct 24, 2024 (11:30 AM)"}
+                      {selectedOrder.targetSchedule || selectedOrder.date}
                     </span>
                   </div>
                 </div>
@@ -528,7 +561,8 @@ export default function Orders() {
                   Student Delivery Note
                 </h3>
                 <div className="p-3 bg-amber-50/50 border border-amber-200/60 rounded-xl text-xs text-amber-900 italic">
-                  {selectedOrder.deliveryNote ||
+                  {selectedOrder.deliveryNotes ||
+                    selectedOrder.deliveryNote ||
                     '"Please look for the buyer at the booth counter or drop off during the assigned break."'}
                 </div>
               </div>
@@ -577,21 +611,101 @@ export default function Orders() {
             </div>
 
             {/* Panel Footer Actions */}
-            <div className="p-6 border-t border-slate-200 bg-white sticky bottom-0 z-10 flex space-x-3">
+            <div className="p-6 border-t border-slate-200 bg-white sticky bottom-0 z-10 flex items-center justify-between gap-3">
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="w-1/2 px-4 py-2.5 border border-slate-300 rounded-xl text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors"
+                className="px-4 py-2.5 border border-slate-300 rounded-xl text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors"
               >
                 Close
               </button>
-              <button
-                onClick={() => markCompleted(selectedOrder)}
-                disabled={updating}
-                className="w-1/2 px-4 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>{updating ? "Updating…" : "Mark as Completed"}</span>
-              </button>
+
+              <div className="flex items-center gap-2">
+                {/* Cancel action if not yet in terminal state */}
+                {["PENDING_PAYMENT", "PENDING_CONFIRMATION", "PREPARING", "READY_FOR_PICKUP", "OUT_FOR_DELIVERY"].includes(
+                  selectedOrder._rawStatus
+                ) && (
+                  <button
+                    onClick={() => {
+                      if (window.confirm("Are you sure you want to cancel this order?")) {
+                        cancelOrder(selectedOrder);
+                      }
+                    }}
+                    disabled={updating}
+                    className="px-3.5 py-2.5 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
+                )}
+
+                {/* Transition: PENDING_CONFIRMATION -> PREPARING */}
+                {selectedOrder._rawStatus === "PENDING_CONFIRMATION" && (
+                  <button
+                    onClick={() => confirmOrder(selectedOrder)}
+                    disabled={updating}
+                    className="px-4 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center space-x-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <PackageCheck className="w-4 h-4" />
+                    <span>{updating ? "Updating…" : "Confirm & Start Preparing"}</span>
+                  </button>
+                )}
+
+                {/* Transition: PREPARING -> READY_FOR_PICKUP or OUT_FOR_DELIVERY */}
+                {selectedOrder._rawStatus === "PREPARING" &&
+                  (selectedOrder.deliveryMethod === "ROOM_TO_ROOM" ? (
+                    <button
+                      onClick={() => outForDelivery(selectedOrder)}
+                      disabled={updating}
+                      className="px-4 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center space-x-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <Truck className="w-4 h-4" />
+                      <span>{updating ? "Updating…" : "Dispatch / Out for Delivery"}</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => readyForPickup(selectedOrder)}
+                      disabled={updating}
+                      className="px-4 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center space-x-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <PackageCheck className="w-4 h-4" />
+                      <span>{updating ? "Updating…" : "Ready for Pickup"}</span>
+                    </button>
+                  ))}
+
+                {/* Transition: READY_FOR_PICKUP or OUT_FOR_DELIVERY -> COMPLETED */}
+                {(selectedOrder._rawStatus === "READY_FOR_PICKUP" ||
+                  selectedOrder._rawStatus === "OUT_FOR_DELIVERY") && (
+                  <button
+                    onClick={() => completeOrder(selectedOrder)}
+                    disabled={updating}
+                    className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center space-x-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>
+                      {updating
+                        ? "Updating…"
+                        : selectedOrder.deliveryMethod === "ROOM_TO_ROOM"
+                        ? "Mark as Delivered"
+                        : "Mark as Picked Up"}
+                    </span>
+                  </button>
+                )}
+
+                {/* Terminal status COMPLETED */}
+                {selectedOrder._rawStatus === "COMPLETED" && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    Completed
+                  </span>
+                )}
+
+                {/* Terminal status CANCELLED */}
+                {selectedOrder._rawStatus === "CANCELLED" && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-rose-700 bg-rose-50 rounded-xl border border-rose-200">
+                    <X className="w-4 h-4 text-rose-600" />
+                    Cancelled
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
