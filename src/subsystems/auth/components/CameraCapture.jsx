@@ -115,7 +115,7 @@ export default function CameraCapture({ id, label = 'Live Selfie', capture, erro
 
   return (
     <div className="flex flex-col h-full">
-      <p id={`${id}-label`} className="flex items-center gap-1 min-h-[16px] text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-300 min-w-0">
+      <p id={`${id}-label`} className="flex items-center gap-1 min-h-[16px] text-[10.5px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-300 min-w-0">
         <span className="truncate">{label}</span>
         <span className="text-[#0284C7] dark:text-amber-400 shrink-0" aria-hidden="true">*</span>
       </p>
@@ -178,12 +178,12 @@ export default function CameraCapture({ id, label = 'Live Selfie', capture, erro
             className="w-full flex items-center gap-2.5 text-left disabled:opacity-60"
           >
             <span className="w-8 h-8 rounded-full bg-[#8ACFF8]/25 border border-[#8ACFF8] text-[#0369A1] dark:bg-amber-400/15 dark:border-amber-400/30 dark:text-amber-400 flex items-center justify-center shrink-0">
-              <Icon name="face" className="text-[18px]" />
+              <Icon name="photo_camera" className="text-[17px]" />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-xs font-bold text-slate-900 dark:text-white truncate leading-tight">Open camera</span>
               <span className="block text-[10px] text-slate-500 dark:text-slate-400 truncate leading-tight">
-                Live selfie
+                Take a selfie
               </span>
             </span>
           </button>

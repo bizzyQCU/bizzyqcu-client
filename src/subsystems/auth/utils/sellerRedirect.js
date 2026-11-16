@@ -12,18 +12,9 @@ export function destinationFor(user, fallbackSellerType) {
     return '/admin'
   }
 
-  // Verification pending / rejected / non-verified -> /account
-  if (
-    user?.verificationStatus === 'PENDING' ||
-    user?.verificationStatus === 'REJECTED' ||
-    user?.verificationStatus === 'UNVERIFIED' ||
-    user?.isVerified === false ||
-    (user?.verificationStatus && user?.verificationStatus !== 'VERIFIED')
-  ) {
-    return '/account'
-  }
-
-  // Check if seller account or has seller profile / seller type / portal fallback
+  // Check if seller account or has seller profile / seller type / portal fallback.
+  // Pending/unapproved sellers are still directed to their seller dashboard,
+  // where an "Account Waiting for Approval" notice is displayed.
   if (user?.role === 'SELLER' || user?.sellerProfile || user?.sellerType || fallbackSellerType) {
     const rawType =
       user?.sellerProfile?.sellerType ||

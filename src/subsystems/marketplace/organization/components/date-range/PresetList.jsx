@@ -1,4 +1,4 @@
-import { quickPresets, academicPresets } from "../../../data/datePresets";
+import { quickPresets, academicPresets } from "../../../shared/data/datePresets";
 
 const BADGE_STYLES = {
   slate: "bg-slate-200 text-slate-700",

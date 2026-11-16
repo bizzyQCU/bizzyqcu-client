@@ -14,6 +14,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  Lock,
 } from "lucide-react";
 
 const AUTH_THEME_KEY = "bizzyqcu-auth-theme";
@@ -39,9 +40,15 @@ const linkClass = ({ isActive }) =>
   ].join(" ");
 
 export default function Sidebar() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const toggleRef = useRef(null);
+
+  const isUnapprovedSeller =
+    user?.role === "SELLER" &&
+    (user?.verificationStatus !== "VERIFIED" ||
+      (user?.sellerProfile?.verificationStatus &&
+        user.sellerProfile.verificationStatus !== "VERIFIED"));
 
   const [theme, setTheme] = useState(() =>
     localStorage.getItem(AUTH_THEME_KEY) === "dark" ? "dark" : "light"
@@ -239,12 +246,32 @@ export default function Sidebar() {
 
           {/* Navigation */}
           <nav className="px-3 mt-4 space-y-1.5" aria-label="Main navigation">
-            {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
-              <NavLink key={to} to={to} className={linkClass}>
-                <Icon className="w-5 h-5 shrink-0" />
-                <span>{label}</span>
-              </NavLink>
-            ))}
+            {NAV_ITEMS.map(({ to, icon: Icon, label }) => {
+              const locked =
+                isUnapprovedSeller && to !== "/seller/org/dashboard";
+              if (locked) {
+                return (
+                  <div
+                    key={to}
+                    aria-disabled="true"
+                    title="Available after admin approval"
+                    className="flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 dark:text-slate-500 cursor-not-allowed select-none"
+                  >
+                    <span className="flex items-center space-x-3 min-w-0">
+                      <Icon className="w-5 h-5 shrink-0 opacity-70" />
+                      <span className="truncate">{label}</span>
+                    </span>
+                    <Lock className="w-3.5 h-3.5 shrink-0 opacity-60" />
+                  </div>
+                );
+              }
+              return (
+                <NavLink key={to} to={to} className={linkClass}>
+                  <Icon className="w-5 h-5 shrink-0" />
+                  <span>{label}</span>
+                </NavLink>
+              );
+            })}
           </nav>
         </div>
 

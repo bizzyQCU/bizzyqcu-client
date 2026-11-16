@@ -1,4 +1,4 @@
-import { badgeTone } from "../../../data/exportDatasets";
+import { badgeTone } from "../../../shared/data/exportDatasets";
 
 export default function DatasetOption({ dataset, data, checked, onToggle }) {
   const badgeText =

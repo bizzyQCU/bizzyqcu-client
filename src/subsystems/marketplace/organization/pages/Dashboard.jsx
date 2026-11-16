@@ -14,13 +14,15 @@ import {
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import SellerTopBar from "../components/SellerTopBar";
+import PendingApprovalNotice from "../components/PendingApprovalNotice";
+import { useAuth } from "../../../../hooks/useAuth";
 import {
   getErrorMessage,
   getMyStore,
   getSellerDashboard,
   getSellerOrders,
 } from "../../api";
-import { peso } from "../../utils/format";
+import { peso } from "../../shared/utils/format";
 
 const ACTIVE_ORDER_KEYS = [
   "PENDING_PAYMENT",
@@ -50,6 +52,7 @@ function formatStatus(status) {
 }
 
 export default function Dashboard() {
+  const { user, refreshUser } = useAuth();
   const [dashboard, setDashboard] = useState(null);
   const [storeInfo, setStoreInfo] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
@@ -57,7 +60,17 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const isPendingApproval =
+    user?.role === "SELLER" &&
+    (user?.verificationStatus !== "VERIFIED" ||
+      (user?.sellerProfile?.verificationStatus &&
+        user.sellerProfile.verificationStatus !== "VERIFIED"));
+
   const loadDashboard = useCallback(async () => {
+    if (isPendingApproval) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     setMissingStore(false);
@@ -102,11 +115,24 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isPendingApproval]);
 
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
+
+  const handleRefresh = async () => {
+    if (isPendingApproval) {
+      setLoading(true);
+      try {
+        await refreshUser();
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+    loadDashboard();
+  };
 
   const ordersByStatus = dashboard?.ordersByStatus || {};
   const activeOrdersCount = ACTIVE_ORDER_KEYS.reduce(
@@ -148,7 +174,7 @@ export default function Dashboard() {
             </div>
             <button
               type="button"
-              onClick={loadDashboard}
+              onClick={handleRefresh}
               disabled={loading}
               className="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 shadow-sm transition-colors disabled:opacity-60"
             >
@@ -162,6 +188,8 @@ export default function Dashboard() {
               <div className="w-8 h-8 border-4 border-slate-200 border-t-[#0284C7] rounded-full animate-spin" />
               <p className="text-sm text-slate-500">Loading store dashboard…</p>
             </div>
+          ) : isPendingApproval ? (
+            <PendingApprovalNotice user={user} />
           ) : missingStore ? (
             <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm max-w-2xl">
               <div className="flex items-start gap-4">

@@ -16,6 +16,7 @@ import { requestPasswordOtp, verifyPasswordOtp, loginWithPasskey } from '../api'
 import { getWebAuthnErrorMessage, isWebAuthnSupported } from '../../../lib/webauthn'
 import { useAuth } from '../../../hooks/useAuth'
 import { getErrorMessage } from '../../../lib/api-client'
+import { destinationFor as sellerDestinationFor } from '../utils/sellerRedirect.js'
 
 // Mirrors bizzyqcu-server: OTP_EXPIRY_MINUTES = 5 (utils/otp.ts).
 const OTP_TTL_SECONDS = 5 * 60
@@ -33,6 +34,7 @@ const formatClock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '
 
 /** Where to send the user after a successful sign-in. */
 function destinationFor(user, from) {
+  if (user?.role === 'SELLER') return sellerDestinationFor(user)
   if (from && from !== '/login') return from
   if (user?.verificationStatus !== 'VERIFIED') return '/account'
   if (user?.role === 'ADMIN') return '/admin'

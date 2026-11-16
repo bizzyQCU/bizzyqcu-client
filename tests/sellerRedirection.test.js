@@ -196,7 +196,7 @@ describe('Seller Login Redirection Suite', () => {
   })
 
   describe('Unverified / Pending / Rejected Seller Handling', () => {
-    it('redirects PENDING verification status seller to /account', () => {
+    it('redirects PENDING verification status Organization Seller to /seller/org/dashboard', () => {
       const user = {
         role: USER_ROLES.SELLER,
         verificationStatus: VERIFICATION_STATUS.PENDING,
@@ -204,10 +204,10 @@ describe('Seller Login Redirection Suite', () => {
           sellerType: SELLER_TYPES.RECOGNIZED_ORGANIZATION,
         },
       }
-      assert.strictEqual(destinationFor(user), '/account')
+      assert.strictEqual(destinationFor(user), '/seller/org/dashboard')
     })
 
-    it('redirects REJECTED verification status seller to /account', () => {
+    it('redirects REJECTED verification status Organization Seller to /seller/org/dashboard', () => {
       const user = {
         role: USER_ROLES.SELLER,
         verificationStatus: VERIFICATION_STATUS.REJECTED,
@@ -215,10 +215,10 @@ describe('Seller Login Redirection Suite', () => {
           sellerType: SELLER_TYPES.RECOGNIZED_ORGANIZATION,
         },
       }
-      assert.strictEqual(destinationFor(user), '/account')
+      assert.strictEqual(destinationFor(user), '/seller/org/dashboard')
     })
 
-    it('redirects UNVERIFIED status seller to /account', () => {
+    it('redirects UNVERIFIED status Enterprise Seller to /seller/dashboard', () => {
       const user = {
         role: USER_ROLES.SELLER,
         verificationStatus: 'UNVERIFIED',
@@ -226,10 +226,10 @@ describe('Seller Login Redirection Suite', () => {
           sellerType: SELLER_TYPES.STUDENT_ENTERPRISE,
         },
       }
-      assert.strictEqual(destinationFor(user), '/account')
+      assert.strictEqual(destinationFor(user), '/seller/dashboard')
     })
 
-    it('redirects seller with isVerified: false to /account', () => {
+    it('redirects Independent Seller with isVerified: false to /seller/dashboard', () => {
       const user = {
         role: USER_ROLES.SELLER,
         isVerified: false,
@@ -237,7 +237,7 @@ describe('Seller Login Redirection Suite', () => {
           sellerType: SELLER_TYPES.INDEPENDENT_SELLER,
         },
       }
-      assert.strictEqual(destinationFor(user), '/account')
+      assert.strictEqual(destinationFor(user), '/seller/dashboard')
     })
   })
 

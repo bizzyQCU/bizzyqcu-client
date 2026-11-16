@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAnalytics } from "../../hooks/useAnalytics";
-import { useDateRange } from "../../hooks/useDateRange";
-import { fmtRange, toISODate } from "../../utils/dates";
+import { useAnalytics } from "../../shared/hooks/useAnalytics";
+import { useDateRange } from "../../shared/hooks/useDateRange";
+import { fmtRange, toISODate } from "../../shared/utils/dates";
 import Sidebar from "../components/Sidebar";
 import SellerTopBar from "../components/SellerTopBar";
 import PageHeader from "../components/analytics/PageHeader";

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { buildMonthGrid, isSameDay, isBetween, monthLabel } from "../../../utils/dates";
+import { buildMonthGrid, isSameDay, isBetween, monthLabel } from "../../../shared/utils/dates";
 
 const DAY_NAMES = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 

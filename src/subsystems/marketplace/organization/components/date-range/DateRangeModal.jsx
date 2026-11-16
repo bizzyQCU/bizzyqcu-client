@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import { useDraftRange } from "../../../hooks/useDateRange";
-import { useScrollLock } from "../../../hooks/useScrollLock";
-import { fmtRange, previousPeriod, fmt } from "../../../utils/dates";
-import { events, boothHours } from "../../../data/academicCalendar";
+import { useDraftRange } from "../../../shared/hooks/useDateRange";
+import { useScrollLock } from "../../../shared/hooks/useScrollLock";
+import { fmtRange, previousPeriod, fmt } from "../../../shared/utils/dates";
+import { events, boothHours } from "../../../shared/data/academicCalendar";
 import PresetList from "./PresetList";
 import RangeCalendar from "./RangeCalendar";
 import DateField from "./DateField";

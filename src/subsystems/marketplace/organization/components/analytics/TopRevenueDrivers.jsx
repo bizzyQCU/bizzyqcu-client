@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { peso } from "../../../utils/format";
+import { peso } from "../../../shared/utils/format";
 
 const toneClass = {
   amber: "bg-amber-100 text-amber-800",

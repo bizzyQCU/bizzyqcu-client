@@ -1,6 +1,6 @@
 import KpiCard from "./KpiCard";
 import CriticalStockCard from "./CriticalStockCard";
-import { peso } from "../../../utils/format";
+import { peso } from "../../../shared/utils/format";
 
 export default function KpiRow({ kpis, critical }) {
   const safeKpis = kpis || {};

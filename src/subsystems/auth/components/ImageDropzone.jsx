@@ -49,7 +49,7 @@ export default function ImageDropzone({
 
   return (
     <div className="flex flex-col h-full">
-      <label className="flex items-center gap-1 min-h-[16px] text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-300 min-w-0" htmlFor={id}>
+      <label className="flex items-center gap-1 min-h-[16px] text-[10.5px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-300 min-w-0" htmlFor={id}>
         <span className="truncate">{label}</span>
         <span className="text-[#0284C7] dark:text-amber-400 shrink-0" aria-hidden="true">*</span>
       </label>
@@ -109,10 +109,10 @@ export default function ImageDropzone({
           ) : (
             <>
               <p className="text-xs text-slate-600 dark:text-slate-300 truncate leading-tight">
-                <span className="font-bold text-[#0369A1] dark:text-amber-300">Click to upload</span>
+                <span className="font-bold text-[#0369A1] dark:text-amber-300">Upload file</span>
               </p>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate leading-tight">
-                {hint || (allowPdf ? 'JPG, PNG, PDF (5MB)' : 'JPG or PNG (5MB)')}
+                {hint || (allowPdf ? 'JPG, PNG, PDF' : 'JPG, PNG')}
               </p>
             </>
           )}

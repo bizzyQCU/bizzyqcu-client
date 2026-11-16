@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Icon from '../../components/Icon.jsx'
 import ConfirmDialog from './components/Dialogs/ConfirmDialog.jsx'
 import MessageWidget from './components/Messages/MessageWidget.jsx'
@@ -11,6 +11,7 @@ import { useCart } from '../../lib/CartContext.jsx'
 import { useMessages } from '../../lib/MessageContext.jsx'
 import { getInitials, getVerificationLabel } from '../../lib/userDisplay.js'
 import { useAuth } from '../../hooks/useAuth'
+import { destinationFor as sellerDestinationFor } from '../auth/utils/sellerRedirect.js'
 import useIsMobile from '../../hooks/useIsMobile.js'
 const logo = '/logo-clear.png'
 
@@ -25,7 +26,7 @@ const navClass = ({ isActive }) =>
 export default function OrdersLayout() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const { user, isAuthenticated, loading: authLoading, logout } = useAuth()
+  const { user, isAuthenticated, isSeller, loading: authLoading, logout } = useAuth()
   const { count } = useCart()
   const { theme, toggleTheme } = useTheme()
   const mobile = useIsMobile()
@@ -40,6 +41,20 @@ export default function OrdersLayout() {
   useEffect(() => {
     if (mobile && chatOpen && pathname !== '/messages') navigate('/messages')
   }, [mobile, chatOpen, pathname, navigate])
+
+  // Wait for auth check so seller accounts never flash buyer marketplace routes.
+  if (authLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#F8FAFC] dark:bg-[#0b1120] text-sm text-slate-500 dark:text-slate-400">
+        Loading…
+      </div>
+    )
+  }
+
+  // Sellers cannot browse or shop in the buyer marketplace; send them to their seller dashboard.
+  if (isAuthenticated && isSeller) {
+    return <Navigate to={sellerDestinationFor(user)} replace />
+  }
 
   const initials = isAuthenticated ? getInitials(user?.fullName, 'Q') : '?'
   const displayName = isAuthenticated ? user?.fullName || 'QCU User' : 'Guest'

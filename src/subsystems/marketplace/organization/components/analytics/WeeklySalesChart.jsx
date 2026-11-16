@@ -1,4 +1,4 @@
-import { peso } from "../../../utils/format";
+import { peso } from "../../../shared/utils/format";
 
 const MAX_BAR_HEIGHT = 125;
 const BAR_STYLES = [

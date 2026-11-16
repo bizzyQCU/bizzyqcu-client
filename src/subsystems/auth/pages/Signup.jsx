@@ -230,11 +230,11 @@ export default function Signup() {
 
       <section className="w-full max-w-[540px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="signup-title">
         <AuthCard
-          className="!p-4 sm:!px-6 sm:!py-4"
+          className="!p-5 sm:!px-6 sm:!py-5"
           onClose={() => navigate('/login')}
           closeLabel="Close and return to login"
         >
-          <div className="text-center mb-2 px-4">
+          <div className="text-center mb-2.5 px-4">
             <div className="flex items-center justify-center gap-2">
               <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
               <h1 id="signup-title" className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
@@ -243,11 +243,11 @@ export default function Signup() {
               <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-              Verified QCU students only — your ID and selfie are reviewed by an administrator.
+              Verified QCU students only — reviewed by an administrator.
             </p>
           </div>
 
-          <AuthModeTabs active="signup" loginTo="/login" signupTo="/signup" className="mb-2.5" />
+          <AuthModeTabs active="signup" loginTo="/login" signupTo="/signup" className="mb-3" />
 
           {otpFlow.step === 'otp' ? (
             <RegistrationOtpStep
@@ -267,7 +267,7 @@ export default function Signup() {
               onBack={otpFlow.backToForm}
             />
           ) : (
-            <form className="space-y-2" onSubmit={handleSubmit} noValidate>
+            <form className="space-y-2.5" onSubmit={handleSubmit} noValidate>
             {otpFlow.formError && <Alert tone="error">{otpFlow.formError}</Alert>}
 
             <Field id="signup-full-name" label="Full Name" icon="person" error={errors.fullName}>
@@ -283,8 +283,8 @@ export default function Signup() {
               />
             </Field>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-start">
-              <Field id="signup-qcu-id" label="QCU ID Number" icon="badge" error={errors.qcuIdNumber} hint="YY-NNNN">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+              <Field id="signup-qcu-id" label="QCU ID Number" icon="badge" error={errors.qcuIdNumber}>
                 <input
                   id="signup-qcu-id"
                   type="text"
@@ -299,7 +299,7 @@ export default function Signup() {
                 />
               </Field>
 
-              <Field id="signup-email" label="Email Address" icon="mail" error={errors.email} hint="OTP sent here">
+              <Field id="signup-email" label="Email Address" icon="mail" error={errors.email}>
                 <input
                   id="signup-email"
                   type="email"
@@ -314,7 +314,7 @@ export default function Signup() {
             </div>
 
             {/* Sign-in method: password is optional on the server */}
-            <div className="rounded-xl border border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.02] px-3 py-2 space-y-1.5">
+            <div className="rounded-xl border border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.02] px-3.5 py-2.5 space-y-2">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -327,22 +327,18 @@ export default function Signup() {
                   }}
                   className="w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white dark:bg-white/5 dark:border-white/20 dark:text-amber-500 dark:focus:ring-amber-400 dark:focus:ring-offset-slate-900 shrink-0"
                 />
-                <span className="text-xs text-slate-600 dark:text-slate-300 leading-snug truncate">
-                  <span className="font-semibold text-slate-900 dark:text-white">Set a password</span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-1.5">
-                    — Sign in with password + 6-digit email OTP{passkeyCapable ? ' (or uncheck for Passkey-only)' : ''}.
-                  </span>
+                <span className="text-xs font-semibold text-slate-900 dark:text-white leading-snug">
+                  Set a password
                 </span>
               </label>
 
               {usePassword && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-start">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
                   <Field
                     id="signup-password"
                     label="Password"
                     icon="lock"
                     error={errors.password}
-                    hint={`Min ${MIN_PASSWORD_LENGTH} chars`}
                     rightSlot={<PasswordToggle visible={showPass} onToggle={() => setShowPass((s) => !s)} />}
                   >
                     <input
@@ -380,7 +376,7 @@ export default function Signup() {
             </div>
 
             {/* Identity verification */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
               <ImageDropzone
                 id="signup-qcu-id-photo"
                 label="QCU Student ID Photo"
@@ -406,11 +402,9 @@ export default function Signup() {
               />
             </div>
 
-            <p className="flex items-center gap-1.5 text-[10px] text-slate-500 leading-tight">
-              <Icon name="shield_lock" className="text-[13px] text-[#0284C7] dark:text-slate-400 shrink-0" />
-              <span className="truncate">
-                Your ID photo and selfie are protected under RA 10173 and viewable by BizzyQCU administrators only.
-              </span>
+            <p className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+              <Icon name="shield_lock" className="text-[14px] text-[#0284C7] dark:text-slate-400 shrink-0" />
+              <span>Files are protected under RA 10173.</span>
             </p>
 
             {import.meta.env.DEV && !isImageUploadConfigured && (

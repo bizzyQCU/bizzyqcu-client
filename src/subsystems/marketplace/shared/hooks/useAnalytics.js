@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { getSellerAnalytics, getMyStore } from '../api'
+import { getSellerAnalytics, getMyStore } from '../../api'
 
 const LOW_STOCK_THRESHOLD = 5
 

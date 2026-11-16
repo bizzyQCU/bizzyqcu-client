@@ -11,7 +11,7 @@ const hashLinks = [
 
 export default function Navbar() {
   const navigate = useNavigate()
-  const { isAuthenticated, isAdmin } = useAuth()
+  const { isAuthenticated, isAdmin, isSeller } = useAuth()
   const { count } = useCart()
   const { pathname } = useLocation()
   const isSellerMessages = pathname === '/seller/messages'
@@ -81,23 +81,25 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center space-x-3 sm:space-x-4">
-          <button
-            type="button"
-            aria-label="Cart"
-            onClick={() => navigate('/cart')}
-            className="relative p-2 text-[#103D84] hover:text-amber-500 transition-colors"
-          >
-            <svg className="w-6 h-6 stroke-current" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" viewBox="0 0 24 24">
-              <circle cx="9" cy="21" r="1" />
-              <circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-            </svg>
-            {count > 0 && (
-              <span className="absolute top-1 right-0.5 bg-[#E88E0E] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white">
-                {count}
-              </span>
-            )}
-          </button>
+          {!isSeller && (
+            <button
+              type="button"
+              aria-label="Cart"
+              onClick={() => navigate('/cart')}
+              className="relative p-2 text-[#103D84] hover:text-amber-500 transition-colors"
+            >
+              <svg className="w-6 h-6 stroke-current" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" viewBox="0 0 24 24">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              </svg>
+              {count > 0 && (
+                <span className="absolute top-1 right-0.5 bg-[#E88E0E] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white">
+                  {count}
+                </span>
+              )}
+            </button>
+          )}
 
           <button
             type="button"
