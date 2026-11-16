@@ -8,8 +8,11 @@ const BAR_STYLES = [
 ];
 
 export default function WeeklySalesChart({ weeks, projected }) {
-  const peak = weeks.reduce((best, w) => w.revenue > best.revenue ? w : best, weeks[0]);
-  const peakIndex = weeks.indexOf(peak);
+  if (!weeks || weeks.length === 0) return null;
+  const peakRevenue = Math.max(...weeks.map((w) => w?.revenue || 0));
+  const hasSales = peakRevenue > 0;
+  const peak = hasSales ? weeks.find((w) => (w?.revenue || 0) === peakRevenue) : null;
+  const peakIndex = peak ? weeks.indexOf(peak) : -1;
 
   return (
     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-7">
@@ -17,12 +20,21 @@ export default function WeeklySalesChart({ weeks, projected }) {
         <div>
           <h3 className="text-base font-bold text-slate-900">Weekly Sales Trajectory</h3>
           <p className="text-xs text-slate-500">
-            October 2024 surge patterns culminating in Tech Summit peak
+            Weekly store sales trends and momentum over time
           </p>
         </div>
         <div className="text-right">
-          <span className="text-xs font-bold text-slate-800">Peak: Week {peakIndex + 1}</span>
-          <span className="block text-[11px] text-emerald-600 font-bold">{peso(peak.revenue)}</span>
+          {hasSales ? (
+            <>
+              <span className="text-xs font-bold text-slate-800">Peak: Week {peakIndex + 1}</span>
+              <span className="block text-[11px] text-emerald-600 font-bold">{peso(peakRevenue)}</span>
+            </>
+          ) : (
+            <>
+              <span className="text-xs font-medium text-slate-500">Peak: None</span>
+              <span className="block text-[11px] text-slate-400">₱0.00</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -38,24 +50,27 @@ export default function WeeklySalesChart({ weeks, projected }) {
         {/* Bars */}
         <div className="relative w-full h-full flex items-end justify-between px-6 z-10">
           {weeks.map((w, i) => {
-            const isPeak = w === peak;
-            const height = Math.round((w.revenue / peak.revenue) * MAX_BAR_HEIGHT);
+            const isPeak = hasSales && w === peak;
+            const revenue = w?.revenue || 0;
+            const height = hasSales ? Math.max(4, Math.round((revenue / peakRevenue) * MAX_BAR_HEIGHT)) : 4;
             const barStyle = isPeak 
               ? "bg-[#0091FF] hover:bg-[#0284C7] shadow-md ring-2 ring-sky-100" 
-              : BAR_STYLES[i % BAR_STYLES.length];
+              : hasSales
+              ? BAR_STYLES[i % BAR_STYLES.length]
+              : "bg-slate-200";
 
             return (
               <div key={w.id} className="flex flex-col items-center gap-2 group">
                 <div className={`text-[10px] font-semibold transition-opacity ${
                   isPeak ? "text-[#0091FF] font-bold" : "text-slate-500 opacity-0 group-hover:opacity-100"
                 }`}>
-                  {isPeak && "★ "}{peso(w.revenue, 0)}
+                  {isPeak && "★ "}{peso(revenue, 0)}
                 </div>
                 <div
                   className={`w-10 rounded-t transition-all ${barStyle}`}
                   style={{ height: `${height}px` }}
                   role="img"
-                  aria-label={`${w.label}: ${peso(w.revenue)}`}
+                  aria-label={`${w.label}: ${peso(revenue)}`}
                 />
                 <div className="text-center">
                   <span className={`text-[11px] block ${isPeak ? "font-bold text-slate-900" : "font-semibold text-slate-700"}`}>
@@ -73,10 +88,10 @@ export default function WeeklySalesChart({ weeks, projected }) {
 
       <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center justify-between text-xs">
         <span className="text-slate-600">
-          Projected November Momentum: <strong className="text-slate-900">{peso(projected, 0)}+</strong>
+          Projected Monthly Momentum: <strong className="text-slate-900">{peso(projected || 0, 0)}+</strong>
         </span>
         <span className="text-emerald-700 font-semibold bg-emerald-100 px-2 py-0.5 rounded">
-          Bullish Demand
+          {projected > 0 ? "Active Demand" : "Healthy Pipeline"}
         </span>
       </div>
     </div>

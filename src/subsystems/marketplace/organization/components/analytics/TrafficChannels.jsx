@@ -1,14 +1,18 @@
 export default function TrafficChannels({ traffic }) {
+  const total = traffic?.total || 0;
+  const channels = traffic?.channels || [];
+
   return (
     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
       <div className="mb-4">
         <h3 className="text-base font-bold text-slate-900">Primary Traffic Channels</h3>
-        <p className="text-xs text-slate-500">Attribution for {traffic.total.toLocaleString()} unique visits</p>
+        <p className="text-xs text-slate-500">Attribution for {total.toLocaleString()} unique visits</p>
       </div>
 
       <div className="space-y-4">
-        {traffic.channels.map((channel) => {
-          const percentage = Math.round((channel.visits / traffic.total) * 100);
+        {channels.map((channel) => {
+          const visits = channel.visits || 0;
+          const percentage = total > 0 ? Math.round((visits / total) * 100) : 0;
           return (
             <div key={channel.id}>
               <div className="flex items-center justify-between text-sm mb-1.5">
@@ -17,7 +21,7 @@ export default function TrafficChannels({ traffic }) {
                   <span className="font-medium text-slate-700">{channel.label}</span>
                 </div>
                 <span className="font-semibold text-slate-900">
-                  {percentage}% <span className="text-slate-500 font-normal">({channel.visits})</span>
+                  {percentage}% <span className="text-slate-500 font-normal">({visits})</span>
                 </span>
               </div>
               <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
@@ -37,7 +41,7 @@ export default function TrafficChannels({ traffic }) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p className="text-xs text-sky-900">
-            <strong className="font-semibold">Insight:</strong> {traffic.insight}
+            <strong className="font-semibold">Insight:</strong> {traffic?.insight || "Campus visitor channels tracked dynamically."}
           </p>
         </div>
       </div>

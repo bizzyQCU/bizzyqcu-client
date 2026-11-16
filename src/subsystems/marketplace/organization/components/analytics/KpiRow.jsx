@@ -3,6 +3,8 @@ import CriticalStockCard from "./CriticalStockCard";
 import { peso } from "../../../utils/format";
 
 export default function KpiRow({ kpis, critical }) {
+  const safeKpis = kpis || {};
+
   return (
     <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
       <KpiCard
@@ -23,11 +25,11 @@ export default function KpiRow({ kpis, critical }) {
           </svg>
         }
         iconClass="bg-emerald-100"
-        value={peso(kpis.grossRevenue, 0)}
-        delta={kpis.revenueChangePct}
-        deltaNote="vs last month"
+        value={peso(safeKpis.grossRevenue ?? 0, 0)}
+        delta={safeKpis.revenueChangePct ?? 0}
+        deltaNote="vs previous period"
         footerLabel="Net Revenue"
-        footerValue={peso(kpis.netRevenue, 0)}
+        footerValue={peso(safeKpis.netRevenue ?? 0, 0)}
       />
 
       <KpiCard
@@ -48,11 +50,11 @@ export default function KpiRow({ kpis, critical }) {
           </svg>
         }
         iconClass="bg-blue-100"
-        value={kpis.completedOrders.toLocaleString()}
-        delta={kpis.ordersChangePct}
+        value={(safeKpis.completedOrders ?? 0).toLocaleString()}
+        delta={safeKpis.ordersChangePct ?? 0}
         deltaNote="fulfilled successfully"
         footerLabel="Avg. Order Value"
-        footerValue={peso(kpis.avgOrderValue)}
+        footerValue={peso(safeKpis.avgOrderValue ?? 0)}
       />
 
       <KpiCard
@@ -73,18 +75,19 @@ export default function KpiRow({ kpis, critical }) {
           </svg>
         }
         iconClass="bg-sky-100"
-        value={`${kpis.conversionRatePct}%`}
+        value={`${safeKpis.conversionRatePct ?? 0}%`}
         valueClass="text-[#0091FF]"
-        delta={kpis.conversionChangePct}
-        deltaNote="above org average"
+        delta={safeKpis.conversionChangePct ?? 0}
+        deltaNote="visitor conversion rate"
         footerLabel="Unique Visitors"
-        footerValue={kpis.uniqueVisitors.toLocaleString()}
+        footerValue={(safeKpis.uniqueVisitors ?? 0).toLocaleString()}
       />
 
       <CriticalStockCard
-        productName={critical.productName}
-        unitsLeft={critical.unitsLeft}
-        note={critical.note}
+        isCritical={critical?.isCritical}
+        productName={critical?.productName || "All Products In Stock"}
+        unitsLeft={critical?.unitsLeft ?? 0}
+        note={critical?.note || "Healthy inventory levels"}
       />
     </section>
   );
