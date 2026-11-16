@@ -12,7 +12,7 @@ export default function RequireAuth({ children }) {
 
   if (loading) {
     return (
-      <main className="flex-grow flex items-center justify-center py-20 text-slate-600 gap-2">
+      <main className="flex-grow flex items-center justify-center py-20 text-slate-600 dark:text-slate-300 gap-2">
         <Spinner />
         <span className="text-sm">Checking your session…</span>
       </main>

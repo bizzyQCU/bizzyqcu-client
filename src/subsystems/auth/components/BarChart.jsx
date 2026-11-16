@@ -13,7 +13,8 @@ export default function BarChart({ className = '' }) {
     const root = rootRef.current;
     if (!root) return undefined;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    return createBarChartScene(root, { reducedMotion });
+    const dark = Boolean(root.closest('.dot-grid-container')?.classList.contains('dark'));
+    return createBarChartScene(root, { reducedMotion, dark });
   }, []);
 
   return (

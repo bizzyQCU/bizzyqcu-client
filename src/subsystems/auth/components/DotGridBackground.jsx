@@ -9,9 +9,9 @@ import './DotGridBackground.css';
  * - Deep dark navy background (#0b1120)
  * - No pointer tracking needed - purely animated
  */
-export default function DotGridBackground({ children, className = '' }) {
+export default function DotGridBackground({ children, className = '', ...rest }) {
   return (
-    <div className={`dot-grid-container ${className}`}>
+    <div className={`dot-grid-container ${className}`} {...rest}>
       {/* Foreground content - positioned above the gradient */}
       <div className="dot-content">
         {children}

@@ -23,10 +23,10 @@ const OTP_TTL_SECONDS = 5 * 60
 const RESEND_COOLDOWN_SECONDS = 60
 
 const submitBtn = (done) =>
-  `w-full py-3 rounded-xl font-extrabold text-base transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8ACFF8] ${
+  `w-full py-3 rounded-xl font-extrabold text-base transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:cursor-not-allowed dark:ring-1 dark:ring-inset focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8ACFF8] dark:focus-visible:ring-amber-200 ${
     done
-      ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25'
-      : 'bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] disabled:opacity-60'
+      ? 'bg-emerald-600 dark:bg-emerald-500 text-white dark:ring-emerald-300/40 shadow-lg shadow-emerald-500/25'
+      : 'bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:bg-gradient-to-r dark:from-amber-400 dark:via-amber-500 dark:to-amber-600 dark:hover:from-amber-300 dark:hover:via-amber-400 dark:hover:to-amber-500 dark:text-slate-950 dark:ring-amber-200/50 dark:shadow-lg dark:shadow-amber-500/25 dark:hover:shadow-xl dark:hover:shadow-amber-500/40 disabled:opacity-60'
   }`
 
 const formatClock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
@@ -42,13 +42,13 @@ function destinationFor(user, from) {
 function QcuIdInput({ id, value, onChange, disabled, inputRef }) {
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700" htmlFor={id}>
-        <Icon name="badge" className="text-[16px] text-[#0284C7]" />
+      <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200" htmlFor={id}>
+        <Icon name="badge" className="text-[16px] text-[#0284C7] dark:text-amber-400" />
         <span>QCU ID Number</span>
-        <span className="text-[#0284C7]" aria-hidden="true">*</span>
+        <span className="text-[#0284C7] dark:text-amber-400" aria-hidden="true">*</span>
       </label>
       <div className="relative mt-1.5">
-        <Icon name="account_circle" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none" />
+        <Icon name="account_circle" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-[20px] pointer-events-none" />
         <input
           ref={inputRef}
           id={id}
@@ -59,7 +59,7 @@ function QcuIdInput({ id, value, onChange, disabled, inputRef }) {
           disabled={disabled}
           onChange={(e) => onChange(e.target.value)}
           placeholder="e.g. 24-0001"
-          className={`${inputBase} border-slate-200 pl-11 pr-4`}
+          className={`${inputBase} border-slate-200 dark:border-white/10 pl-11 pr-4`}
         />
       </div>
     </div>
@@ -199,13 +199,13 @@ export default function Login() {
         <AuthCard>
           {/* Header */}
           <div className="text-center mb-5">
-            <div className="mx-auto mb-3 w-11 h-11 rounded-xl bg-gradient-to-br from-[#F4EB6C] via-[#FFD444] to-[#EFE768] flex items-center justify-center shadow-md shadow-[#FFD444]/35 ring-1 ring-inset ring-white/70">
-              <Icon name="storefront" className="text-slate-900 text-[22px]" />
+            <div className="mx-auto mb-3 w-11 h-11 rounded-xl bg-gradient-to-br from-[#F4EB6C] via-[#FFD444] to-[#EFE768] dark:from-amber-300 dark:via-amber-400 dark:to-amber-600 flex items-center justify-center shadow-md shadow-[#FFD444]/35 dark:shadow-lg dark:shadow-amber-500/30 ring-1 ring-inset ring-white/70 dark:ring-white/30">
+              <Icon name="storefront" className="text-slate-900 dark:text-slate-950 text-[22px]" />
             </div>
-            <h1 id="login-title" className="text-2xl font-extrabold tracking-tight text-slate-900">
+            <h1 id="login-title" className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Welcome back
             </h1>
-            <p className="text-sm text-slate-500 mt-1">Sign in to your BizzyQCU account</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Sign in to your BizzyQCU account</p>
           </div>
 
           <AuthModeTabs active="login" loginTo="/login" signupTo="/signup" />
@@ -224,13 +224,13 @@ export default function Login() {
               />
 
               <div>
-                <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700" htmlFor="login-password">
-                  <Icon name="lock" className="text-[16px] text-[#0284C7]" />
+                <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200" htmlFor="login-password">
+                  <Icon name="lock" className="text-[16px] text-[#0284C7] dark:text-amber-400" />
                   <span>Password</span>
-                  <span className="text-[#0284C7]" aria-hidden="true">*</span>
+                  <span className="text-[#0284C7] dark:text-amber-400" aria-hidden="true">*</span>
                 </label>
                 <div className="relative mt-1.5">
-                  <Icon name="lock" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none" />
+                  <Icon name="lock" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-[20px] pointer-events-none" />
                   <input
                     id="login-password"
                     type={showPassword ? 'text' : 'password'}
@@ -241,14 +241,14 @@ export default function Login() {
                     disabled={busy}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className={`${inputBase} border-slate-200 pl-11 pr-11`}
+                    className={`${inputBase} border-slate-200 dark:border-white/10 pl-11 pr-11`}
                   />
                   <PasswordToggle visible={showPassword} onToggle={() => setShowPassword((s) => !s)} />
                 </div>
               </div>
 
-              <p className="flex items-center gap-1.5 text-xs text-slate-500">
-                <Icon name="verified_user" className="text-[15px] text-emerald-600" />
+              <p className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                <Icon name="verified_user" className="text-[15px] text-emerald-600 dark:text-emerald-400" />
                 <span>We&apos;ll email a 6-digit code to confirm it&apos;s you.</span>
               </p>
 
@@ -270,18 +270,18 @@ export default function Login() {
               {otpNotice && (
                 <Alert tone="info" icon="mark_email_read">
                   {otpNotice}
-                  <span className="block text-xs text-[#0369A1]/80 mt-0.5">Signing in as {identifier.trim()}</span>
+                  <span className="block text-xs text-[#0369A1]/80 dark:text-amber-200/70 mt-0.5">Signing in as {identifier.trim()}</span>
                 </Alert>
               )}
 
               <div>
                 <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700" htmlFor="login-otp">
-                    <Icon name="pin" className="text-[16px] text-[#0284C7]" />
+                  <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200" htmlFor="login-otp">
+                    <Icon name="pin" className="text-[16px] text-[#0284C7] dark:text-amber-400" />
                     <span>6-Digit Code</span>
                   </label>
                   <span
-                    className={`text-xs font-semibold tabular-nums ${otpExpired ? 'text-rose-600' : otpSecondsLeft <= 60 ? 'text-amber-600' : 'text-slate-500'}`}
+                    className={`text-xs font-semibold tabular-nums ${otpExpired ? 'text-rose-600 dark:text-red-400' : otpSecondsLeft <= 60 ? 'text-amber-600 dark:text-orange-300' : 'text-slate-500 dark:text-slate-400'}`}
                     aria-live="polite"
                   >
                     {otpExpired ? 'Code expired' : `Expires in ${formatClock(otpSecondsLeft)}`}
@@ -300,7 +300,7 @@ export default function Login() {
                   disabled={loginState !== 'idle'}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="••••••"
-                  className={`${inputBase} border-slate-200 mt-1.5 px-4 text-center tracking-[0.6em] text-xl font-mono`}
+                  className={`${inputBase} border-slate-200 dark:border-white/10 mt-1.5 px-4 text-center tracking-[0.6em] text-xl font-mono`}
                 />
               </div>
 
@@ -314,14 +314,14 @@ export default function Login() {
               </button>
 
               <div className="flex items-center justify-between pt-1">
-                <button type="button" onClick={backToPassword} disabled={loginState !== 'idle'} className="text-xs text-slate-500 hover:text-[#0369A1] disabled:opacity-50">
+                <button type="button" onClick={backToPassword} disabled={loginState !== 'idle'} className="text-xs text-slate-500 hover:text-[#0369A1] dark:text-slate-400 dark:hover:text-white disabled:opacity-50">
                   ← Use a different account
                 </button>
                 <button
                   type="button"
                   onClick={handleRequestOtp}
                   disabled={loginState !== 'idle' || resendSecondsLeft > 0}
-                  className="text-xs font-semibold text-[#0369A1] hover:text-[#0284C7] hover:underline disabled:text-slate-400 disabled:no-underline disabled:cursor-not-allowed"
+                  className="text-xs font-semibold text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 hover:underline disabled:text-slate-400 dark:disabled:text-slate-500 disabled:no-underline disabled:cursor-not-allowed"
                 >
                   {resendSecondsLeft > 0 ? `Resend code in ${resendSecondsLeft}s` : 'Resend code'}
                 </button>
@@ -331,10 +331,10 @@ export default function Login() {
 
           {/* Footer */}
           <div className="mt-auto pt-5">
-            <div className="pt-4 border-t border-slate-200 text-center">
+            <div className="pt-4 border-t border-slate-200 dark:border-white/10 text-center">
               <Link
                 to="/seller-login-form"
-                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full bg-sky-50 text-[#0369A1] hover:bg-[#8ACFF8]/25 hover:text-[#0284C7] border border-[#8ACFF8] transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full bg-sky-50 text-[#0369A1] hover:bg-[#8ACFF8]/25 hover:text-[#0284C7] border border-[#8ACFF8] dark:bg-amber-400/10 dark:text-amber-300 dark:hover:bg-amber-400/20 dark:hover:text-amber-200 dark:border-amber-400/25 transition-colors"
               >
                 <Icon name="storefront" className="text-[16px]" />
                 <span>Want to sell? Seller Portal</span>

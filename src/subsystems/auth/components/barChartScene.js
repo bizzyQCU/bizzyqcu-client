@@ -12,7 +12,7 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
-const PALETTE = {
+const LIGHT_PALETTE = {
   floorFill: '#EFF6FF',
   gridLine: 'rgba(2, 132, 199, 0.20)',
   gridBorder: 'rgba(3, 105, 161, 0.45)',
@@ -20,6 +20,16 @@ const PALETTE = {
   barHigh: 0x8acff8, // Electric Sky
   keyLight: 0xfffdf0,
   fillLight: 0xffd444, // Golden Alert
+};
+
+const DARK_PALETTE = {
+  floorFill: '#0f1b33',
+  gridLine: 'rgba(253, 184, 19, 0.22)',
+  gridBorder: 'rgba(253, 184, 19, 0.45)',
+  barLow: 0xd97706, // amber-600
+  barHigh: 0xfde68a, // amber-200 / bright gold
+  keyLight: 0xfff4dc,
+  fillLight: 0x38bdf8,
 };
 
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
@@ -32,13 +42,14 @@ const outBack = (x) => {
   return 1 + 2.2 * x * x * x + 1.2 * x * x;
 };
 
-export function createBarChartScene(root, { reducedMotion = false } = {}) {
+export function createBarChartScene(root, { reducedMotion = false, dark = false } = {}) {
+  let PALETTE = dark ? DARK_PALETTE : LIGHT_PALETTE;
   const host = root.querySelector('.coin-stack-gl');
   if (!host) return () => {};
 
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
   } catch {
     return () => {};
   }
@@ -69,14 +80,19 @@ export function createBarChartScene(root, { reducedMotion = false } = {}) {
     const t = new THREE.CanvasTexture(c);
     t.colorSpace = THREE.SRGBColorSpace;
     t.anisotropy = 4;
+    t.redraw = () => {
+      g.clearRect(0, 0, w, h);
+      draw(g, w, h);
+      t.needsUpdate = true;
+    };
     return t;
   };
 
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 80);
   camera.position.set(0, 3.8, 10.4);
   camera.lookAt(0, 0.75, 0);
-  addLight(PALETTE.keyLight, 3, 6, 4, 1.7);
-  addLight(PALETTE.fillLight, -4, 3, -3, 0.7);
+  const keyLightObj = addLight(PALETTE.keyLight, 3, 6, 4, 1.7);
+  const fillLightObj = addLight(PALETTE.fillLight, -4, 3, -3, 0.7);
 
   const grid = mkTex(512, 256, (g, w, h) => {
     g.fillStyle = PALETTE.floorFill;
@@ -180,6 +196,21 @@ export function createBarChartScene(root, { reducedMotion = false } = {}) {
     renderer.render(scene, camera);
   };
 
+  const onThemeChange = (e) => {
+    if (dead) return;
+    PALETTE = e.detail === 'dark' ? DARK_PALETTE : LIGHT_PALETTE;
+    keyLightObj.color.setHex(PALETTE.keyLight);
+    fillLightObj.color.setHex(PALETTE.fillLight);
+    grid.redraw();
+    const nextLo = new THREE.Color(PALETTE.barLow);
+    const nextHi = new THREE.Color(PALETTE.barHigh);
+    bars.forEach((m, i) => {
+      m.material.color.copy(nextLo.clone().lerp(nextHi, i / (heights.length - 1)));
+    });
+    renderer.render(scene, camera);
+  };
+  window.addEventListener('bizzyqcu-auth-theme', onThemeChange);
+
   renderer.compileAsync(scene, camera).then(() => {
     if (!dead && !raf) raf = requestAnimationFrame(loop);
   });
@@ -190,6 +221,7 @@ export function createBarChartScene(root, { reducedMotion = false } = {}) {
     raf = -1;
     ro.disconnect();
     root.removeEventListener('pointermove', onMove);
+    window.removeEventListener('bizzyqcu-auth-theme', onThemeChange);
     scene.traverse((o) => {
       if (o.geometry) o.geometry.dispose();
       const ms = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];

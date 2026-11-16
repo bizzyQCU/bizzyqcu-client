@@ -15,8 +15,8 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
-// BizzyQCU buyer palette (keep in sync with tailwind.config.js)
-const PALETTE = {
+// BizzyQCU buyer palette (light) & royal-blue/gold palette (dark)
+const LIGHT_PALETTE = {
   coinLight: '#F4EB6C', // Sunlit Yellow
   coinMid: '#FFD444', // Golden Alert (pop)
   coinDark: '#EAB308',
@@ -28,6 +28,18 @@ const PALETTE = {
   fillLight: 0x8acff8, // Electric Sky rim light
 };
 
+const DARK_PALETTE = {
+  coinLight: '#FDE68A', // amber-200
+  coinMid: '#FDB813', // brand.yellow
+  coinDark: '#D97706', // amber-600
+  rim: 0xf59e0b, // brand.gold
+  faceInk: 'rgba(15, 39, 86, 0.92)', // brand.deepBlue
+  faceRing: 'rgba(255, 255, 255, 0.85)',
+  shadow: '11, 17, 32', // #0b1120 (DotGridBackground dark base), as r,g,b
+  keyLight: 0xfff4dc, // warm key light
+  fillLight: 0x3b82f6, // cool navy/blue rim light
+};
+
 const FONT = '"Plus Jakarta Sans", system-ui, sans-serif';
 
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
@@ -36,13 +48,14 @@ const smoothstep = (x) => {
   return x * x * (3 - 2 * x);
 };
 
-export function createCoinStackScene(root, { reducedMotion = false } = {}) {
+export function createCoinStackScene(root, { reducedMotion = false, dark = false } = {}) {
+  let PALETTE = dark ? DARK_PALETTE : LIGHT_PALETTE;
   const host = root.querySelector('.coin-stack-gl');
   if (!host) return () => {};
 
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
   } catch {
     // WebGL unavailable: leave the decorative panel empty.
     return () => {};
@@ -96,6 +109,7 @@ export function createCoinStackScene(root, { reducedMotion = false } = {}) {
     );
     m.rotation.x = -Math.PI / 2;
     m.position.y = y;
+    m.userData.shadowTex = t;
     scene.add(m);
     return m;
   };
@@ -104,8 +118,8 @@ export function createCoinStackScene(root, { reducedMotion = false } = {}) {
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 80);
   camera.position.set(0, 2.4, 6.6);
   camera.lookAt(0, -0.2, 0);
-  addLight(PALETTE.keyLight, 2, 5, 4, 1.5);
-  addLight(PALETTE.fillLight, -4, 1.5, -2, 0.8);
+  const keyLightObj = addLight(PALETTE.keyLight, 2, 5, 4, 1.5);
+  const fillLightObj = addLight(PALETTE.fillLight, -4, 1.5, -2, 0.8);
 
   // Coin face texture
   const face = makeTexture(256, 256, (g, w, h) => {
@@ -211,6 +225,18 @@ export function createCoinStackScene(root, { reducedMotion = false } = {}) {
     update(s, px, py);
     renderer.render(scene, camera);
   };
+  const onThemeChange = (e) => {
+    if (dead) return;
+    PALETTE = e.detail === 'dark' ? DARK_PALETTE : LIGHT_PALETTE;
+    rim.color.setHex(PALETTE.rim);
+    keyLightObj.color.setHex(PALETTE.keyLight);
+    fillLightObj.color.setHex(PALETTE.fillLight);
+    face.redraw();
+    shadow.userData.shadowTex?.redraw();
+    renderer.render(scene, camera);
+  };
+  window.addEventListener('bizzyqcu-auth-theme', onThemeChange);
+
   // Compile shaders first so mounting doesn't stall the page
   renderer.compileAsync(scene, camera).then(() => {
     if (!dead && !raf) raf = requestAnimationFrame(loop);
@@ -222,6 +248,7 @@ export function createCoinStackScene(root, { reducedMotion = false } = {}) {
     raf = -1;
     ro.disconnect();
     root.removeEventListener('pointermove', onMove);
+    window.removeEventListener('bizzyqcu-auth-theme', onThemeChange);
     scene.traverse((o) => {
       if (o.geometry) o.geometry.dispose();
       const ms = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];

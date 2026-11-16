@@ -69,8 +69,8 @@ function initials(name = '') {
 function SectionTitle({ icon, title, children }) {
   return (
     <div className="flex items-center justify-between gap-3 mb-4">
-      <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
-        <Icon name={icon} className="text-[20px] text-[#0284C7]" />
+      <h2 className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white">
+        <Icon name={icon} className="text-[20px] text-[#0284C7] dark:text-amber-400" />
         <span>{title}</span>
       </h2>
       {children}
@@ -119,9 +119,9 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
   const synced = device.deviceType === 'multiDevice'
 
   return (
-    <li className="rounded-2xl bg-[#F8FAFC] border border-slate-200 p-4">
+    <li className="rounded-2xl bg-[#F8FAFC] border border-slate-200 dark:bg-white/[0.03] dark:border-white/10 p-4">
       <div className="flex items-start gap-3">
-        <span className="w-10 h-10 rounded-xl bg-[#8ACFF8]/25 border border-[#8ACFF8] flex items-center justify-center text-[#0369A1] shrink-0">
+        <span className="w-10 h-10 rounded-xl bg-[#8ACFF8]/25 border border-[#8ACFF8] text-[#0369A1] dark:bg-amber-400/10 dark:border-amber-400/30 dark:text-amber-300 flex items-center justify-center shrink-0">
           <Icon name={synced ? 'cloud_sync' : 'phonelink_lock'} className="text-[20px]" />
         </span>
         <div className="flex-1 min-w-0">
@@ -133,13 +133,13 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
                 disabled={savingName}
-                className={`${inputBase} border-slate-200 py-1.5 px-3 text-xs`}
+                className={`${inputBase} border-slate-200 dark:border-white/15 py-1.5 px-3 text-xs`}
                 autoFocus
               />
               <button
                 type="submit"
                 disabled={savingName}
-                className="px-2.5 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-bold"
+                className="px-2.5 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white dark:bg-amber-400 dark:hover:bg-amber-300 dark:text-slate-950 text-xs font-bold"
               >
                 {savingName ? 'Saving…' : 'Save'}
               </button>
@@ -149,25 +149,25 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
                   setEditing(false)
                   setNameInput(device.deviceName || '')
                 }}
-                className="px-2 py-1.5 rounded-lg text-xs text-slate-500 hover:text-slate-800"
+                className="px-2 py-1.5 rounded-lg text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
               >
                 Cancel
               </button>
             </form>
           ) : (
-            <p className="text-sm font-bold text-slate-900 truncate">{device.deviceName || 'Unnamed device'}</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{device.deviceName || 'Unnamed device'}</p>
           )}
           <div className="mt-1 flex flex-wrap gap-1.5">
-            <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white text-slate-600 border border-slate-200">
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white text-slate-600 border border-slate-200 dark:bg-white/[0.06] dark:text-slate-300 dark:border-white/10">
               {synced ? 'Synced passkey' : 'Device-bound'}
             </span>
             {device.backedUp && (
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-400/10 dark:text-emerald-300 dark:border-emerald-400/25">
                 Backed up
               </span>
             )}
             {(device.transports || []).map((t) => (
-              <span key={t} className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white text-slate-500 border border-slate-200">
+              <span key={t} className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white text-slate-500 border border-slate-200 dark:bg-white/[0.06] dark:text-slate-400 dark:border-white/10">
                 {TRANSPORT_LABELS[t] || t}
               </span>
             ))}
@@ -183,7 +183,7 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
               type="button"
               onClick={() => setEditing(true)}
               aria-label={`Rename device ${device.deviceName || ''}`}
-              className="p-2 rounded-lg text-slate-400 hover:text-[#0369A1] hover:bg-sky-50 transition-colors"
+              className="p-2 rounded-lg text-slate-400 hover:text-[#0369A1] hover:bg-sky-50 dark:hover:text-amber-300 dark:hover:bg-amber-400/10 transition-colors"
             >
               <Icon name="edit" className="text-[18px]" />
             </button>
@@ -191,7 +191,7 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
               type="button"
               onClick={() => setConfirming(true)}
               aria-label={`Remove device ${device.deviceName || ''}`}
-              className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-red-300 dark:hover:bg-red-500/10 transition-colors"
             >
               <Icon name="delete" className="text-[18px]" />
             </button>
@@ -200,8 +200,8 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
       </div>
 
       {confirming && (
-        <div className="mt-3 rounded-xl bg-rose-50 border border-rose-200 p-3 space-y-2.5">
-          <p className="text-xs text-rose-700">
+        <div className="mt-3 rounded-xl bg-rose-50 border border-rose-200 dark:bg-red-500/[0.07] dark:border-red-400/25 p-3 space-y-2.5">
+          <p className="text-xs text-rose-700 dark:text-red-200">
             Remove this registered device / passkey?
             {isLast && ' This is your only passkey — make sure you have a password set, or you may be locked out.'}
           </p>
@@ -210,7 +210,7 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
               type="button"
               onClick={() => setConfirming(false)}
               disabled={deleting}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-white"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-white/[0.06]"
             >
               Cancel
             </button>
@@ -218,7 +218,7 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
               type="button"
               onClick={handleDelete}
               disabled={deleting}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 disabled:opacity-60"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-700 dark:bg-red-500 dark:hover:bg-red-400 text-white flex items-center gap-1.5 disabled:opacity-60"
             >
               {deleting && <Spinner className="text-[14px]" />}
               <span>{deleting ? 'Removing…' : 'Remove device'}</span>
@@ -226,7 +226,7 @@ function DeviceRow({ device, isLast, onRename, onDelete }) {
           </div>
         </div>
       )}
-      {error && <p className="mt-2 text-[11px] text-rose-600">{error}</p>}
+      {error && <p className="mt-2 text-[11px] text-rose-600 dark:text-red-400">{error}</p>}
     </li>
   )
 }
@@ -436,7 +436,7 @@ export default function AccountSecurity() {
 
   if (loading) {
     return (
-      <main className="flex-grow flex items-center justify-center py-20 text-slate-600 gap-2">
+      <main className="flex-grow flex items-center justify-center py-20 text-slate-600 dark:text-slate-300 gap-2">
         <Spinner />
         <span className="text-sm">Loading your account…</span>
       </main>
@@ -454,7 +454,7 @@ export default function AccountSecurity() {
               setLoading(true)
               load()
             }}
-            className="w-full py-2.5 rounded-xl bg-white hover:bg-sky-50 border-[1.5px] border-[#8ACFF8] hover:border-[#0284C7] text-sm font-semibold text-[#0369A1]"
+            className="w-full py-2.5 rounded-xl bg-white hover:bg-sky-50 border-[1.5px] dark:border border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] dark:bg-white/[0.06] dark:hover:bg-white/[0.1] dark:border-white/10 text-sm font-semibold dark:text-white"
           >
             Try again
           </button>
@@ -472,15 +472,15 @@ export default function AccountSecurity() {
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Account &amp; Security</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Account &amp; Security</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Manage your QCU identity verification, seller endorsement, and registered passkey devices.
           </p>
         </div>
         <button
           type="button"
           onClick={handleLogout}
-          className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-sky-50 border-[1.5px] border-[#8ACFF8] hover:border-[#0284C7] text-sm font-semibold text-[#0369A1] transition-colors"
+          className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-sky-50 border-[1.5px] dark:border border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:border-white/10 text-sm font-semibold dark:text-slate-200 transition-colors"
         >
           <Icon name="logout" className="text-[18px]" />
           <span>Sign out</span>
@@ -492,15 +492,15 @@ export default function AccountSecurity() {
       {/* 1. Profile & Verification Status */}
       <AuthCard fixedHeight={false}>
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F4EB6C] via-[#FFD444] to-[#EFE768] ring-1 ring-inset ring-[#FFD444] flex items-center justify-center text-slate-900 text-xl font-black shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F4EB6C] via-[#FFD444] to-[#EFE768] dark:from-amber-300 dark:via-amber-400 dark:to-amber-600 ring-1 ring-inset ring-[#FFD444] dark:ring-0 flex items-center justify-center text-slate-900 dark:text-slate-950 text-xl font-black shrink-0">
             {initials(profile.fullName)}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-lg font-bold text-slate-900 truncate">{profile.fullName}</p>
+              <p className="text-lg font-bold text-slate-900 dark:text-white truncate">{profile.fullName}</p>
               <VerificationBadge status={profile.verificationStatus} />
             </div>
-            <p className="text-sm text-slate-500 truncate">{profile.email}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{profile.email}</p>
           </div>
         </div>
 
@@ -510,12 +510,12 @@ export default function AccountSecurity() {
             ['Member Type', profile.memberType, 'school'],
             ['Account Role', profile.role, 'manage_accounts'],
           ].map(([k, v, icon]) => (
-            <div key={k} className="rounded-xl bg-[#F8FAFC] border border-slate-200 px-3.5 py-2.5">
+            <div key={k} className="rounded-xl bg-[#F8FAFC] border border-slate-200 dark:bg-white/[0.03] dark:border-white/10 px-3.5 py-2.5">
               <dt className="flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-slate-500">
-                <Icon name={icon} className="text-[14px] text-[#0284C7]" />
+                <Icon name={icon} className="text-[14px] text-[#0284C7] dark:text-slate-500" />
                 {k}
               </dt>
-              <dd className="mt-0.5 text-slate-900 font-semibold">{v}</dd>
+              <dd className="mt-0.5 text-slate-900 dark:text-white font-semibold">{v}</dd>
             </div>
           ))}
         </dl>
@@ -535,8 +535,8 @@ export default function AccountSecurity() {
 
         {/* Resubmit User Verification Form (POST /auth/resubmit-verification) */}
         {profile.verificationStatus !== 'VERIFIED' && (
-          <form onSubmit={handleResubmitUserVerification} className="mt-4 pt-4 border-t border-slate-200 space-y-3.5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#0369A1] flex items-center gap-1.5">
+          <form onSubmit={handleResubmitUserVerification} className="mt-4 pt-4 border-t border-slate-200 dark:border-white/10 space-y-3.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#0369A1] dark:text-amber-300 flex items-center gap-1.5">
               <Icon name="upload_file" className="text-[16px]" />
               <span>Resubmit QCU ID / Live Selfie Verification</span>
             </h3>
@@ -562,7 +562,7 @@ export default function AccountSecurity() {
             <button
               type="submit"
               disabled={resubmittingUser || (!resubmitIdFile && !resubmitSelfie)}
-              className="px-4 py-2.5 rounded-xl font-bold text-sm text-white bg-[#0284C7] hover:bg-[#0369A1] shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] flex items-center gap-2 disabled:opacity-60"
+              className="px-4 py-2.5 rounded-xl font-bold text-sm text-white dark:text-slate-950 bg-[#0284C7] hover:bg-[#0369A1] dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:hover:from-amber-300 dark:hover:to-amber-400 shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:shadow-none flex items-center gap-2 disabled:opacity-60"
             >
               {resubmittingUser && <Spinner className="text-[16px]" />}
               <span>{resubmittingUser ? 'Resubmitting…' : 'Resubmit Identity Documents'}</span>
@@ -579,18 +579,18 @@ export default function AccountSecurity() {
 
         {seller ? (
           <div className="space-y-3.5">
-            <div className="rounded-xl bg-[#F8FAFC] border border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-sm">
+            <div className="rounded-xl bg-[#F8FAFC] border border-slate-200 dark:bg-white/[0.03] dark:border-white/10 px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-sm">
               <div>
-                <span className="text-slate-500">Seller Category: </span>
-                <span className="text-slate-900 font-semibold">
+                <span className="text-slate-500 dark:text-slate-400">Seller Category: </span>
+                <span className="text-slate-900 dark:text-white font-semibold">
                   {SELLER_TYPE_LABELS[seller.sellerType] || seller.sellerType}
                 </span>
               </div>
               <span
                 className={`px-2.5 py-0.5 rounded-full border text-[11px] font-bold ${
                   seller.isPaymongoVerified
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-white text-slate-600 border-slate-200'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-400/30'
+                    : 'bg-white text-slate-600 border-slate-200 dark:bg-white/[0.06] dark:text-slate-400 dark:border-white/10'
                 }`}
               >
                 {seller.isPaymongoVerified ? 'GCash (PayMongo) Verified' : 'Cash on Delivery / Pickup'}
@@ -612,8 +612,8 @@ export default function AccountSecurity() {
 
             {/* Resubmit Seller Endorsement (POST /auth/seller/resubmit) */}
             {seller.verificationStatus !== 'VERIFIED' && (
-              <form onSubmit={(e) => handleSellerSubmit(e, true)} className="pt-3 border-t border-slate-200 space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#0369A1]">
+              <form onSubmit={(e) => handleSellerSubmit(e, true)} className="pt-3 border-t border-slate-200 dark:border-white/10 space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#0369A1] dark:text-amber-300">
                   Update / Resubmit Seller Endorsement Document
                 </h3>
                 {sellerErr && <Alert tone="error">{sellerErr}</Alert>}
@@ -624,10 +624,10 @@ export default function AccountSecurity() {
                     value={sellerTypeInput}
                     onChange={(e) => setSellerTypeInput(e.target.value)}
                     disabled={submittingSeller}
-                    className={`${inputBase} border-slate-200 pl-10 pr-8 bg-white`}
+                    className={`${inputBase} border-slate-200 dark:border-white/10 pl-10 pr-8 bg-white dark:bg-slate-900/90`}
                   >
                     {Object.entries(SELLER_TYPE_LABELS).map(([val, label]) => (
-                      <option key={val} value={val} className="bg-white text-slate-900">
+                      <option key={val} value={val} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
                         {label}
                       </option>
                     ))}
@@ -646,7 +646,7 @@ export default function AccountSecurity() {
                 <button
                   type="submit"
                   disabled={submittingSeller || !sellerDocFile}
-                  className="px-4 py-2.5 rounded-xl font-bold text-sm text-white bg-[#0284C7] hover:bg-[#0369A1] shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] flex items-center gap-2 disabled:opacity-60"
+                  className="px-4 py-2.5 rounded-xl font-bold text-sm text-white dark:text-slate-950 bg-[#0284C7] hover:bg-[#0369A1] dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:hover:from-amber-300 dark:hover:to-amber-400 shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:shadow-none flex items-center gap-2 disabled:opacity-60"
                 >
                   {submittingSeller && <Spinner className="text-[16px]" />}
                   <span>{submittingSeller ? 'Uploading…' : 'Resubmit Seller Endorsement'}</span>
@@ -657,7 +657,7 @@ export default function AccountSecurity() {
         ) : profile.memberType === MEMBER_TYPES.STUDENT ? (
           /* Apply for Seller Verification (POST /auth/seller-application) */
           <form onSubmit={(e) => handleSellerSubmit(e, false)} className="space-y-3.5">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Want to open a store on BizzyQCU? Select your seller category and upload your required endorsement document.
             </p>
             {sellerErr && <Alert tone="error">{sellerErr}</Alert>}
@@ -668,10 +668,10 @@ export default function AccountSecurity() {
                 value={sellerTypeInput}
                 onChange={(e) => setSellerTypeInput(e.target.value)}
                 disabled={submittingSeller}
-                className={`${inputBase} border-slate-200 pl-10 pr-8 bg-white`}
+                className={`${inputBase} border-slate-200 dark:border-white/10 pl-10 pr-8 bg-white dark:bg-slate-900/90`}
               >
                 {Object.entries(SELLER_TYPE_LABELS).map(([val, label]) => (
-                  <option key={val} value={val} className="bg-white text-slate-900">
+                  <option key={val} value={val} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
                     {label}
                   </option>
                 ))}
@@ -690,15 +690,15 @@ export default function AccountSecurity() {
             <button
               type="submit"
               disabled={submittingSeller || !sellerDocFile}
-              className="px-4 py-2.5 rounded-xl font-bold text-sm text-white bg-[#0284C7] hover:bg-[#0369A1] shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] flex items-center gap-2 disabled:opacity-60"
+              className="px-4 py-2.5 rounded-xl font-bold text-sm text-white dark:text-slate-950 bg-[#0284C7] hover:bg-[#0369A1] dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:hover:from-amber-300 dark:hover:to-amber-400 shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:shadow-none flex items-center gap-2 disabled:opacity-60"
             >
               {submittingSeller && <Spinner className="text-[16px]" />}
               <span>{submittingSeller ? 'Submitting application…' : 'Submit Seller Application'}</span>
             </button>
           </form>
         ) : (
-          <p className="text-sm text-slate-600">
-            Faculty and Staff accounts are eligible for campus shopping (<code className="text-[#0369A1] font-semibold">BUYER</code>). Only enrolled QCU students may register as sellers.
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Faculty and Staff accounts are eligible for campus shopping (<code className="text-[#0369A1] dark:text-amber-300 font-semibold dark:font-normal">BUYER</code>). Only enrolled QCU students may register as sellers.
           </p>
         )}
       </AuthCard>
@@ -706,7 +706,7 @@ export default function AccountSecurity() {
       {/* 3. Registered Devices & Passkey Management (GET/PATCH/DELETE /auth/devices/:id) */}
       <AuthCard fixedHeight={false}>
         <SectionTitle icon="key" title="Registered Devices &amp; Passkeys">
-          <span className="text-xs font-semibold text-slate-500">{devices.length} registered</span>
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{devices.length} registered</span>
         </SectionTitle>
 
         {notice && (
@@ -716,9 +716,9 @@ export default function AccountSecurity() {
         )}
 
         {devices.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-[#F8FAFC] p-5 text-center mb-5">
-            <Icon name="fingerprint" className="text-3xl text-[#0284C7]" />
-            <p className="mt-1 text-sm text-slate-800 font-semibold">No passkey devices registered</p>
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-[#F8FAFC] dark:border-white/15 dark:bg-transparent p-5 text-center mb-5">
+            <Icon name="fingerprint" className="text-3xl text-[#0284C7] dark:text-slate-500" />
+            <p className="mt-1 text-sm text-slate-800 dark:text-slate-300 font-semibold">No passkey devices registered</p>
             <p className="text-xs text-slate-500">
               Register this device below to sign in with biometrics or PIN.
             </p>
@@ -737,7 +737,7 @@ export default function AccountSecurity() {
           </ul>
         )}
 
-        <div className="pt-5 border-t border-slate-200">
+        <div className="pt-5 border-t border-slate-200 dark:border-white/10">
           <PasskeySetup
             userId={profile.id}
             onRegistered={async () => {
@@ -773,7 +773,7 @@ export default function AccountSecurity() {
               <button
                 type="submit"
                 disabled={savingEmail || newEmail.trim() === profile.email}
-                className="px-4 py-2.5 rounded-xl font-bold text-sm bg-white hover:bg-sky-50 border-[1.5px] border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
+                className="px-4 py-2.5 rounded-xl font-bold text-sm bg-white hover:bg-sky-50 border-[1.5px] dark:border border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:border-white/15 dark:text-white flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
               >
                 {savingEmail && <Spinner className="text-[16px]" />}
                 <span>Update Email</span>
@@ -781,8 +781,8 @@ export default function AccountSecurity() {
             </div>
           </form>
 
-          <form onSubmit={handleChangePassword} className="pt-5 border-t border-slate-200 space-y-3.5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">Change Password</h3>
+          <form onSubmit={handleChangePassword} className="pt-5 border-t border-slate-200 dark:border-white/10 space-y-3.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Change Password</h3>
             {passErr && <Alert tone="error">{passErr}</Alert>}
             {passMsg && <Alert tone="success">{passMsg}</Alert>}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -801,7 +801,7 @@ export default function AccountSecurity() {
                   value={passwords.currentPassword}
                   onChange={(e) => setPasswords((p) => ({ ...p, currentPassword: e.target.value }))}
                   placeholder="Current password"
-                  className={`${inputBase} border-slate-200 pl-10 pr-9`}
+                  className={`${inputBase} border-slate-200 dark:border-white/10 pl-10 pr-9`}
                 />
               </Field>
               <Field
@@ -818,7 +818,7 @@ export default function AccountSecurity() {
                   value={passwords.newPassword}
                   onChange={(e) => setPasswords((p) => ({ ...p, newPassword: e.target.value }))}
                   placeholder="Min 8 chars"
-                  className={`${inputBase} border-slate-200 pl-10 pr-9`}
+                  className={`${inputBase} border-slate-200 dark:border-white/10 pl-10 pr-9`}
                 />
               </Field>
               <Field id="confirm-new-password" label="Confirm Password" icon="key">
@@ -830,14 +830,14 @@ export default function AccountSecurity() {
                   value={passwords.confirmPassword}
                   onChange={(e) => setPasswords((p) => ({ ...p, confirmPassword: e.target.value }))}
                   placeholder="Repeat password"
-                  className={`${inputBase} border-slate-200 pl-10 pr-3.5`}
+                  className={`${inputBase} border-slate-200 dark:border-white/10 pl-10 pr-3.5`}
                 />
               </Field>
             </div>
             <button
               type="submit"
               disabled={savingPass || !passwords.newPassword}
-              className="px-4 py-2.5 rounded-xl font-bold text-sm bg-white hover:bg-sky-50 border-[1.5px] border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] flex items-center gap-1.5 disabled:opacity-50 transition-colors"
+              className="px-4 py-2.5 rounded-xl font-bold text-sm bg-white hover:bg-sky-50 border-[1.5px] dark:border border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] dark:bg-white/[0.06] dark:hover:bg-white/[0.12] dark:border-white/15 dark:text-white flex items-center gap-1.5 disabled:opacity-50 transition-colors"
             >
               {savingPass && <Spinner className="text-[16px]" />}
               <span>Save New Password</span>
@@ -847,7 +847,7 @@ export default function AccountSecurity() {
       </AuthCard>
 
       <p className="text-center text-xs text-slate-500">
-        <Link to="/marketplace" className="text-[#0369A1] font-semibold hover:text-[#0284C7] hover:underline">
+        <Link to="/marketplace" className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-semibold hover:underline">
           Continue to marketplace →
         </Link>
       </p>

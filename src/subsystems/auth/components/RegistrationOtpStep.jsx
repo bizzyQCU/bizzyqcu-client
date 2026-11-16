@@ -198,20 +198,20 @@ export function RegistrationOtpStep({
 
       <Alert tone="info" icon="mark_email_read">
         {notice || 'Enter the 6-digit verification code sent to your email.'}
-        <span className="block text-xs text-[#0369A1]/80 mt-0.5 truncate">
+        <span className="block text-xs text-[#0369A1]/80 dark:text-amber-200/75 mt-0.5 truncate">
           Verifying {email.trim()}
         </span>
       </Alert>
 
       <div>
         <div className="flex items-center justify-between gap-2">
-          <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700" htmlFor={id}>
-            <Icon name="pin" className="text-[16px] text-[#0284C7]" />
+          <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200" htmlFor={id}>
+            <Icon name="pin" className="text-[16px] text-[#0284C7] dark:text-amber-400" />
             <span>6-Digit Verification Code</span>
           </label>
           <span
             className={`text-xs font-semibold tabular-nums ${
-              expired ? 'text-rose-600' : secondsLeft <= 60 ? 'text-amber-600' : 'text-slate-500'
+              expired ? 'text-rose-600 dark:text-red-400' : secondsLeft <= 60 ? 'text-amber-600 dark:text-orange-300' : 'text-slate-500 dark:text-slate-400'
             }`}
             aria-live="polite"
           >
@@ -232,9 +232,9 @@ export function RegistrationOtpStep({
           disabled={busy}
           onChange={(e) => onOtpChange(e.target.value.replace(/\D/g, '').slice(0, 6))}
           placeholder="••••••"
-          className={`${inputBase} border-slate-200 mt-1.5 px-4 text-center tracking-[0.6em] text-xl font-mono`}
+          className={`${inputBase} border-slate-200 dark:border-white/10 mt-1.5 px-4 text-center tracking-[0.6em] text-xl font-mono`}
         />
-        <p className="mt-1.5 text-[11px] text-slate-500">
+        <p className="mt-1.5 text-[11px] text-slate-500 dark:text-slate-400">
           Your form details and uploaded documents are saved while you verify your email.
         </p>
       </div>
@@ -253,7 +253,7 @@ export function RegistrationOtpStep({
           type="button"
           onClick={onBack}
           disabled={busy}
-          className="text-xs text-slate-500 hover:text-[#0369A1] disabled:opacity-50"
+          className="text-xs text-slate-500 hover:text-[#0369A1] dark:text-slate-400 dark:hover:text-white disabled:opacity-50"
         >
           ← Back to edit details
         </button>
@@ -261,7 +261,7 @@ export function RegistrationOtpStep({
           type="button"
           onClick={onResend}
           disabled={busy || resendSecondsLeft > 0}
-          className="text-xs font-semibold text-[#0369A1] hover:text-[#0284C7] hover:underline disabled:text-slate-400 disabled:no-underline disabled:cursor-not-allowed"
+          className="text-xs font-semibold text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 hover:underline disabled:text-slate-400 dark:disabled:text-slate-500 disabled:no-underline disabled:cursor-not-allowed"
         >
           {resendSecondsLeft > 0 ? `Resend code in ${resendSecondsLeft}s` : 'Resend code'}
         </button>

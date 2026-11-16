@@ -16,7 +16,8 @@ export default function CoinStack({ className = '' }) {
     const root = rootRef.current;
     if (!root) return undefined;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    return createCoinStackScene(root, { reducedMotion });
+    const dark = Boolean(root.closest('.dot-grid-container')?.classList.contains('dark'));
+    return createCoinStackScene(root, { reducedMotion, dark });
   }, []);
 
   return (

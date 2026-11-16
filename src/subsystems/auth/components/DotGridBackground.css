@@ -14,6 +14,11 @@
   overflow: hidden;
 }
 
+.dot-grid-container.dark {
+  background-color: #0b1120;
+  background-image: radial-gradient(rgba(234, 179, 8, 0.18) 1.5px, transparent 1.5px);
+}
+
 .dot-grid-container *,
 .dot-grid-container *::before,
 .dot-grid-container *::after {
@@ -36,6 +41,13 @@
   pointer-events: none;
   z-index: 1;
   animation: pulseGlow 7s ease-in-out infinite alternate;
+}
+
+.dot-grid-container.dark::before {
+  background: radial-gradient(circle,
+      rgba(245, 158, 11, 0.2) 0%,
+      rgba(217, 119, 6, 0.08) 50%,
+      transparent 75%);
 }
 
 @keyframes pulseGlow {
@@ -97,6 +109,18 @@
   background-color: rgba(3, 105, 161, 0.5);
 }
 
+.dark .auth-card-scroll {
+  scrollbar-color: rgba(251, 191, 36, 0.25) transparent;
+}
+
+.dark .auth-card-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(251, 191, 36, 0.25);
+}
+
+.dark .auth-card-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(251, 191, 36, 0.45);
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .dot-grid-container::before {
@@ -137,6 +161,21 @@
   }
 }
 
+.dark .shine-text {
+  background: linear-gradient(105deg,
+      #FFFFFF 30%,
+      #FCD34D 42%,
+      #F59E0B 50%,
+      #FCD34D 58%,
+      #FFFFFF 70%);
+  background-size: 260% 100%;
+  background-position: 130% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
 /* Reduced motion: disable shine animation */
 @media (prefers-reduced-motion: reduce) {
   .shine-text {
@@ -146,6 +185,12 @@
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
+  }
+
+  .dark .shine-text {
+    background: #FFFFFF;
+    -webkit-background-clip: text;
+    background-clip: text;
   }
 }
 
@@ -198,5 +243,87 @@
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* ============================================================================
+   Theme Button & Circular Reveal (View Transitions API)
+   ============================================================================ */
+
+:root,
+[data-theme="light"] {
+  --auth-page-bg: #F8FAFC;
+  --auth-page-text: #0F172A;
+  --button-bg: rgba(255, 255, 255, 0.95);
+  --button-border: #8ACFF8;
+  --button-icon: #0284C7;
+}
+
+.dark,
+[data-theme="dark"] {
+  --auth-page-bg: #0b1120;
+  --auth-page-text: #FFFFFF;
+  --button-bg: rgba(15, 23, 42, 0.72);
+  --button-border: rgba(251, 191, 36, 0.35);
+  --button-icon: #FBBF24;
+}
+
+.theme-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  border: 1.5px solid var(--button-border);
+  background: var(--button-bg);
+  color: var(--button-icon);
+  box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: transform 150ms ease;
+}
+
+.dark .theme-button,
+[data-theme="dark"] .theme-button {
+  border-width: 1px;
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.35);
+}
+
+.theme-button:hover  { transform: scale(1.05); }
+.theme-button:active { transform: scale(0.95); }
+
+/* Show only the icon for the current mode */
+.theme-button .icon-moon { display: none; }
+.dark .theme-button .icon-sun,
+[data-theme="dark"] .theme-button .icon-sun  { display: none; }
+.dark .theme-button .icon-moon,
+[data-theme="dark"] .theme-button .icon-moon { display: inline; }
+
+/* Freeze element color/background transitions while View Transition snapshots are taken
+   so every element flips inside the expanding circle with a crisp edge */
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition: none !important;
+}
+
+/* Turn off the browser's default cross-fade so only our circle animates */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Keep the old snapshot underneath and the new one on top */
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
+/* Users who prefer reduced motion get an instant switch */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

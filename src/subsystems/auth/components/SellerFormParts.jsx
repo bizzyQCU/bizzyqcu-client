@@ -197,21 +197,21 @@ export function SellerRegistrationForm({
       <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-2 lg:py-4 grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] gap-8 lg:gap-16 items-center">
         <SellerShowcase badge={badge} />
         <section className="w-full max-w-[490px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="seller-done-title">
-          <AuthCard className="border-[#8ACFF8]/70">
+          <AuthCard className="border-[#8ACFF8]/70 dark:border-amber-400/20">
             <div className="space-y-4">
               <div className="text-center space-y-2.5">
-                <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 dark:bg-emerald-500/15 dark:border-emerald-400/30 dark:text-emerald-400 flex items-center justify-center">
                   <Icon name="storefront" className="text-3xl" />
                 </div>
-                <h1 id="seller-done-title" className="text-2xl font-extrabold text-slate-900">
+                <h1 id="seller-done-title" className="text-2xl font-extrabold text-slate-900 dark:text-white">
                   Seller Application Submitted
                 </h1>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                   An administrator will verify your QCU ID, live selfie, and seller endorsement document. Once approved, you can create and manage your campus store.
                 </p>
               </div>
 
-              <dl className="rounded-2xl bg-[#F8FAFC] border border-slate-200 divide-y divide-slate-200 text-sm">
+              <dl className="rounded-2xl bg-[#F8FAFC] border border-slate-200 divide-y divide-slate-200 dark:bg-white/[0.03] dark:border-white/10 dark:divide-white/5 text-sm">
                 {[
                   ['Full Name', registered.fullName],
                   ['QCU ID', registered.qcuIdNumber],
@@ -219,25 +219,25 @@ export function SellerRegistrationForm({
                   ['Seller Type', SELLER_TYPE_LABELS[sellerType] || sellerType],
                 ].map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between gap-3 px-4 py-2.5">
-                    <dt className="text-slate-500">{k}</dt>
-                    <dd className="text-slate-900 font-medium truncate">{v}</dd>
+                    <dt className="text-slate-500 dark:text-slate-400">{k}</dt>
+                    <dd className="text-slate-900 dark:text-white font-medium truncate">{v}</dd>
                   </div>
                 ))}
                 <div className="flex items-center justify-between gap-3 px-4 py-2.5">
-                  <dt className="text-slate-500">QCU Identity Status</dt>
+                  <dt className="text-slate-500 dark:text-slate-400">QCU Identity Status</dt>
                   <dd>
                     <VerificationBadge status={registered.verificationStatus} />
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-3 px-4 py-2.5">
-                  <dt className="text-slate-500">Seller Profile Status</dt>
+                  <dt className="text-slate-500 dark:text-slate-400">Seller Profile Status</dt>
                   <dd>
                     <VerificationBadge status={sellerStatus} />
                   </dd>
                 </div>
               </dl>
 
-              <div className="pt-3 border-t border-slate-200 space-y-3">
+              <div className="pt-3 border-t border-slate-200 dark:border-white/10 space-y-3">
                 {needsPasskey && passkeyCapable && (
                   <Alert tone="warning">
                     You didn&apos;t set a password, so a passkey is required to sign in. Register one on this device now.
@@ -279,26 +279,26 @@ export function SellerRegistrationForm({
 
       <section className="w-full max-w-[550px] mx-auto lg:mx-0 lg:justify-self-end">
         <AuthCard
-          className="border-[#8ACFF8]/70"
+          className="border-[#8ACFF8]/70 dark:border-amber-400/20"
           onClose={() => navigate('/seller-signup')}
           closeLabel="Back to seller portals"
         >
             {/* Header */}
             <div className="text-center mb-4 px-5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] text-[10px] font-extrabold tracking-wider uppercase text-slate-900 mb-2">
-                <Icon name="storefront" className="text-[14px] text-[#0284C7]" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] text-[10px] font-extrabold tracking-wider uppercase text-slate-900 dark:bg-amber-400/10 dark:border-amber-400/30 dark:text-amber-300 mb-2">
+                <Icon name="storefront" className="text-[14px] text-[#0284C7] dark:text-amber-300" />
                 <span>{SELLER_TYPE_LABELS[sellerType] || badge}</span>
               </span>
               <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                <Icon name="auto_awesome" className="text-[#0284C7] text-[18px]" />
-                <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">
+                <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
+                <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                   {titlePrefix}{' '}
-                  <span className="text-[#0284C7]">{titleHighlight}</span>
+                  <span className="text-[#0284C7] dark:text-amber-400">{titleHighlight}</span>
                   {titleSuffix && ` ${titleSuffix}`}
                 </h1>
-                <Icon name="auto_awesome" className="text-[#0284C7] text-[18px]" />
+                <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
               </div>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 {subtitle || 'Verified QCU students only. Store profile details are set up after seller approval.'}
               </p>
             </div>
@@ -380,7 +380,7 @@ export function SellerRegistrationForm({
               </div>
 
               {/* Optional password (or Passkey-only) */}
-              <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-3.5 space-y-3">
+              <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.02] p-3.5 space-y-3">
                 <label className="flex items-start gap-2.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
@@ -391,11 +391,11 @@ export function SellerRegistrationForm({
                       clearError('password')
                       clearError('confirmPassword')
                     }}
-                    className="mt-0.5 w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white"
+                    className="mt-0.5 w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white dark:bg-white/5 dark:border-white/20 dark:text-amber-500 dark:focus:ring-amber-400 dark:focus:ring-offset-slate-900"
                   />
                   <span>
-                    <span className="block text-sm font-semibold text-slate-900">Set a password</span>
-                    <span className="block text-[11px] text-slate-500">
+                    <span className="block text-sm font-semibold text-slate-900 dark:text-white">Set a password</span>
+                    <span className="block text-[11px] text-slate-500 dark:text-slate-400">
                       Sign in with password + 6-digit email OTP.
                       {passkeyCapable && ' Uncheck to use a FIDO2 Passkey only.'}
                     </span>
@@ -492,7 +492,7 @@ export function SellerRegistrationForm({
               </div>
 
               <p className="flex items-start gap-1.5 text-[11px] text-slate-500 leading-relaxed">
-                <Icon name="shield_lock" className="text-[14px] text-[#0284C7] mt-px" />
+                <Icon name="shield_lock" className="text-[14px] text-[#0284C7] dark:text-slate-400 mt-px" />
                 <span>
                   Identity &amp; endorsement files are protected under RA 10173 and reviewed only by BizzyQCU administrators.
                 </span>
@@ -519,17 +519,17 @@ export function SellerRegistrationForm({
 
             {/* Footer link */}
             <div className="mt-auto pt-3.5">
-              <div className="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-slate-500">
+              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                 <span>
                   Already registered?{' '}
                   <Link
-                    className="text-[#0369A1] font-bold hover:text-[#0284C7] hover:underline"
+                    className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline"
                     to={`/seller-login-form?type=${portalKey}`}
                   >
                     Seller Log In
                   </Link>
                 </span>
-                <Link className="text-slate-500 hover:text-[#0369A1] text-xs" to="/seller-signup">
+                <Link className="text-slate-500 hover:text-[#0369A1] dark:text-slate-400 dark:hover:text-white text-xs" to="/seller-signup">
                   ← Switch seller type
                 </Link>
               </div>

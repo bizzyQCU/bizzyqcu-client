@@ -155,18 +155,18 @@ export default function Signup() {
         <section className="w-full max-w-[480px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="signup-done-title">
           <AuthCard>
             <div className="text-center space-y-3">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+              <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 dark:bg-emerald-500/15 dark:border-emerald-400/30 dark:text-emerald-400 flex items-center justify-center">
                 <Icon name="how_to_reg" className="text-3xl" />
               </div>
-              <h1 id="signup-done-title" className="text-2xl font-extrabold text-slate-900">
+              <h1 id="signup-done-title" className="text-2xl font-extrabold text-slate-900 dark:text-white">
                 Registration submitted
               </h1>
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 An administrator will review your QCU ID and live selfie. You&apos;ll get full marketplace access once your account is verified.
               </p>
             </div>
 
-            <dl className="mt-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 divide-y divide-slate-200 text-sm">
+            <dl className="mt-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 divide-y divide-slate-200 dark:bg-white/[0.03] dark:border-white/10 dark:divide-white/5 text-sm">
               {[
                 ['Name', registered.fullName],
                 ['QCU ID', registered.qcuIdNumber],
@@ -174,19 +174,19 @@ export default function Signup() {
                 ['Role', `${registered.memberType} · ${registered.role}`],
               ].map(([k, v]) => (
                 <div key={k} className="flex items-center justify-between gap-3 px-4 py-2.5">
-                  <dt className="text-slate-500">{k}</dt>
-                  <dd className="text-slate-900 font-medium truncate">{v}</dd>
+                  <dt className="text-slate-500 dark:text-slate-400">{k}</dt>
+                  <dd className="text-slate-900 dark:text-white font-medium truncate">{v}</dd>
                 </div>
               ))}
               <div className="flex items-center justify-between gap-3 px-4 py-2.5">
-                <dt className="text-slate-500">Status</dt>
+                <dt className="text-slate-500 dark:text-slate-400">Status</dt>
                 <dd>
                   <VerificationBadge status={registered.verificationStatus} />
                 </dd>
               </div>
             </dl>
 
-            <div className="mt-5 pt-5 border-t border-slate-200 space-y-3">
+            <div className="mt-5 pt-5 border-t border-slate-200 dark:border-white/10 space-y-3">
               {needsPasskey && passkeyCapable && (
                 <Alert tone="warning">
                   You didn&apos;t set a password, so a passkey is the only way to sign in. Create one now on this device.
@@ -230,13 +230,13 @@ export default function Signup() {
         <AuthCard onClose={() => navigate('/login')} closeLabel="Close and return to login">
           <div className="text-center mb-5 px-4">
             <div className="flex items-center justify-center gap-2">
-              <Icon name="auto_awesome" className="text-[#0284C7] text-[20px]" />
-              <h1 id="signup-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
+              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[20px]" />
+              <h1 id="signup-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 Create your QCU account
               </h1>
-              <Icon name="auto_awesome" className="text-[#0284C7] text-[20px]" />
+              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[20px]" />
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
               Verified QCU students only — your ID and selfie are reviewed by an administrator.
             </p>
           </div>
@@ -308,7 +308,7 @@ export default function Signup() {
             </div>
 
             {/* Sign-in method: password is optional on the server */}
-            <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-3.5 space-y-3.5">
+            <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.02] p-3.5 space-y-3.5">
               <label className="flex items-start gap-2.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -319,11 +319,11 @@ export default function Signup() {
                     clearError('password')
                     clearError('confirmPassword')
                   }}
-                  className="mt-0.5 w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white"
+                  className="mt-0.5 w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white dark:bg-white/5 dark:border-white/20 dark:text-amber-500 dark:focus:ring-amber-400 dark:focus:ring-offset-slate-900"
                 />
                 <span>
-                  <span className="block text-sm font-semibold text-slate-900">Set a password</span>
-                  <span className="block text-[11px] text-slate-500">
+                  <span className="block text-sm font-semibold text-slate-900 dark:text-white">Set a password</span>
+                  <span className="block text-[11px] text-slate-500 dark:text-slate-400">
                     Sign in with your password plus a 6-digit code sent to your email.
                     {passkeyCapable && ' Skip this to use a passkey only — you\u2019ll create it right after submitting.'}
                   </span>
@@ -401,7 +401,7 @@ export default function Signup() {
             </div>
 
             <p className="flex items-start gap-1.5 text-[11px] text-slate-500 leading-relaxed">
-              <Icon name="shield_lock" className="text-[14px] text-[#0284C7] mt-px" />
+              <Icon name="shield_lock" className="text-[14px] text-[#0284C7] dark:text-slate-400 mt-px" />
               <span>
                 Your ID photo and selfie are protected under the Data Privacy Act (RA 10173) and are viewable by BizzyQCU administrators only.
               </span>
@@ -433,10 +433,10 @@ export default function Signup() {
           )}
 
           <div className="mt-auto pt-4">
-            <div className="pt-3.5 border-t border-slate-200 text-center">
-              <p className="text-sm text-slate-500">
+            <div className="pt-3.5 border-t border-slate-200 dark:border-white/10 text-center">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 Already have an account?{' '}
-                <Link className="text-[#0369A1] font-bold hover:text-[#0284C7] hover:underline" to="/login">
+                <Link className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline" to="/login">
                   Log in
                 </Link>
               </p>

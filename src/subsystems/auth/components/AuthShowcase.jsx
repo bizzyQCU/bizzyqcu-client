@@ -11,19 +11,19 @@ const highlights = [
 export default function AuthShowcase() {
   return (
     <section className="hidden lg:flex flex-col items-center text-center" aria-label="About BizzyQCU">
-      <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] shadow-sm">
+      <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] dark:bg-amber-500/10 dark:border-amber-400/25 dark:backdrop-blur-md shadow-sm">
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0284C7] opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0284C7]" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0284C7] dark:bg-amber-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0284C7] dark:bg-amber-400" />
         </span>
-        <p className="text-xs font-bold tracking-wider uppercase text-slate-900">Campus Marketplace</p>
+        <p className="text-xs font-bold tracking-wider uppercase text-slate-900 dark:text-amber-300">Campus Marketplace</p>
       </div>
 
-      <h2 className="mt-4 text-4xl xl:text-[44px] font-black tracking-tight leading-[1.1] text-slate-900">
+      <h2 className="mt-4 text-4xl xl:text-[44px] font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white">
         Every buy builds
         <span className="block shine-text">a QCian&apos;s dream.</span>
       </h2>
-      <p className="mt-3 max-w-md text-base text-slate-600 leading-relaxed">
+      <p className="mt-3 max-w-md text-base text-slate-600 dark:text-slate-300/90 leading-relaxed">
         Support QCU student entrepreneurs and shop from the people you share the halls with.
       </p>
 
@@ -37,14 +37,14 @@ export default function AuthShowcase() {
         {highlights.map((h) => (
           <li
             key={h.label}
-            className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200 hover:border-[#8ACFF8] shadow-sm transition-colors"
+            className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200 hover:border-[#8ACFF8] dark:border-white/10 dark:hover:border-amber-400/40 shadow-sm transition-colors"
           >
-            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#8ACFF8]/25 border border-[#8ACFF8] text-[#0369A1]">
+            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#8ACFF8]/25 border border-[#8ACFF8] text-[#0369A1] dark:bg-amber-400/15 dark:border-amber-400/30 dark:text-amber-400">
               <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
                 {h.icon}
               </span>
             </span>
-            <span className="text-sm font-semibold text-slate-800">{h.label}</span>
+            <span className="text-sm font-semibold text-slate-800 dark:text-white/90">{h.label}</span>
           </li>
         ))}
       </ul>

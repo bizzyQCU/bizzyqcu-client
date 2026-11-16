@@ -115,29 +115,29 @@ export default function CameraCapture({ id, label = 'Live Selfie', capture, erro
 
   return (
     <div>
-      <p id={`${id}-label`} className="flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-slate-700">
+      <p id={`${id}-label`} className="flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-300">
         <span>{label}</span>
-        <span className="text-[#0284C7]" aria-hidden="true">*</span>
+        <span className="text-[#0284C7] dark:text-amber-400" aria-hidden="true">*</span>
       </p>
       <div
         aria-labelledby={`${id}-label`}
-        className={`mt-1.5 rounded-2xl border p-3 ${showError ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-[#F8FAFC]'}`}
+        className={`mt-1.5 rounded-2xl border p-3 ${showError ? 'border-rose-400 bg-rose-50 dark:border-red-400/70 dark:bg-red-500/5' : 'border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.03]'}`}
       >
         {state === 'live' || state === 'starting' ? (
           <div className="space-y-3">
-            <div className="relative mx-auto w-full max-w-[240px] aspect-square rounded-2xl overflow-hidden bg-slate-900 border border-[#8ACFF8]">
+            <div className="relative mx-auto w-full max-w-[240px] aspect-square rounded-2xl overflow-hidden bg-slate-900 dark:bg-black border border-[#8ACFF8] dark:border-amber-400/30">
               <video ref={videoRef} playsInline muted className="w-full h-full object-cover -scale-x-100" />
-              <div aria-hidden="true" className="pointer-events-none absolute inset-6 rounded-full border-2 border-dashed border-[#8ACFF8]/80" />
+              <div aria-hidden="true" className="pointer-events-none absolute inset-6 rounded-full border-2 border-dashed border-[#8ACFF8]/80 dark:border-amber-300/60" />
               {state === 'starting' && (
-                <div className="absolute inset-0 flex items-center justify-center text-slate-200 text-xs">Starting camera…</div>
+                <div className="absolute inset-0 flex items-center justify-center text-slate-200 dark:text-slate-300 text-xs">Starting camera…</div>
               )}
             </div>
-            <p className="text-[11px] text-center text-slate-500">Center your face in the circle, in good lighting, without sunglasses or a mask.</p>
+            <p className="text-[11px] text-center text-slate-500 dark:text-slate-400">Center your face in the circle, in good lighting, without sunglasses or a mask.</p>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={cancel}
-                className="flex-1 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold"
+                className="flex-1 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:border-white/10 dark:text-slate-300 text-sm font-semibold"
               >
                 Cancel
               </button>
@@ -145,7 +145,7 @@ export default function CameraCapture({ id, label = 'Live Selfie', capture, erro
                 type="button"
                 onClick={takePhoto}
                 disabled={state !== 'live'}
-                className="flex-[2] py-2 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-sm font-bold flex items-center justify-center gap-1.5 disabled:opacity-60"
+                className="flex-[2] py-2 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white dark:bg-gradient-to-r dark:from-amber-400 dark:to-amber-500 dark:hover:from-amber-300 dark:hover:to-amber-400 dark:text-slate-950 text-sm font-bold flex items-center justify-center gap-1.5 disabled:opacity-60"
               >
                 <Icon name="photo_camera" className="text-[18px]" />
                 <span>Capture</span>
@@ -154,18 +154,18 @@ export default function CameraCapture({ id, label = 'Live Selfie', capture, erro
           </div>
         ) : state === 'captured' && preview ? (
           <div className="flex items-center gap-3">
-            <img src={preview} alt="Your captured selfie" className="w-16 h-16 rounded-xl object-cover border border-emerald-300" />
+            <img src={preview} alt="Your captured selfie" className="w-16 h-16 rounded-xl object-cover border border-emerald-300 dark:border-emerald-400/40" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-emerald-700 flex items-center gap-1">
+              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
                 <Icon name="check_circle" className="text-[16px]" /> Selfie captured
               </p>
-              <p className="text-[11px] text-slate-500">Reviewed only by BizzyQCU administrators.</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">Reviewed only by BizzyQCU administrators.</p>
             </div>
             <button
               type="button"
               onClick={retake}
               disabled={disabled}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#0369A1] bg-white hover:bg-sky-50 border border-[#8ACFF8] disabled:opacity-60"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#0369A1] bg-white hover:bg-sky-50 border border-[#8ACFF8] dark:bg-transparent dark:text-amber-300 dark:hover:bg-amber-400/10 dark:border-amber-400/30 disabled:opacity-60"
             >
               Retake
             </button>
@@ -177,19 +177,19 @@ export default function CameraCapture({ id, label = 'Live Selfie', capture, erro
             disabled={disabled}
             className="w-full flex items-center gap-3 text-left disabled:opacity-60"
           >
-            <span className="w-12 h-12 rounded-full bg-[#8ACFF8]/25 border border-[#8ACFF8] flex items-center justify-center text-[#0369A1] shrink-0">
+            <span className="w-12 h-12 rounded-full bg-[#8ACFF8]/25 border border-[#8ACFF8] text-[#0369A1] dark:bg-amber-400/15 dark:border-amber-400/30 dark:text-amber-400 flex items-center justify-center shrink-0">
               <Icon name="face" className="text-[24px]" />
             </span>
             <span className="min-w-0">
-              <span className="block text-sm font-bold text-slate-900">Open camera</span>
-              <span className="block text-[11px] text-slate-500">
+              <span className="block text-sm font-bold text-slate-900 dark:text-white">Open camera</span>
+              <span className="block text-[11px] text-slate-500 dark:text-slate-400">
                 Take a live photo so admins can match you with your QCU ID.
               </span>
             </span>
           </button>
         )}
       </div>
-      {showError && <p className="mt-1 text-[11px] text-rose-600">{showError}</p>}
+      {showError && <p className="mt-1 text-[11px] text-rose-600 dark:text-red-400">{showError}</p>}
     </div>
   )
 }
