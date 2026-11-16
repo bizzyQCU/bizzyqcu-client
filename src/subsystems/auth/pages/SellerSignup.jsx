@@ -70,22 +70,22 @@ export default function SellerSignup() {
   }
 
   return (
-    <main className="flex-1 min-h-0 flex flex-col items-center justify-center px-4 sm:px-6 pt-20 pb-2 lg:py-4">
-      <section className="w-full max-w-[840px]" aria-labelledby="seller-signup-title">
-        <AuthCard onClose={closeModal} closeLabel="Close">
+    <main className="flex-1 min-h-0 flex flex-col items-center justify-center px-4 sm:px-6 pt-16 pb-1 lg:py-2">
+      <section className="w-full max-w-[840px] mx-auto" aria-labelledby="seller-signup-title">
+        <AuthCard className="!p-4 sm:!px-6 sm:!py-5" onClose={closeModal} closeLabel="Close">
           {/* Header */}
-          <div className="relative text-center max-w-xl mx-auto mb-6">
+          <div className="relative text-center max-w-xl mx-auto mb-3.5">
             <div className="flex items-center justify-center gap-2">
-              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[20px]" />
-              <h1 id="seller-signup-title" className="text-2xl sm:text-[26px] font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
+              <h1 id="seller-signup-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 Register a Seller Account
               </h1>
-              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[20px]" />
+              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1.5">
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
               Only enrolled QCU students (<code className="text-[#0369A1] dark:text-amber-300 font-semibold dark:font-normal">STUDENT</code>) may register as campus sellers. Select your seller category and upload your required endorsement document.
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Already have a seller account?{' '}
               <Link className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline" to="/seller-login-form">
                 Seller Log in
@@ -97,7 +97,7 @@ export default function SellerSignup() {
               </Link>
             </p>
 
-            <div className="inline-flex items-center gap-2 mt-4 px-3.5 py-1 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] dark:bg-amber-500/10 dark:border-amber-400/25">
+            <div className="inline-flex items-center gap-2 mt-2.5 px-3.5 py-0.5 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] dark:bg-amber-500/10 dark:border-amber-400/25">
               <span className="w-1.5 h-1.5 rounded-full bg-[#0284C7] dark:bg-amber-400" />
               <span className="text-[10px] font-extrabold tracking-wider uppercase text-slate-900 dark:text-amber-300">
                 SELECT YOUR SELLER TYPE:
@@ -106,11 +106,11 @@ export default function SellerSignup() {
           </div>
 
           {/* Portal Cards */}
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-3.5 items-stretch">
             {sellerTypes.map((s) => (
               <div
                 key={s.type}
-                className={`group relative rounded-2xl border p-5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-4px_rgba(2,132,199,0.10)] dark:hover:shadow-lg dark:hover:shadow-black/30 ${s.accentRing}`}
+                className={`group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-4px_rgba(2,132,199,0.10)] dark:hover:shadow-lg dark:hover:shadow-black/30 ${s.accentRing}`}
               >
                 {s.primary && (
                   <div className="absolute -top-2.5 right-3.5">
@@ -120,8 +120,8 @@ export default function SellerSignup() {
                   </div>
                 )}
 
-                <div>
-                  <div className={`w-11 h-11 rounded-xl border ${s.iconWrap} flex items-center justify-center mb-3.5 transition-transform duration-200 group-hover:scale-105`}>
+                <div className="flex flex-col flex-1">
+                  <div className={`w-9 h-9 rounded-xl border ${s.iconWrap} flex items-center justify-center mb-2 transition-transform duration-200 group-hover:scale-105`}>
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       {s.iconPath.map((d) => (
                         <path key={d} d={d} />
@@ -130,16 +130,16 @@ export default function SellerSignup() {
                   </div>
 
                   <h2 className="text-sm font-bold text-slate-900 dark:text-white">{s.title}</h2>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mt-1.5">{s.description}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-snug mt-1 flex-1">{s.description}</p>
 
-                  <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  <p className="mt-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     Required Verification:
                   </p>
-                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  <div className="flex flex-wrap gap-1 mt-1">
                     {s.tags.map((t) => (
                       <span
                         key={t.text}
-                        className={`border ${t.cls} text-[10px] font-semibold px-2.5 py-0.5 rounded-md`}
+                        className={`border ${t.cls} text-[10px] font-semibold px-2 py-0.5 rounded-md`}
                       >
                         {t.text}
                       </span>
@@ -150,7 +150,7 @@ export default function SellerSignup() {
                 <button
                   type="button"
                   onClick={() => navigate(s.route)}
-                  className={`w-full text-xs font-extrabold py-2.5 px-3.5 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 mt-5 active:scale-[0.98] ${
+                  className={`w-full text-xs font-extrabold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 mt-3.5 active:scale-[0.98] ${
                     s.primary
                       ? 'bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:bg-gradient-to-r dark:from-amber-400 dark:via-amber-500 dark:to-amber-600 dark:hover:from-amber-300 dark:hover:via-amber-400 dark:hover:to-amber-500 dark:text-slate-950 dark:ring-1 dark:ring-inset dark:ring-amber-200/50 dark:shadow-md dark:shadow-amber-500/25'
                       : 'bg-white hover:bg-sky-50 border-[1.5px] dark:border border-[#8ACFF8] hover:border-[#0284C7] text-[#0369A1] dark:bg-white/[0.05] dark:hover:bg-white/[0.1] dark:border-white/15 dark:hover:border-amber-400/40 dark:text-white dark:hover:text-amber-300'
@@ -163,12 +163,10 @@ export default function SellerSignup() {
           </div>
 
           {/* Footer info */}
-          <div className="mt-auto pt-4">
-            <div className="text-center border-t border-slate-200 dark:border-white/10 pt-4">
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
-                Both your QCU ID and your seller supporting document must be verified by an administrator before your store can open on the marketplace.
-              </p>
-            </div>
+          <div className="pt-2.5 border-t border-slate-200 dark:border-white/10 text-center">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-xl mx-auto leading-snug">
+              Both your QCU ID and your seller supporting document must be verified by an administrator before your store can open on the marketplace.
+            </p>
           </div>
         </AuthCard>
 

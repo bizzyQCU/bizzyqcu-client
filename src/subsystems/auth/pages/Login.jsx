@@ -23,7 +23,7 @@ const OTP_TTL_SECONDS = 5 * 60
 const RESEND_COOLDOWN_SECONDS = 60
 
 const submitBtn = (done) =>
-  `w-full py-3 rounded-xl font-extrabold text-base transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:cursor-not-allowed dark:ring-1 dark:ring-inset focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8ACFF8] dark:focus-visible:ring-amber-200 ${
+  `w-full py-2.5 rounded-xl font-extrabold text-sm sm:text-base transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:cursor-not-allowed dark:ring-1 dark:ring-inset focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8ACFF8] dark:focus-visible:ring-amber-200 ${
     done
       ? 'bg-emerald-600 dark:bg-emerald-500 text-white dark:ring-emerald-300/40 shadow-lg shadow-emerald-500/25'
       : 'bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] dark:bg-gradient-to-r dark:from-amber-400 dark:via-amber-500 dark:to-amber-600 dark:hover:from-amber-300 dark:hover:via-amber-400 dark:hover:to-amber-500 dark:text-slate-950 dark:ring-amber-200/50 dark:shadow-lg dark:shadow-amber-500/25 dark:hover:shadow-xl dark:hover:shadow-amber-500/40 disabled:opacity-60'
@@ -42,12 +42,12 @@ function destinationFor(user, from) {
 function QcuIdInput({ id, value, onChange, disabled, inputRef }) {
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200" htmlFor={id}>
+      <label className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200" htmlFor={id}>
         <Icon name="badge" className="text-[16px] text-[#0284C7] dark:text-amber-400" />
         <span>QCU ID Number</span>
         <span className="text-[#0284C7] dark:text-amber-400" aria-hidden="true">*</span>
       </label>
-      <div className="relative mt-1.5">
+      <div className="relative mt-1">
         <Icon name="account_circle" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-[20px] pointer-events-none" />
         <input
           ref={inputRef}
@@ -198,23 +198,23 @@ export default function Login() {
       <section className="w-full max-w-[420px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="login-title">
         <AuthCard>
           {/* Header */}
-          <div className="text-center mb-5">
-            <div className="mx-auto mb-3 w-11 h-11 rounded-xl bg-gradient-to-br from-[#F4EB6C] via-[#FFD444] to-[#EFE768] dark:from-amber-300 dark:via-amber-400 dark:to-amber-600 flex items-center justify-center shadow-md shadow-[#FFD444]/35 dark:shadow-lg dark:shadow-amber-500/30 ring-1 ring-inset ring-white/70 dark:ring-white/30">
-              <Icon name="storefront" className="text-slate-900 dark:text-slate-950 text-[22px]" />
+          <div className="text-center mb-3.5">
+            <div className="mx-auto mb-2 w-10 h-10 rounded-xl bg-gradient-to-br from-[#F4EB6C] via-[#FFD444] to-[#EFE768] dark:from-amber-300 dark:via-amber-400 dark:to-amber-600 flex items-center justify-center shadow-md shadow-[#FFD444]/35 dark:shadow-lg dark:shadow-amber-500/30 ring-1 ring-inset ring-white/70 dark:ring-white/30">
+              <Icon name="storefront" className="text-slate-900 dark:text-slate-950 text-[20px]" />
             </div>
-            <h1 id="login-title" className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            <h1 id="login-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Welcome back
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Sign in to your BizzyQCU account</p>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Sign in to your BizzyQCU account</p>
           </div>
 
           <AuthModeTabs active="login" loginTo="/login" signupTo="/signup" />
 
-          {loginError && <Alert tone="error" className="mb-4">{loginError}</Alert>}
+          {loginError && <Alert tone="error" className="mb-3">{loginError}</Alert>}
 
           {step === 'password' ? (
             /* STEP 1: Single Login Form (QCU ID + Password -> Email OTP, or Passkey) */
-            <form className="space-y-4" onSubmit={handleRequestOtp}>
+            <form className="space-y-3" onSubmit={handleRequestOtp}>
               <QcuIdInput
                 id="login-identifier"
                 value={identifier}
@@ -224,12 +224,12 @@ export default function Login() {
               />
 
               <div>
-                <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200" htmlFor="login-password">
+                <label className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200" htmlFor="login-password">
                   <Icon name="lock" className="text-[16px] text-[#0284C7] dark:text-amber-400" />
                   <span>Password</span>
                   <span className="text-[#0284C7] dark:text-amber-400" aria-hidden="true">*</span>
                 </label>
-                <div className="relative mt-1.5">
+                <div className="relative mt-1">
                   <Icon name="lock" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-[20px] pointer-events-none" />
                   <input
                     id="login-password"
@@ -330,16 +330,14 @@ export default function Login() {
           )}
 
           {/* Footer */}
-          <div className="mt-auto pt-5">
-            <div className="pt-4 border-t border-slate-200 dark:border-white/10 text-center">
-              <Link
-                to="/seller-login-form"
-                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full bg-sky-50 text-[#0369A1] hover:bg-[#8ACFF8]/25 hover:text-[#0284C7] border border-[#8ACFF8] dark:bg-amber-400/10 dark:text-amber-300 dark:hover:bg-amber-400/20 dark:hover:text-amber-200 dark:border-amber-400/25 transition-colors"
-              >
-                <Icon name="storefront" className="text-[16px]" />
-                <span>Want to sell? Seller Portal</span>
-              </Link>
-            </div>
+          <div className="mt-3.5 pt-3 border-t border-slate-200 dark:border-white/10 text-center">
+            <Link
+              to="/seller-login-form"
+              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-4 py-1.5 rounded-full bg-sky-50 text-[#0369A1] hover:bg-[#8ACFF8]/25 hover:text-[#0284C7] border border-[#8ACFF8] dark:bg-amber-400/10 dark:text-amber-300 dark:hover:bg-amber-400/20 dark:hover:text-amber-200 dark:border-amber-400/25 transition-colors"
+            >
+              <Icon name="storefront" className="text-[16px]" />
+              <span>Want to sell? Seller Portal</span>
+            </Link>
           </div>
         </AuthCard>
 

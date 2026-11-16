@@ -14,14 +14,14 @@ export default function EnterpriseSeller() {
       badge="STUDENT_ENTERPRISE"
       titlePrefix="Register as a"
       titleHighlight="Student Enterprise"
-      subtitle="For BS Entrepreneurship OJT & Business Implementation ventures. You'll set up your store profile once your seller application is approved."
-      fullNameLabel="Enterprise Lead / Student Full Name"
+      subtitle="For BS Entrepreneurship OJT & Business Implementation ventures."
+      fullNameLabel="Enterprise Lead / Full Name"
       fullNamePlaceholder="e.g. Juan Dela Cruz"
-      qcuIdLabel="Student QCU ID Number"
+      qcuIdLabel="QCU ID Number"
       emailLabel="QCU Email Address"
       emailPlaceholder="you@qcu.edu.ph"
-      endorsementLabel="OJT / Faculty Endorsement Document"
-      endorsementHint="Upload your signed OJT or Business Implementation endorsement (JPG, PNG, or PDF, Max 5MB)"
+      endorsementLabel="OJT Endorsement Doc"
+      endorsementHint="Signed OJT or Business Implementation endorsement (Max 5MB)"
     />
   )
 }

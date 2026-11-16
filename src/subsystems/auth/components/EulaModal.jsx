@@ -244,7 +244,7 @@ export function EulaConsentField({ id = 'eula-consent', accepted, error, disable
   return (
     <div>
       <div
-        className={`rounded-2xl border p-3.5 transition-colors ${
+        className={`rounded-xl border px-3 py-1.5 transition-colors ${
           error
             ? 'border-rose-400 bg-rose-50 dark:border-red-400/70 dark:bg-red-500/5'
             : accepted
@@ -252,7 +252,7 @@ export function EulaConsentField({ id = 'eula-consent', accepted, error, disable
               : 'border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.02]'
         }`}
       >
-        <label htmlFor={id} className="flex items-start gap-2.5 cursor-pointer select-none">
+        <label htmlFor={id} className="flex items-center gap-2 cursor-pointer select-none">
           <input
             id={id}
             type="checkbox"
@@ -265,9 +265,9 @@ export function EulaConsentField({ id = 'eula-consent', accepted, error, disable
                 onToggle(e.target.checked)
               }
             }}
-            className="mt-0.5 w-4 h-4 rounded bg-white dark:bg-white/5 border-slate-300 dark:border-white/20 text-[#0284C7] dark:text-amber-500 focus:ring-[#8ACFF8] dark:focus:ring-amber-400 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+            className="w-4 h-4 rounded bg-white dark:bg-white/5 border-slate-300 dark:border-white/20 text-[#0284C7] dark:text-amber-500 focus:ring-[#8ACFF8] dark:focus:ring-amber-400 focus:ring-offset-white dark:focus:ring-offset-slate-900 shrink-0"
           />
-          <span className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+          <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-snug">
             I have read and agree to the{' '}
             <button
               type="button"
@@ -281,7 +281,7 @@ export function EulaConsentField({ id = 'eula-consent', accepted, error, disable
           </span>
         </label>
       </div>
-      {error && <p className="mt-1.5 text-[11px] text-rose-600 dark:text-red-400">{error}</p>}
+      {error && <p className="mt-1 text-[11px] text-rose-600 dark:text-red-400">{error}</p>}
     </div>
   )
 }

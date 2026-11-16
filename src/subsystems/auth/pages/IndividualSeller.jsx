@@ -14,14 +14,14 @@ export default function IndividualSeller() {
       badge="INDEPENDENT_SELLER"
       titlePrefix="Register as an"
       titleHighlight="Independent Seller"
-      subtitle="For enrolled QCU students selling crafts, food, pre-loved items, or peer services. Store details are configured after seller approval."
+      subtitle="For enrolled QCU students selling crafts, food, pre-loved items, or peer services."
       fullNameLabel="Student Full Name"
       fullNamePlaceholder="e.g. Juan Dela Cruz"
-      qcuIdLabel="Student QCU ID Number"
+      qcuIdLabel="QCU ID Number"
       emailLabel="QCU Email Address"
       emailPlaceholder="you@qcu.edu.ph"
-      endorsementLabel="Proof of Enrollment / COR"
-      endorsementHint="Upload your current semester Certificate of Registration or enrollment proof (JPG, PNG, or PDF, Max 5MB)"
+      endorsementLabel="Proof of Enrollment (COR)"
+      endorsementHint="Current semester Certificate of Registration (Max 5MB)"
     />
   )
 }

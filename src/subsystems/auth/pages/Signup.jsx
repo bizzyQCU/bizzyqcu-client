@@ -222,26 +222,32 @@ export default function Signup() {
   // --------------------------------------------------------------------------
   // Registration form
   // --------------------------------------------------------------------------
+  const signupInput = `${inputBase} !py-1.5`
+
   return (
-    <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-2 lg:py-4 grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] gap-8 lg:gap-16 items-center">
+    <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-1 lg:py-2 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
       <AuthShowcase />
 
       <section className="w-full max-w-[540px] mx-auto lg:mx-0 lg:justify-self-end" aria-labelledby="signup-title">
-        <AuthCard onClose={() => navigate('/login')} closeLabel="Close and return to login">
-          <div className="text-center mb-5 px-4">
+        <AuthCard
+          className="!p-4 sm:!px-6 sm:!py-4"
+          onClose={() => navigate('/login')}
+          closeLabel="Close and return to login"
+        >
+          <div className="text-center mb-2 px-4">
             <div className="flex items-center justify-center gap-2">
-              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[20px]" />
-              <h1 id="signup-title" className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
+              <h1 id="signup-title" className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 Create your QCU account
               </h1>
-              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[20px]" />
+              <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
               Verified QCU students only — your ID and selfie are reviewed by an administrator.
             </p>
           </div>
 
-          <AuthModeTabs active="signup" loginTo="/login" signupTo="/signup" />
+          <AuthModeTabs active="signup" loginTo="/login" signupTo="/signup" className="mb-2.5" />
 
           {otpFlow.step === 'otp' ? (
             <RegistrationOtpStep
@@ -261,7 +267,7 @@ export default function Signup() {
               onBack={otpFlow.backToForm}
             />
           ) : (
-            <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+            <form className="space-y-2" onSubmit={handleSubmit} noValidate>
             {otpFlow.formError && <Alert tone="error">{otpFlow.formError}</Alert>}
 
             <Field id="signup-full-name" label="Full Name" icon="person" error={errors.fullName}>
@@ -273,12 +279,12 @@ export default function Signup() {
                 onChange={update('fullName')}
                 disabled={busy}
                 placeholder="As printed on your QCU ID"
-                className={`${inputBase} ${fieldBorder(errors.fullName)} pl-10 pr-3.5`}
+                className={`${signupInput} ${fieldBorder(errors.fullName)} pl-10 pr-3.5`}
               />
             </Field>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field id="signup-qcu-id" label="QCU ID Number" icon="badge" error={errors.qcuIdNumber} hint="Format: YY-NNNN">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-start">
+              <Field id="signup-qcu-id" label="QCU ID Number" icon="badge" error={errors.qcuIdNumber} hint="YY-NNNN">
                 <input
                   id="signup-qcu-id"
                   type="text"
@@ -289,11 +295,11 @@ export default function Signup() {
                   onChange={update('qcuIdNumber')}
                   disabled={busy}
                   placeholder="e.g. 24-0001"
-                  className={`${inputBase} ${fieldBorder(errors.qcuIdNumber)} pl-10 pr-3.5`}
+                  className={`${signupInput} ${fieldBorder(errors.qcuIdNumber)} pl-10 pr-3.5`}
                 />
               </Field>
 
-              <Field id="signup-email" label="Email Address" icon="mail" error={errors.email} hint="Login codes are sent here">
+              <Field id="signup-email" label="Email Address" icon="mail" error={errors.email} hint="OTP sent here">
                 <input
                   id="signup-email"
                   type="email"
@@ -302,14 +308,14 @@ export default function Signup() {
                   onChange={update('email')}
                   disabled={busy}
                   placeholder="you@qcu.edu.ph"
-                  className={`${inputBase} ${fieldBorder(errors.email)} pl-10 pr-3.5`}
+                  className={`${signupInput} ${fieldBorder(errors.email)} pl-10 pr-3.5`}
                 />
               </Field>
             </div>
 
             {/* Sign-in method: password is optional on the server */}
-            <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.02] p-3.5 space-y-3.5">
-              <label className="flex items-start gap-2.5 cursor-pointer select-none">
+            <div className="rounded-xl border border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.02] px-3 py-2 space-y-1.5">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={usePassword}
@@ -319,25 +325,24 @@ export default function Signup() {
                     clearError('password')
                     clearError('confirmPassword')
                   }}
-                  className="mt-0.5 w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white dark:bg-white/5 dark:border-white/20 dark:text-amber-500 dark:focus:ring-amber-400 dark:focus:ring-offset-slate-900"
+                  className="w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white dark:bg-white/5 dark:border-white/20 dark:text-amber-500 dark:focus:ring-amber-400 dark:focus:ring-offset-slate-900 shrink-0"
                 />
-                <span>
-                  <span className="block text-sm font-semibold text-slate-900 dark:text-white">Set a password</span>
-                  <span className="block text-[11px] text-slate-500 dark:text-slate-400">
-                    Sign in with your password plus a 6-digit code sent to your email.
-                    {passkeyCapable && ' Skip this to use a passkey only — you\u2019ll create it right after submitting.'}
+                <span className="text-xs text-slate-600 dark:text-slate-300 leading-snug truncate">
+                  <span className="font-semibold text-slate-900 dark:text-white">Set a password</span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-1.5">
+                    — Sign in with password + 6-digit email OTP{passkeyCapable ? ' (or uncheck for Passkey-only)' : ''}.
                   </span>
                 </span>
               </label>
 
               {usePassword && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-start">
                   <Field
                     id="signup-password"
                     label="Password"
                     icon="lock"
                     error={errors.password}
-                    hint={`At least ${MIN_PASSWORD_LENGTH} characters`}
+                    hint={`Min ${MIN_PASSWORD_LENGTH} chars`}
                     rightSlot={<PasswordToggle visible={showPass} onToggle={() => setShowPass((s) => !s)} />}
                   >
                     <input
@@ -348,7 +353,7 @@ export default function Signup() {
                       onChange={update('password')}
                       disabled={busy}
                       placeholder="Create a password"
-                      className={`${inputBase} ${fieldBorder(errors.password)} pl-10 pr-9`}
+                      className={`${signupInput} ${fieldBorder(errors.password)} pl-10 pr-9`}
                     />
                   </Field>
 
@@ -367,7 +372,7 @@ export default function Signup() {
                       onChange={update('confirmPassword')}
                       disabled={busy}
                       placeholder="Re-enter password"
-                      className={`${inputBase} ${fieldBorder(errors.confirmPassword)} pl-10 pr-9`}
+                      className={`${signupInput} ${fieldBorder(errors.confirmPassword)} pl-10 pr-9`}
                     />
                   </Field>
                 </div>
@@ -375,7 +380,7 @@ export default function Signup() {
             </div>
 
             {/* Identity verification */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-stretch">
               <ImageDropzone
                 id="signup-qcu-id-photo"
                 label="QCU Student ID Photo"
@@ -390,6 +395,7 @@ export default function Signup() {
               />
               <CameraCapture
                 id="signup-selfie"
+                label="Live Selfie Capture"
                 capture={selfie}
                 error={errors.selfie}
                 disabled={busy}
@@ -400,10 +406,10 @@ export default function Signup() {
               />
             </div>
 
-            <p className="flex items-start gap-1.5 text-[11px] text-slate-500 leading-relaxed">
-              <Icon name="shield_lock" className="text-[14px] text-[#0284C7] dark:text-slate-400 mt-px" />
-              <span>
-                Your ID photo and selfie are protected under the Data Privacy Act (RA 10173) and are viewable by BizzyQCU administrators only.
+            <p className="flex items-center gap-1.5 text-[10px] text-slate-500 leading-tight">
+              <Icon name="shield_lock" className="text-[13px] text-[#0284C7] dark:text-slate-400 shrink-0" />
+              <span className="truncate">
+                Your ID photo and selfie are protected under RA 10173 and viewable by BizzyQCU administrators only.
               </span>
             </p>
 
@@ -425,22 +431,20 @@ export default function Signup() {
               onOpenModal={() => setEulaModalOpen(true)}
             />
 
-            <button type="submit" disabled={busy || !eulaAccepted} className={primaryButton}>
+            <button type="submit" disabled={busy || !eulaAccepted} className={`${primaryButton} !py-2`}>
               <span>{status === 'idle' && emailAlreadyVerified ? 'Submit for Verification' : SUBMIT_TEXT[status]}</span>
               {busy && <Spinner />}
             </button>
           </form>
           )}
 
-          <div className="mt-auto pt-4">
-            <div className="pt-3.5 border-t border-slate-200 dark:border-white/10 text-center">
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Already have an account?{' '}
-                <Link className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline" to="/login">
-                  Log in
-                </Link>
-              </p>
-            </div>
+          <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-white/10 text-center">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Already have an account?{' '}
+              <Link className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline" to="/login">
+                Log in
+              </Link>
+            </p>
           </div>
         </AuthCard>
 

@@ -273,20 +273,22 @@ export function SellerRegistrationForm({
   // --------------------------------------------------------------------------
   // Seller Registration Form
   // --------------------------------------------------------------------------
+  const sellerSignupInput = `${inputBase} !py-1.5`
+
   return (
-    <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-2 lg:py-4 grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)] gap-8 lg:gap-16 items-center">
+    <main className="flex-1 min-h-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-1 lg:py-2 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
       <SellerShowcase badge={badge} />
 
-      <section className="w-full max-w-[550px] mx-auto lg:mx-0 lg:justify-self-end">
+      <section className="w-full max-w-[580px] mx-auto lg:mx-0 lg:justify-self-end">
         <AuthCard
-          className="border-[#8ACFF8]/70 dark:border-amber-400/20"
+          className="border-[#8ACFF8]/70 dark:border-amber-400/20 !p-4 sm:!px-6 sm:!py-4"
           onClose={() => navigate('/seller-signup')}
           closeLabel="Back to seller portals"
         >
             {/* Header */}
-            <div className="text-center mb-4 px-5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] text-[10px] font-extrabold tracking-wider uppercase text-slate-900 dark:bg-amber-400/10 dark:border-amber-400/30 dark:text-amber-300 mb-2">
-                <Icon name="storefront" className="text-[14px] text-[#0284C7] dark:text-amber-300" />
+            <div className="text-center mb-2.5 px-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F4EB6C]/45 border border-[#FFD444] text-[10px] font-extrabold tracking-wider uppercase text-slate-900 dark:bg-amber-400/10 dark:border-amber-400/30 dark:text-amber-300 mb-1">
+                <Icon name="storefront" className="text-[13px] text-[#0284C7] dark:text-amber-300" />
                 <span>{SELLER_TYPE_LABELS[sellerType] || badge}</span>
               </span>
               <div className="flex items-center justify-center gap-1.5 flex-wrap">
@@ -298,7 +300,7 @@ export function SellerRegistrationForm({
                 </h1>
                 <Icon name="auto_awesome" className="text-[#0284C7] dark:text-amber-400 text-[18px]" />
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                 {subtitle || 'Verified QCU students only. Store profile details are set up after seller approval.'}
               </p>
             </div>
@@ -321,7 +323,7 @@ export function SellerRegistrationForm({
                 onBack={otpFlow.backToForm}
               />
             ) : (
-              <form className="space-y-3.5" onSubmit={handleSubmit} noValidate>
+              <form className="space-y-2" onSubmit={handleSubmit} noValidate>
               {otpFlow.formError && <Alert tone="error">{otpFlow.formError}</Alert>}
 
               <Field id={`${portalKey}-full-name`} label={fullNameLabel} icon="person" error={errors.fullName}>
@@ -333,17 +335,17 @@ export function SellerRegistrationForm({
                   value={form.fullName}
                   onChange={update('fullName')}
                   placeholder={fullNamePlaceholder}
-                  className={`${inputBase} ${fieldBorder(errors.fullName)} pl-10 pr-3.5`}
+                  className={`${sellerSignupInput} ${fieldBorder(errors.fullName)} pl-10 pr-3.5`}
                 />
               </Field>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-start">
                 <Field
                   id={`${portalKey}-qcu-id`}
                   label={qcuIdLabel}
                   icon="badge"
                   error={errors.qcuIdNumber}
-                  hint="Format: YY-NNNN (Students only)"
+                  hint="YY-NNNN"
                 >
                   <input
                     id={`${portalKey}-qcu-id`}
@@ -355,7 +357,7 @@ export function SellerRegistrationForm({
                     value={form.qcuIdNumber}
                     onChange={update('qcuIdNumber')}
                     placeholder="e.g. 24-0001"
-                    className={`${inputBase} ${fieldBorder(errors.qcuIdNumber)} pl-10 pr-3.5`}
+                    className={`${sellerSignupInput} ${fieldBorder(errors.qcuIdNumber)} pl-10 pr-3.5`}
                   />
                 </Field>
 
@@ -364,7 +366,7 @@ export function SellerRegistrationForm({
                   label={emailLabel}
                   icon="mail"
                   error={errors.email}
-                  hint="OTP login codes are sent here"
+                  hint="OTP sent here"
                 >
                   <input
                     id={`${portalKey}-email`}
@@ -374,14 +376,14 @@ export function SellerRegistrationForm({
                     value={form.email}
                     onChange={update('email')}
                     placeholder={emailPlaceholder}
-                    className={`${inputBase} ${fieldBorder(errors.email)} pl-10 pr-3.5`}
+                    className={`${sellerSignupInput} ${fieldBorder(errors.email)} pl-10 pr-3.5`}
                   />
                 </Field>
               </div>
 
               {/* Optional password (or Passkey-only) */}
-              <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.02] p-3.5 space-y-3">
-                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+              <div className="rounded-xl border border-slate-200 bg-[#F8FAFC] dark:border-white/10 dark:bg-white/[0.02] px-3 py-2 space-y-1.5">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={usePassword}
@@ -391,25 +393,24 @@ export function SellerRegistrationForm({
                       clearError('password')
                       clearError('confirmPassword')
                     }}
-                    className="mt-0.5 w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white dark:bg-white/5 dark:border-white/20 dark:text-amber-500 dark:focus:ring-amber-400 dark:focus:ring-offset-slate-900"
+                    className="w-4 h-4 rounded bg-white border-slate-300 text-[#0284C7] focus:ring-[#8ACFF8] focus:ring-offset-white dark:bg-white/5 dark:border-white/20 dark:text-amber-500 dark:focus:ring-amber-400 dark:focus:ring-offset-slate-900 shrink-0"
                   />
-                  <span>
-                    <span className="block text-sm font-semibold text-slate-900 dark:text-white">Set a password</span>
-                    <span className="block text-[11px] text-slate-500 dark:text-slate-400">
-                      Sign in with password + 6-digit email OTP.
-                      {passkeyCapable && ' Uncheck to use a FIDO2 Passkey only.'}
+                  <span className="text-xs text-slate-600 dark:text-slate-300 leading-snug truncate">
+                    <span className="font-semibold text-slate-900 dark:text-white">Set a password</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-1.5">
+                      — Sign in with password + 6-digit email OTP{passkeyCapable ? ' (or uncheck for Passkey-only)' : ''}.
                     </span>
                   </span>
                 </label>
 
                 {usePassword && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-start">
                     <Field
                       id={`${portalKey}-password`}
                       label="Password"
                       icon="lock"
                       error={errors.password}
-                      hint={`Min ${MIN_PASSWORD_LENGTH} characters`}
+                      hint={`Min ${MIN_PASSWORD_LENGTH} chars`}
                       rightSlot={<PasswordToggle visible={showPass} onToggle={() => setShowPass((s) => !s)} />}
                     >
                       <input
@@ -420,7 +421,7 @@ export function SellerRegistrationForm({
                         value={form.password}
                         onChange={update('password')}
                         placeholder="Create a password"
-                        className={`${inputBase} ${fieldBorder(errors.password)} pl-10 pr-9`}
+                        className={`${sellerSignupInput} ${fieldBorder(errors.password)} pl-10 pr-9`}
                       />
                     </Field>
 
@@ -439,35 +440,34 @@ export function SellerRegistrationForm({
                         value={form.confirmPassword}
                         onChange={update('confirmPassword')}
                         placeholder="Re-enter password"
-                        className={`${inputBase} ${fieldBorder(errors.confirmPassword)} pl-10 pr-9`}
+                        className={`${sellerSignupInput} ${fieldBorder(errors.confirmPassword)} pl-10 pr-9`}
                       />
                     </Field>
                   </div>
                 )}
               </div>
 
-              {/* Seller Supporting Endorsement Document (SELLER_ENDORSEMENT) */}
-              <ImageDropzone
-                id={`${portalKey}-endorsement-file`}
-                label={endorsementLabel}
-                hint={endorsementHint || 'JPG, PNG, or PDF (Max 5MB)'}
-                allowPdf
-                file={endorsementDoc}
-                error={errors.endorsementDoc}
-                disabled={busy}
-                onChange={(file) => {
-                  setEndorsementDoc(file)
-                  clearError('endorsementDoc')
-                }}
-                onError={(msg) => setErrors((prev) => ({ ...prev, endorsementDoc: msg }))}
-              />
+              {/* Seller Verification Documents (Endorsement, QCU ID, Live Selfie) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-stretch">
+                <ImageDropzone
+                  id={`${portalKey}-endorsement-file`}
+                  label={endorsementLabel}
+                  hint="JPG, PNG, PDF (5MB)"
+                  allowPdf
+                  file={endorsementDoc}
+                  error={errors.endorsementDoc}
+                  disabled={busy}
+                  onChange={(file) => {
+                    setEndorsementDoc(file)
+                    clearError('endorsementDoc')
+                  }}
+                  onError={(msg) => setErrors((prev) => ({ ...prev, endorsementDoc: msg }))}
+                />
 
-              {/* QCU ID Photo (QCU_ID) & Live Selfie Camera Capture (LIVE_SELFIE) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <ImageDropzone
                   id={`${portalKey}-qcu-id-file`}
-                  label="QCU Student ID Photo"
-                  hint="JPG or PNG (Max 5MB)"
+                  label="QCU Student ID"
+                  hint="JPG or PNG (5MB)"
                   file={idPhoto}
                   error={errors.idPhoto}
                   disabled={busy}
@@ -480,7 +480,7 @@ export function SellerRegistrationForm({
 
                 <CameraCapture
                   id={`${portalKey}-live-selfie`}
-                  label="Live Selfie Capture"
+                  label="Live Selfie"
                   capture={selfie}
                   error={errors.selfie}
                   disabled={busy}
@@ -491,9 +491,9 @@ export function SellerRegistrationForm({
                 />
               </div>
 
-              <p className="flex items-start gap-1.5 text-[11px] text-slate-500 leading-relaxed">
-                <Icon name="shield_lock" className="text-[14px] text-[#0284C7] dark:text-slate-400 mt-px" />
-                <span>
+              <p className="flex items-center gap-1.5 text-[10px] text-slate-500 leading-tight">
+                <Icon name="shield_lock" className="text-[13px] text-[#0284C7] dark:text-slate-400 shrink-0" />
+                <span className="truncate">
                   Identity &amp; endorsement files are protected under RA 10173 and reviewed only by BizzyQCU administrators.
                 </span>
               </p>
@@ -510,7 +510,7 @@ export function SellerRegistrationForm({
                 onOpenModal={() => setEulaModalOpen(true)}
               />
 
-              <button type="submit" disabled={busy || !eulaAccepted} className={primaryButton}>
+              <button type="submit" disabled={busy || !eulaAccepted} className={`${primaryButton} !py-2`}>
                 <span>{status === 'idle' && emailAlreadyVerified ? 'Submit Seller Application' : SUBMIT_TEXT[status]}</span>
                 {busy && <Spinner />}
               </button>
@@ -518,21 +518,19 @@ export function SellerRegistrationForm({
             )}
 
             {/* Footer link */}
-            <div className="mt-auto pt-3.5">
-              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                <span>
-                  Already registered?{' '}
-                  <Link
-                    className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline"
-                    to={`/seller-login-form?type=${portalKey}`}
-                  >
-                    Seller Log In
-                  </Link>
-                </span>
-                <Link className="text-slate-500 hover:text-[#0369A1] dark:text-slate-400 dark:hover:text-white text-xs" to="/seller-signup">
-                  ← Switch seller type
+            <div className="mt-2 pt-2 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <span>
+                Already registered?{' '}
+                <Link
+                  className="text-[#0369A1] hover:text-[#0284C7] dark:text-amber-300 dark:hover:text-amber-200 font-bold hover:underline"
+                  to={`/seller-login-form?type=${portalKey}`}
+                >
+                  Seller Log In
                 </Link>
-              </div>
+              </span>
+              <Link className="text-slate-500 hover:text-[#0369A1] dark:text-slate-400 dark:hover:text-white text-xs" to="/seller-signup">
+                ← Switch seller type
+              </Link>
             </div>
         </AuthCard>
 

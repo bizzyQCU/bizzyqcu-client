@@ -48,10 +48,10 @@ export default function ImageDropzone({
   const isPdf = file?.type === 'application/pdf'
 
   return (
-    <div>
-      <label className="flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-300" htmlFor={id}>
-        <span>{label}</span>
-        <span className="text-[#0284C7] dark:text-amber-400" aria-hidden="true">*</span>
+    <div className="flex flex-col h-full">
+      <label className="flex items-center gap-1 min-h-[16px] text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-300 min-w-0" htmlFor={id}>
+        <span className="truncate">{label}</span>
+        <span className="text-[#0284C7] dark:text-amber-400 shrink-0" aria-hidden="true">*</span>
       </label>
       <input
         ref={inputRef}
@@ -81,7 +81,7 @@ export default function ImageDropzone({
           setDragging(false)
           if (!disabled) pick(e.dataTransfer.files?.[0])
         }}
-        className={`mt-1.5 flex items-center gap-3 px-3.5 py-3 rounded-2xl border-2 border-dashed transition-colors ${
+        className={`mt-1 flex-1 min-h-[48px] flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-dashed transition-colors ${
           disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
         } ${
           error
@@ -92,27 +92,27 @@ export default function ImageDropzone({
         }`}
       >
         {preview ? (
-          <img src={preview} alt="" className="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-white/15 shrink-0" />
+          <img src={preview} alt="" className="w-8 h-8 rounded-lg object-cover border border-slate-200 dark:border-white/15 shrink-0" />
         ) : (
-          <span className="w-12 h-12 rounded-full bg-[#8ACFF8]/25 border border-[#8ACFF8] text-[#0369A1] dark:bg-amber-400/15 dark:border-amber-400/30 dark:text-amber-400 flex items-center justify-center shrink-0">
-            <Icon name={isPdf ? 'picture_as_pdf' : file ? 'task_alt' : 'cloud_upload'} className="text-[22px]" />
+          <span className="w-8 h-8 rounded-full bg-[#8ACFF8]/25 border border-[#8ACFF8] text-[#0369A1] dark:bg-amber-400/15 dark:border-amber-400/30 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <Icon name={isPdf ? 'picture_as_pdf' : file ? 'task_alt' : 'cloud_upload'} className="text-[17px]" />
           </span>
         )}
-        <div className="text-left min-w-0">
+        <div className="text-left min-w-0 flex-1">
           {file ? (
             <>
-              <p className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white truncate">{file.name}</p>
-              <p className="text-[11px] text-[#0369A1] dark:text-amber-300">
-                {(file.size / 1024 / 1024).toFixed(2)} MB · Click to replace
+              <p className="text-xs font-semibold text-slate-900 dark:text-white truncate leading-tight">{file.name}</p>
+              <p className="text-[10px] text-[#0369A1] dark:text-amber-300 truncate leading-tight">
+                {(file.size / 1024 / 1024).toFixed(2)} MB · Replace
               </p>
             </>
           ) : (
             <>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                <span className="font-bold text-[#0369A1] dark:text-amber-300">Click to upload</span> or drag and drop
+              <p className="text-xs text-slate-600 dark:text-slate-300 truncate leading-tight">
+                <span className="font-bold text-[#0369A1] dark:text-amber-300">Click to upload</span>
               </p>
-              <p className="text-[11px] text-slate-500">
-                {hint || (allowPdf ? 'JPG, PNG, or PDF (Max 5MB)' : 'JPG or PNG (Max 5MB)')}
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate leading-tight">
+                {hint || (allowPdf ? 'JPG, PNG, PDF (5MB)' : 'JPG or PNG (5MB)')}
               </p>
             </>
           )}

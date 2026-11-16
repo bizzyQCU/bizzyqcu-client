@@ -15,14 +15,14 @@ export default function OrganizationSeller() {
       titlePrefix="Register a"
       titleHighlight="Student Organization"
       titleSuffix="Seller Account"
-      subtitle="For OSA-recognized QCU student organizations and councils. Organization store branding is configured once your seller profile is approved."
-      fullNameLabel="Authorized Officer / President Full Name"
+      subtitle="For OSA-recognized QCU student organizations, clubs, and councils."
+      fullNameLabel="Authorized Officer Full Name"
       fullNamePlaceholder="e.g. Juan Dela Cruz"
-      qcuIdLabel="Officer QCU ID Number"
-      emailLabel="Official Organization / Officer Email"
+      qcuIdLabel="Officer QCU ID"
+      emailLabel="Official Organization Email"
       emailPlaceholder="org@qcu.edu.ph"
-      endorsementLabel="OSA Recognition / Accreditation Certificate"
-      endorsementHint="Upload your valid Office of Student Affairs recognition certificate (JPG, PNG, or PDF, Max 5MB)"
+      endorsementLabel="OSA Recognition Cert"
+      endorsementHint="Valid Office of Student Affairs recognition certificate (Max 5MB)"
     />
   )
 }
